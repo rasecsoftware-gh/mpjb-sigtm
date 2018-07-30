@@ -1,0 +1,26 @@
+/************************ *************************/
+.dataview-multisort-item{
+    float: left;
+    margin: 8px 8px 4px;
+    padding: 8px;
+}
+
+.main_user_label{
+	font-weight: bold;
+	color: #0055d4; 
+}
+.app-bold {
+	font-weight: bold;
+}
+.app-section-title {
+	color: #4285f4!important;
+}
+.x-panel-header-default-horizontal {
+    padding: 4px 8px 5px;
+}
+.x-grid-cell-inner {
+	padding: 5px 5px 4px;
+}
+.x-column-header-inner {
+    padding: 5px;
+}

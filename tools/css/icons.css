@@ -1,0 +1,51 @@
+/*************** estados de grillas *****************/
+.alta-col {
+    background-image: url("../icons/tag_red.png");
+}
+
+.media-col {
+    background-image: url("../icons/tag_yellow.png");
+}
+
+.normal-col {
+    background-image: url("../icons/tag_green.png");
+}
+
+/************** tipos de transaccion ***************/
+.creado-col {
+    background-image: url("../icons/asterisk_yellow.png");
+}
+
+.enviado-col {
+    background-image: url("../icons/arrow_left.png");
+}
+
+.devuelto-col {
+    background-image: url("../icons/arrow_undo.png");
+}
+
+.recibido-col {
+    background-image: url("../icons/arrow_down.png");
+}
+
+/************* iconos de formularios ******************/
+.ico-new {
+    background-image: url("../icons/asterisk_yellow.png");
+}
+
+.ico-edit {
+    background-image: url("../icons/asterisk_yellow.png");
+}
+
+.ico-save {
+    background-image: url("../icons/asterisk_yellow.png");
+}
+
+.ico-delete {
+    background-image: url("../icons/asterisk_yellow.png");
+}
+
+.ico-inactive {
+    background-image: url("../icons/asterisk_yellow.png");
+}
+
