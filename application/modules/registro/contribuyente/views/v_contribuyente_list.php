@@ -152,6 +152,10 @@
 		    }],
 			listeners:{
 				select: function(ths, record, index, eOpts ) {
+					if (!contribuyente.form_editing) {
+						var f = Ext.getCmp('contribuyente_form');
+						f.loadRecord(record);
+					}
 				}
 			}
 		},{
@@ -258,7 +262,7 @@
 					id: 'contribuyente_form_contribuyente_numero_doc_field',
     				xtype: 'textfield',
     				name: 'contribuyente_numero_doc',
-    				x: 10, y: 90, width: 210
+    				x: 10, y: 90, width: 240
 				},{
 					fieldLabel: 'Nombres o Razon soc.',
 					id: 'contribuyente_form_contribuyente_nombres_field',

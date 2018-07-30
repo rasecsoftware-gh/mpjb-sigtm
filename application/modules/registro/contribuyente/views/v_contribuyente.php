@@ -54,6 +54,7 @@
 		}
 	});
 
+	contribuyente.form_editing = false;
 	contribuyente.contribuyente_id_selected = 0;
 	
 	contribuyente.main_store = Ext.create("Ext.data.Store", {

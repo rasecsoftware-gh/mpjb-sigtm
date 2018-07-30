@@ -1,5 +1,6 @@
 <script>
 	contribuyente.new_window = function() {
+		contribuyente.form_editing = true;
 		var w = Ext.getCmp('contribuyente_form');
 		w.mask('cargando');
 		Ext.create("Ext.data.Store", {
@@ -32,6 +33,7 @@
 					} else {
 						Ext.Msg.alert('contribuyente', eOpts.getResultSet().getMessage());
 						w.unmask();
+						contribuyente.form_editing = false;
 					}
 				}
 			}
