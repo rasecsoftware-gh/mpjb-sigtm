@@ -88,7 +88,7 @@
 <!--  cargamos los componentes -->
 <?php echo $this->load->view('v_contribuyente_list'); ?>
 <?php echo $this->load->view('v_contribuyente_new'); ?>
-<?php //echo $this->load->view('v_contribuyente_edit'); ?>
+<?php echo $this->load->view('v_contribuyente_edit'); ?>
 <?php //echo $this->load->view('v_contribuyente_trabajador_search'); ?>
 <?php //echo $this->load->view('v_contribuyente_print'); ?>
 <?php //echo $this->load->view('v_contribuyente_emitir'); ?>

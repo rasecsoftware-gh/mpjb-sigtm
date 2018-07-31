@@ -11,11 +11,15 @@ class M_Contribuyente extends CI_Model{
 		$this->db->select("
 			c.*,
 			tp.tipo_persona_desc,
-			tdi.tipo_doc_identidad_desc
+			tdi.tipo_doc_identidad_desc,
+			u.ubigeo_departamento,
+			u.ubigeo_provincia,
+			u.ubigeo_distrito
 		")
 		->from('public.contribuyente AS c')
 		->join('public.tipo_persona AS tp', 'tp.tipo_persona_id = c.tipo_persona_id', 'inner')
-		->join('public.tipo_doc_identidad AS tdi', 'tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id', 'inner');
+		->join('public.tipo_doc_identidad AS tdi', 'tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id', 'inner')
+		->join('public.ubigeo AS u', 'u.ubigeo_id = c.ubigeo_id', 'left');
 		//->where_in('c.tipo_persona_id', $tc_in_list);
 
 		switch ($search_by) {
@@ -81,11 +85,15 @@ class M_Contribuyente extends CI_Model{
 		->select("
 			c.*, 
 			tp.tipo_persona_desc, 
-			tdi.tipo_doc_identidad_desc
+			tdi.tipo_doc_identidad_desc,
+			u.ubigeo_departamento,
+			u.ubigeo_provincia,
+			u.ubigeo_distrito
 		")
 		->from("public.contribuyente AS c")
 		->join("public.tipo_persona AS tp", "tp.tipo_persona_id = c.tipo_persona_id", "inner")
 		->join("public.tipo_doc_identidad AS tdi", "tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id", "inner")
+		->join('public.ubigeo AS u', 'u.ubigeo_id = c.ubigeo_id', 'left')
 		->where('contribuyente_id', $id);
 		return $this->db->get()->row();
 	}
@@ -150,11 +158,15 @@ class M_Contribuyente extends CI_Model{
 
 	public function get_ubigeo_list ($filter) {
 		$rows = $this->db
+		->where('TRIM(ubigeo_distrito)<>', '')
 		->like('ubigeo_id', strtoupper($filter))
+		->or_like('UPPER(ubigeo_departamento)', strtoupper($filter))
+		->or_like('UPPER(ubigeo_provincia)', strtoupper($filter))
 		->or_like('UPPER(ubigeo_distrito)', strtoupper($filter))
 		->order_by('ubigeo_departamento', 'ASC')
 		->order_by('ubigeo_provincia', 'ASC')
 		->order_by('ubigeo_distrito', 'ASC')
+		->limit(50)
 		->get('public.ubigeo')->result();
 		$total_count = count($rows);
 		$ret = array(

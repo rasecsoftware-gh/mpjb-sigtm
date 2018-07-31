@@ -32,11 +32,13 @@
 				}
 			],
 			tbar:[{
-				text:'Nuevo', handler: function() {
+				text:'Nuevo', 
+				handler: function() {
 					contribuyente.new_window();
 				}
 			},{
-				text:'Modificar', handler: function() {
+				text:'Modificar', 
+				handler: function() {
 					var rows = Ext.getCmp('contribuyente_main_grid').getSelection();
 					if (rows.length>0) {
 						contribuyente.edit_window(rows[0].get('contribuyente_id'));
@@ -151,10 +153,20 @@
 		        displayInfo: true
 		    }],
 			listeners:{
-				select: function(ths, record, index, eOpts ) {
+				select: function (ths, record, index, eOpts ) {
 					if (!contribuyente.form_editing) {
 						var f = Ext.getCmp('contribuyente_form');
 						f.loadRecord(record);
+						Ext.getCmp('contribuyente_form_ubigeo_departamento_provincia_field').setValue(record.get('ubigeo_departamento')+' / '+record.get('ubigeo_provincia'));
+						Ext.getCmp('contribuyente_form_save_bt').hide();
+						Ext.getCmp('contribuyente_form_cancel_bt').hide();
+						Ext.getCmp('contribuyente_form_ubigeo_id_field').hide();
+						Ext.getCmp('contribuyente_form_ubigeo_distrito_field').show();
+					}
+				},
+				rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts ) {
+					if (!contribuyente.form_editing) {
+						contribuyente.edit_window(record.get('contribuyente_id'));
 					}
 				}
 			}
@@ -182,15 +194,19 @@
 					hidden: true,
 					handler: function () {
 						var frm = Ext.getCmp('contribuyente_form');
+						frm.mask('guardando');
 						frm.submit({
 							success: function(form, action) {
+								frm.unmask();
 								if (action.result.success) {
+									contribuyente.form_editing = false;
 									contribuyente.main_store.reload(action.result.rowid);	
 								} else {
 									Ext.Msg.alert('Error', action.result.msg);
 								}
 							},
 							failure: function(form, action) {
+								frm.unmask();
 								Ext.Msg.alert('Guardar', action.result.msg, function () {
 									sys_focus(action.result.target_id);
 								});
@@ -204,6 +220,9 @@
 					handler: function () {
 						Ext.getCmp('contribuyente_form_save_bt').hide();
 						Ext.getCmp('contribuyente_form_cancel_bt').hide();
+						Ext.getCmp('contribuyente_form_ubigeo_id_field').hide();
+						Ext.getCmp('contribuyente_form_ubigeo_distrito_field').show();
+						contribuyente.form_editing = false;
 					}
 				}],
 				defaults: {
@@ -216,9 +235,12 @@
 					name: 'operation',
 					value: 'edit'
 				},{
+					xtype: 'hidden',
+					id: 'contribuyente_form_contribuyente_id_field',
+					name: 'contribuyente_id'
+				},{
 					xtype: 'displayfield',
 					fieldLabel: 'ID',
-					id: 'contribuyente_form_contribuyente_id_field',
 					name: 'contribuyente_id',
 					value: '',
 					x: 10, y: 0,
@@ -291,6 +313,8 @@
     				valueField: 'ubigeo_id',
     				store: contribuyente.ubigeo_store,
     				queryMode: 'remote',
+    				triggerAction: 'last', // query
+    				minChars: 2,
     				matchFieldWidth: false,
     				x: 10, y: 210, width: 380,
     				editable: true,
@@ -300,7 +324,14 @@
     							record.get('ubigeo_departamento') + ' / ' + record.get('ubigeo_provincia')
     						);
 				    	}
-    				}
+    				},
+    				hidden: true
+				},{
+					fieldLabel: 'Distrito',
+					id: 'contribuyente_form_ubigeo_distrito_field',
+    				xtype: 'textfield',
+    				name: 'ubigeo_distrito',
+    				x: 10, y: 210, width: 380
 				},{
 					fieldLabel: 'Direccion',
 					id: 'contribuyente_form_contribuyente_direccion_field',

@@ -138,8 +138,8 @@ class Contribuyente extends MX_Controller {
 			'contribuyente_direccion'=>$this->input->post('contribuyente_direccion'),
 			'contribuyente_telefono'=>$this->input->post('contribuyente_telefono'),
 			'contribuyente_email'=>$this->input->post('contribuyente_email'),
-			'contribuyente_observacion'=>$this->input->post('contribuyente_observacion'),
-			'contribuyente_estado'=>$this->input->post('contribuyente_estado'),
+			'contribuyente_observacion'=>$this->input->post('contribuyente_observacion')
+			//'contribuyente_estado'=>$this->input->post('contribuyente_estado'),
 		);
 
 		if (trim($data['contribuyente_numero_doc'])=='') {
