@@ -67,12 +67,7 @@
 				},'-',{
 					text: 'Ver informacion de registro', 
 					handler: function() {
-						var rows = Ext.getCmp('contribuyente_main_grid').getSelection();
-						if (rows.length>0) {
-							syslog.show_window('public.contribuyente', rows[0].get('contribuyente_id'));
-						} else {
-							Ext.Msg.alert('Error','Seleccione un registro');
-						}
+						contribuyente.syslog_window();
 					}
 				}]
 			},'->',{
@@ -154,11 +149,8 @@
 				},
 				tbar:[{
 					xtype: 'label',
-					text: 'Contribuyente',
-					style: {
-						fontWeight: 'bold'
-					}
-				},'-','->',{
+					text: 'Contribuyente'
+				},'->',{
 					text: 'Guardar',
 					id: 'contribuyente_form_save_bt',
 					hidden: true,

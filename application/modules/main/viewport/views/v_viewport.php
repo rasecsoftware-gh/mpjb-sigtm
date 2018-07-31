@@ -79,11 +79,27 @@
 							handler: sys_menu_item_handler,
 							hidden: !<?php echo sys_session_hasRoleToString('contribuyente'); ?>
 						},'-',{
-							text: 'Guia de Entrega de Bienes &nbsp;', 
+							text: 'Constancia de Libre Infraccion de Transito &nbsp;', 
 							module: {
-								title: 'Guia de Entrega de Bienes',
-								name: 'geb',
-								url: 'geb/geb'
+								title: 'Constancia de Libre Infraccion de Transito',
+								name: 'clit',
+								url: 'clit/clit'
+							},
+							handler: sys_menu_item_handler
+						},{
+							text: 'Permiso de Servicio Publico &nbsp;', 
+							module: {
+								title: 'Permiso de Servicio Publico',
+								name: 'psp',
+								url: 'psp/psp'
+							},
+							handler: sys_menu_item_handler
+						},{
+							text: 'Permiso de Servicio Publico &nbsp;', 
+							module: {
+								title: 'Permiso de Servicio Publico',
+								name: 'psp',
+								url: 'psp/psp'
 							},
 							handler: sys_menu_item_handler
 						}]
