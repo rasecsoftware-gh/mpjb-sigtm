@@ -2,29 +2,28 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 use PhpOffice\PhpWord\TemplateProcessor;
 
-class Contribuyente extends MX_Controller {
+class Clit extends MX_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model('m_contribuyente','model');
+		$this->load->model('m_clit','model');
 		$this->load->library('upload');
-		//sys_session_hasRoleOrDie('contribuyente');
+		//sys_session_hasRoleOrDie('clit');
 	}
 
 	public function index() {
 		$data = array();
-		$this->load->view('v_contribuyente', $data);
+		$this->load->view('v_clit', $data);
 	}
 
 	public function getList() {
 		$search_by = $this->input->get('search_by');
 		$search_text = $this->input->get('search_text');
-		$p_tipo_persona_id = $this->input->get('tipo_persona_id');
-		$p_tipo_doc_identidad_id = $this->input->get('tipo_doc_identidad_id');
+		$p_anio = $this->input->get('anio');
 		$pagination_size = $this->input->get('limit');
 		$pagination_start = $this->input->get('start');
-		$ret = $this->model->get_list($search_by, $search_text, $p_tipo_persona_id, $p_tipo_doc_identidad_id, $pagination_size, $pagination_start);
+		$ret = $this->model->get_list($search_by, $search_text, $p_anio, $pagination_size, $pagination_start);
 		/*$rows = $ret['data'];
 		foreach ($rows as $i=>$r) {
 			//$ret['data'][$i]->oc_anio_numero = $r->oc_anio.'-'.$r->oc_numero;
@@ -56,64 +55,67 @@ class Contribuyente extends MX_Controller {
 	}
 
 	public function Add() {
-		//sys_session_hasRoleOrDie('rh.contribuyente.add, rh.contribuyente.update');
+		//sys_session_hasRoleOrDie('rh.clit.add, rh.clit.update');
 		$data = array(
-			'tipo_persona_id'=>$this->input->post('tipo_persona_id'),
-  			'tipo_doc_identidad_id'=>$this->input->post('tipo_doc_identidad_id'),
-			'contribuyente_numero_doc'=>trim($this->input->post('contribuyente_numero_doc')),
-			'contribuyente_nombres'=>to_upper($this->input->post('contribuyente_nombres')),
-			'contribuyente_apellidos'=>to_upper($this->input->post('contribuyente_apellidos')),
-			'ubigeo_id'=>$this->input->post('ubigeo_id'),
-			'contribuyente_direccion'=>$this->input->post('contribuyente_direccion'),
-			'contribuyente_telefono'=>$this->input->post('contribuyente_telefono'),
-			'contribuyente_email'=>$this->input->post('contribuyente_email'),
-			'contribuyente_observacion'=>$this->input->post('contribuyente_observacion'),
-			
-			'contribuyente_estado'=>'A',
+  			'clit_anio'=>trim($this->input->post('clit_anio')),
+			'clit_numero'=>trim($this->input->post('clit_numero')),
+			'contribuyente_id'=>$this->input->post('contribuyente_id'),
+			'clit_fecha'=>$this->input->post('clit_fecha'),
+			'clit_resultado'=>trim($this->input->post('clit_resultado')),
+			'plantilla_id'=>$this->input->post('plantilla_id')
 		);
 
-		if ($data['contribuyente_numero_doc']=='') {
+		if ($data['clit_anio']=='') {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique el Año de Documento",
+				'target_id'=>'clit_form_clit_anio_field'
+			)));
+		}
+
+		if ($data['clit_numero']=='') {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Numero de Documento",
-				'target_id'=>'contribuyente_form_contribuyente_numero_doc_field'
+				'target_id'=>'clit_form_clit_numero_field'
 			)));
 		}
 
-		$numero_doc_count = $this->db
+		$anio_numero_count = $this->db
 		->select('COUNT(*) AS value')
-		->from('public.contribuyente')
-		->where('contribuyente_numero_doc', $data['contribuyente_numero_doc'])
+		->from('public.clit')
+		->where('clit_anio', $data['clit_anio'])
+		->where('clit_numero', $data['clit_numero'])
 		->get()->row();
-		if ($numero_doc_count->value > 0) {
+		if ($anio_numero_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"El Numero de Documento ya existe.",
-				'target_id'=>'contribuyente_form_contribuyente_numero_doc_field'
+				'msg'=>"El Numero del Documento ya existe.",
+				'target_id'=>'clit_form_clit_numero_field'
 			)));
 		}
 
-		if (trim($data['contribuyente_nombres'])=='') {
+		if ($data['contribuyente_id'] > 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"Especifique los Nombres o Razon social",
-				'target_id'=>'contribuyente_form_contribuyente_nombres_field'
+				'msg'=>"Especifique el Contribuyente",
+				'target_id'=>'clit_form_contribuyente_id_field'
 			)));
 		}
 
-		if (trim($data['contribuyente_apellidos'])=='') {
+		if (trim($data['clit_fecha'])=='') {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"Especifique los Apelllidos",
-				'target_id'=>'contribuyente_form_contribuyente_apellidos_field'
+				'msg'=>"Especifique la fecha",
+				'target_id'=>'clit_form_clit_fecha_field'
 			)));
 		}
 
-		if (trim($data['ubigeo_id'])=='') {
+		if ($data['plantilla_id'] == 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"Especifique la ubicacion.",
-				'target_id'=>'contribuyente_form_contribuyente_nombres_field'
+				'msg'=>"Especifique una plantilla para la generacion del PDF.",
+				'target_id'=>'clit_form_plantilla_field'
 			)));
 		}
 
@@ -135,62 +137,72 @@ class Contribuyente extends MX_Controller {
 				'msg'=>"Error al realizar la operacion.".(isset($error)?'<br>$error':'')
 			)));
 		}
-		echo json_encode($ret);
 	}
 
 	public function Update() {
-		//sys_session_hasRoleOrDie('contribuyente.update');
+		//sys_session_hasRoleOrDie('clit.update');
 		$data = array(
+			'clit_id'=>$this->input->post('clit_id'),
+  			'clit_anio'=>trim($this->input->post('clit_anio')),
+			'clit_numero'=>trim($this->input->post('clit_numero')),
 			'contribuyente_id'=>$this->input->post('contribuyente_id'),
-			'tipo_persona_id'=>$this->input->post('tipo_persona_id'),
-			'tipo_doc_identidad_id'=>$this->input->post('tipo_doc_identidad_id'),
-			'contribuyente_numero_doc'=>trim($this->input->post('contribuyente_numero_doc')),
-			'contribuyente_nombres'=>to_upper($this->input->post('contribuyente_nombres')),
-			'contribuyente_apellidos'=>to_upper($this->input->post('contribuyente_apellidos')),
-
-			'ubigeo_id'=>$this->input->post('ubigeo_id'),
-			'contribuyente_direccion'=>$this->input->post('contribuyente_direccion'),
-			'contribuyente_telefono'=>$this->input->post('contribuyente_telefono'),
-			'contribuyente_email'=>$this->input->post('contribuyente_email'),
-			'contribuyente_observacion'=>$this->input->post('contribuyente_observacion')
-			//'contribuyente_estado'=>$this->input->post('contribuyente_estado'),
+			'clit_fecha'=>$this->input->post('clit_fecha'),
+			'clit_resultado'=>trim($this->input->post('clit_resultado')),
+			'plantilla_id'=>$this->input->post('plantilla_id')
 		);
 
-		if (trim($data['contribuyente_numero_doc'])=='') {
+		if ($data['clit_anio']=='') {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"Especifique el Numero del documento",
-				'target_id'=>'contribuyente_form_contribuyente_numero_doc_field'
+				'msg'=>"Especifique el Año de Documento",
+				'target_id'=>'clit_form_clit_anio_field'
 			)));
 		}
 
-		$numero_doc_count = $this->db
+		if ($data['clit_numero']=='') {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique el Numero de Documento",
+				'target_id'=>'clit_form_clit_numero_field'
+			)));
+		}
+
+		$anio_numero_count = $this->db
 		->select('COUNT(*) AS value')
-		->from('public.contribuyente')
-		->where('contribuyente_numero_doc', $data['contribuyente_numero_doc'])
-		->where('contribuyente_id <>', $data['contribuyente_id'])
+		->from('public.clit')
+		->where('clit_anio', $data['clit_anio'])
+		->where('clit_numero', $data['clit_numero'])
+		->where('clit_id <>', $data['clit_id'])
 		->get()->row();
-		if ($numero_doc_count->value > 0) {
+		if ($anio_numero_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"El Numero de Documento ya existe.",
-				'target_id'=>'contribuyente_form_contribuyente_numero_doc_field'
+				'msg'=>"El Numero del Documento ya existe.",
+				'target_id'=>'clit_form_clit_numero_field'
 			)));
 		}
 
-		if (trim($data['contribuyente_nombres'])=='') {
+		if ($data['contribuyente_id'] > 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"Especifique los nombres p rason social",
-				'target_id'=>'contribuyente_form_contribuyente_nombres_field'
+				'msg'=>"Especifique el Contribuyente",
+				'target_id'=>'clit_form_contribuyente_id_field'
 			)));
 		}
 
-		if (trim($data['contribuyente_apellidos'])=='') {
+		if (trim($data['clit_fecha'])=='') {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"Especifique los apellidos",
-				'target_id'=>'contribuyente_form_contribuyente_apellidos_field'
+				'msg'=>"Especifique la fecha",
+				'target_id'=>'clit_form_clit_fecha_field'
+			)));
+		}
+
+		if ($data['plantilla_id'] == 0) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique una plantilla para la generacion del PDF.",
+				'target_id'=>'clit_form_plantilla_field'
 			)));
 		}
 
@@ -215,17 +227,17 @@ class Contribuyente extends MX_Controller {
 	}
 
 	public function Activar() {
-		//sys_session_hasRoleOrDie('rh.contribuyente.modify');
+		//sys_session_hasRoleOrDie('rh.clit.modify');
 		$data = array(
-			'contribuyente_id'=>$this->input->post('contribuyente_id'),
-			'contribuyente_estado'=>'A'
+			'clit_id'=>$this->input->post('clit_id'),
+			'clit_estado'=>'A'
 		);
 
-		$r = $this->model->get_row($data['contribuyente_id']);
-		if ($r->contribuyente_estado == 'A') {
+		$r = $this->model->get_row($data['clit_id']);
+		if ($r->clit_estado == 'A') {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"El contribuyente ya se encuentra Activo."
+				'msg'=>"El clit ya se encuentra Activo."
 			)));
 		}
 
@@ -246,16 +258,16 @@ class Contribuyente extends MX_Controller {
 	}
 
 	public function Inactivar() {
-		//sys_session_hasRoleOrDie('rh.contribuyente.modify');
+		//sys_session_hasRoleOrDie('rh.clit.modify');
 		$data = array(
-			'contribuyente_id'=>$this->input->post('contribuyente_id'),
-			'contribuyente_estado'=>'I'
+			'clit_id'=>$this->input->post('clit_id'),
+			'clit_estado'=>'I'
 		);
-		$r = $this->model->get_row($data['contribuyente_id']);
-		if ($r->contribuyente_estado == 'I') {
+		$r = $this->model->get_row($data['clit_id']);
+		if ($r->clit_estado == 'I') {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"El contribuyente ya se encuentra Inactivo."
+				'msg'=>"El clit ya se encuentra Inactivo."
 			)));
 		}
 
@@ -276,42 +288,42 @@ class Contribuyente extends MX_Controller {
 	}
 
 	public function Delete() {
-		//sys_session_hasRoleOrDie('rh.contribuyente.modify');
-		$p_contribuyente_id = $this->input->post('contribuyente_id');
+		//sys_session_hasRoleOrDie('rh.clit.modify');
+		$p_clit_id = $this->input->post('clit_id');
 
-		$clit_count = $this->db->select('COUNT(*) AS value')->where('contribuyente_id', $p_contribuyente_id)->get('public.clit')->row();
+		$clit_count = $this->db->select('COUNT(*) AS value')->where('clit_id', $p_clit_id)->get('public.clit')->row();
 		if ($clit_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"El contribuyente tiene Constancias de Libre Infraccion de Transito registrado(s)."
+				'msg'=>"El clit tiene Constancias de Libre Infraccion de Transito registrado(s)."
 			)));
 		}
 
-		$psp_count = $this->db->select('COUNT(*) AS value')->where('contribuyente_id', $p_contribuyente_id)->get('public.psp')->row();
+		$psp_count = $this->db->select('COUNT(*) AS value')->where('clit_id', $p_clit_id)->get('public.psp')->row();
 		if ($psp_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"El contribuyente tiene Permisos de Servicio Publico registrado(s)."
+				'msg'=>"El clit tiene Permisos de Servicio Publico registrado(s)."
 			)));
 		}
 
-		$lc_count = $this->db->select('COUNT(*) AS value')->where('contribuyente_id', $p_contribuyente_id)->get('public.lc')->row();
+		$lc_count = $this->db->select('COUNT(*) AS value')->where('clit_id', $p_clit_id)->get('public.lc')->row();
 		if ($lc_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"El contribuyente tiene Licencias de Conducir registrado(s)."
+				'msg'=>"El clit tiene Licencias de Conducir registrado(s)."
 			)));
 		}
 
-		$cat_count = $this->db->select('COUNT(*) AS value')->where('contribuyente_id', $p_contribuyente_id)->get('public.cat')->row();
+		$cat_count = $this->db->select('COUNT(*) AS value')->where('clit_id', $p_clit_id)->get('public.cat')->row();
 		if ($cat_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"El contribuyente tiene Constancias de Autorizacion Temporal registrado(s)."
+				'msg'=>"El clit tiene Constancias de Autorizacion Temporal registrado(s)."
 			)));
 		}
 
-		$result = $this->model->delete($p_contribuyente_id);
+		$result = $this->model->delete($p_clit_id);
 
 		if ($result !== false) {
 			die(json_encode(array(
@@ -346,20 +358,20 @@ class Contribuyente extends MX_Controller {
 		//die($this->config->item('base_url'));
 		//if (file_exists('tmp/archivo.txt')) { die(file_get_contents('tmp/archivo.txt')); } else { die('no'); }
 		//die(FCPATH);
-		$p_contribuyente_id = $this->input->post('contribuyente_id');
-		$contribuyente = $this->db->where('contribuyente_id', $p_contribuyente_id)->get('rh.contribuyente')->row();
-		$filename = $contribuyente->contribuyente_pdf;
-		if ($contribuyente->contribuyente_estado == 'REGISTRADO') {
-			$filename = $this->generarPDF($p_contribuyente_id);	
+		$p_clit_id = $this->input->post('clit_id');
+		$clit = $this->db->where('clit_id', $p_clit_id)->get('rh.clit')->row();
+		$filename = $clit->clit_pdf;
+		if ($clit->clit_estado == 'REGISTRADO') {
+			$filename = $this->generarPDF($p_clit_id);	
 			$this->db
-			->set('contribuyente_pdf', $filename)
-			->set('contribuyente_estado', 'GENERADO')
-			->where('contribuyente_id', $p_contribuyente_id)
-			->update('rh.contribuyente');
-			//$reload_list = "<script type=\"text/javascript\">contribuyente.reload_list({$p_contribuyente_id})</script>";
+			->set('clit_pdf', $filename)
+			->set('clit_estado', 'GENERADO')
+			->where('clit_id', $p_clit_id)
+			->update('rh.clit');
+			//$reload_list = "<script type=\"text/javascript\">clit.reload_list({$p_clit_id})</script>";
 		} 
-		if (file_exists(FCPATH."dbfiles/rh.contribuyente/".$filename) && $filename != '') {
-			$url = $this->config->item('base_url')."dbfiles/rh.contribuyente/{$filename}";
+		if (file_exists(FCPATH."dbfiles/rh.clit/".$filename) && $filename != '') {
+			$url = $this->config->item('base_url')."dbfiles/rh.clit/{$filename}";
 			echo "<embed src=\"{$url}\" type=\"application/pdf\" width=\"100%\" height=\"100%\"></embed>";
 		} else {
 			echo "No es posible mostrar el archivo '{$filename}'.";
