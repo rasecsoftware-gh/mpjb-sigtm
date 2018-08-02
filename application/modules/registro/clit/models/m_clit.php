@@ -25,6 +25,7 @@ class M_Clit extends CI_Model{
 		->join('public.tipo_doc_identidad AS tdi', 'tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id', 'inner')
 		->join('public.ubigeo AS u', 'u.ubigeo_id = c.ubigeo_id', 'left')
 		->join('public.plantilla AS p', 'p.plantilla_id = cl.plantilla_id', 'left')
+		->join('public.estado_doc AS ed', 'ed.estado_doc_id = cl.estado_doc_id', 'inner')
 		->where('cl.clit_anio', $p_anio);
 
 		switch ($search_by) {
@@ -42,17 +43,11 @@ class M_Clit extends CI_Model{
 					}
 				}
 			break;
-			case 'tp':
-				$this->db->where('tp.tipo_persona_desc', $search_text);	
-			break;
-			case 'tdi':
-				$this->db->where('tdi.tipo_doc_identidad_desc', $search_text);	
-			break;
-			case 'numero_doc':
-				$this->db->like('c.clit_numero_doc', $search_text);	
+			case 'numero':
+				$this->db->like('c.clit_numero', $search_text);	
 			break;
 			case 'estado':
-				$this->db->like('c.clit_estado', strtoupper($search_text));
+				$this->db->like('ed.estado_doc_desc', strtoupper($search_text));
 			break;
 		}
 
@@ -60,8 +55,8 @@ class M_Clit extends CI_Model{
 		$total_count = $this->db->count_all_results();
 
 
-		$this->db->order_by('c.clit_nombres', 'asc');
-		$this->db->order_by('c.clit_apellidos', 'asc');
+		$this->db->order_by('c.clit_anio', 'desc');
+		$this->db->order_by('c.clit_numero', 'desc');
 		$this->db->order_by('c.clit_id', 'asc');
 		$this->db->limit($size, $start);
 
@@ -76,31 +71,46 @@ class M_Clit extends CI_Model{
 		return $ret;
 	}
 
+	private function get_next_numero($anio) {
+		$n_max = $this->db->select('MAX(clit_numero) AS value')->where('clit_anio', $anio)->get('public.clit')->row();
+		if (is_null($n_max)) {
+			return 1;
+		} else {
+			return intval($n_max->value) + 1;
+		}
+	}
+
 	public function get_new_row () {
 		$row = array(
-			'tipo_persona_id'=>'N',
-			'tipo_doc_identidad_id'=>1, // dni
-			'ubigeo_id'=>'230301', // locumba
-			'clit_estado'=>'A'
+			'tipo_doc_id'=>'CLIT',
+			'clit_anio'=>date('Y'), 
+			'clit_numero'=>$this->get_next_numero(date('Y')), 
+			'clit_'=>'A'
 		);
 		return $row;
 	}
 
 	public function get_row ($id) {
-		$this->db
-		->select("
-			c.*, 
-			tp.tipo_persona_desc, 
+		$this->db->select("
+			cl.*,
+			c.contribuyente_numero_doc,
+			c.contribuyente_nombres,
+			c.contribuyente_apellidos,
+			tp.tipo_persona_desc,
 			tdi.tipo_doc_identidad_desc,
 			u.ubigeo_departamento,
 			u.ubigeo_provincia,
 			u.ubigeo_distrito
 		")
-		->from("public.clit AS c")
-		->join("public.tipo_persona AS tp", "tp.tipo_persona_id = c.tipo_persona_id", "inner")
-		->join("public.tipo_doc_identidad AS tdi", "tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id", "inner")
+		->from('public.clit AS cl')
+		->join('public.contribuyente AS c', 'c.contribuyente_id = c.contribuyente_id', 'inner')
+		->join('public.tipo_persona AS tp', 'tp.tipo_persona_id = c.tipo_persona_id', 'inner')
+		->join('public.tipo_doc_identidad AS tdi', 'tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id', 'inner')
 		->join('public.ubigeo AS u', 'u.ubigeo_id = c.ubigeo_id', 'left')
-		->where('clit_id', $id);
+		->join('public.plantilla AS p', 'p.plantilla_id = cl.plantilla_id', 'left')
+		->join('public.estado_doc AS ed', 'ed.estado_doc_id = cl.estado_doc_id', 'inner')
+		->where('cl.clit_id', $id);
+
 		return $this->db->get()->row();
 	}
 
@@ -153,10 +163,26 @@ class M_Clit extends CI_Model{
 		}
 	}
 	
-	public function get_tipo_persona_list () {
+	public function get_contribuyente_list ($filter) {
 		$rows = $this->db
-		->order_by('tipo_persona_id', 'ASC')
-		->get('public.tipo_persona')->result();
+		->select("
+			c.*,
+			tp.tipo_persona_desc,
+			tdi.tipo_doc_identidad_desc,
+			u.ubigeo_departamento,
+			u.ubigeo_provincia,
+			u.ubigeo_distrito
+		")
+		->from('public.contribuyente AS c')
+		->join('public.tipo_persona AS tp', 'tp.tipo_persona_id = c.tipo_persona_id', 'inner')
+		->join('public.tipo_doc_identidad AS tdi', 'tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id', 'inner')
+		->join('public.ubigeo AS u', 'u.ubigeo_id = c.ubigeo_id', 'left')
+		->where('c.contribuyente_estado', 'A')
+		->where("c.contribuyente_numero_doc||' '||c.contribuyente_nombres||' '||c.contribuyente_apellidos ILIKE '%{$filter}%'")
+		->order_by('c.contribuyente_nombres')
+		->order_by('c.contribuyente_apellidos')
+		->order_by('c.contribuyente_id')
+		->get()->result();
 		$total_count = count($rows);
 		$ret = array(
 			'data'=>$rows,
@@ -165,33 +191,57 @@ class M_Clit extends CI_Model{
 		return $ret;
 	}
 
-	public function get_tipo_doc_identidad_list () {
-		$rows = $this->db->get('public.tipo_doc_identidad')->result();
-		$total_count = count($rows);
+	public function get_plantilla_list () {
+		$rows = $this->db
+		->where('tipo_doc_id', 'CLIT')
+		->order_by('plantilla_id')
+		->get('public.plantilla')->result();
 		
 		$ret = array(
-			'data'=>$rows,
-			'total'=>$total_count
+			'data'=>$rows
 		);
 		return $ret;
 	}
 
-	public function get_ubigeo_list ($filter) {
+	public function get_estado_doc_list () {
 		$rows = $this->db
-		->where('TRIM(ubigeo_distrito)<>', '')
-		->like('ubigeo_id', strtoupper($filter))
-		->or_like('UPPER(ubigeo_departamento)', strtoupper($filter))
-		->or_like('UPPER(ubigeo_provincia)', strtoupper($filter))
-		->or_like('UPPER(ubigeo_distrito)', strtoupper($filter))
-		->order_by('ubigeo_departamento', 'ASC')
-		->order_by('ubigeo_provincia', 'ASC')
-		->order_by('ubigeo_distrito', 'ASC')
-		->limit(50)
-		->get('public.ubigeo')->result();
-		$total_count = count($rows);
+		->where('tipo_doc_id', 'CLIT')
+		->order_by('estado_doc_id')
+		->get('public.estado_doc')->result();
+		
 		$ret = array(
-			'data'=>$rows,
-			'total'=>$total_count
+			'data'=>$rows
+		);
+		return $ret;
+	}
+
+	public function get_tipo_doc_requisito_list () {
+		$rows = $this->db
+		->where('tipo_doc_id', 'CLIT')
+		->where('tipo_doc_requisito_estado', 'A')
+		->order_by('tipo_doc_requisito_id', 'A')
+		->get('public.tipo_doc_requisito')->result();
+		
+		$ret = array(
+			'data'=>$rows
+		);
+		return $ret;
+	}
+
+	public function get_doc_requisito_list () {
+		$rows = $this->db
+		->select("
+			
+		")
+		->from('public.tipo_doc_requisito AS tdr')
+		->join('')
+		->where('tipo_doc_id', 'CLIT')
+		->where('tipo_doc_requisito_estado', 'A')
+		->order_by('tipo_doc_requisito_id', 'A')
+		->get('public.tipo_doc_requisito')->result();
+		
+		$ret = array(
+			'data'=>$rows
 		);
 		return $ret;
 	}
