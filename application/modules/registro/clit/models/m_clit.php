@@ -231,7 +231,7 @@ class M_Clit extends CI_Model{
 	public function get_doc_requisito_list () {
 		$rows = $this->db
 		->select("
-			
+			tdr.*
 		")
 		->from('public.tipo_doc_requisito AS tdr')
 		->join('')
