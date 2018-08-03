@@ -17,10 +17,12 @@ class M_Clit extends CI_Model{
 			tdi.tipo_doc_identidad_desc,
 			u.ubigeo_departamento,
 			u.ubigeo_provincia,
-			u.ubigeo_distrito
+			u.ubigeo_distrito,
+			ed.estado_doc_desc,
+			ed.estado_doc_color
 		")
 		->from('public.clit AS cl')
-		->join('public.contribuyente AS c', 'c.contribuyente_id = c.contribuyente_id', 'inner')
+		->join('public.contribuyente AS c', 'c.contribuyente_id = cl.contribuyente_id', 'inner')
 		->join('public.tipo_persona AS tp', 'tp.tipo_persona_id = c.tipo_persona_id', 'inner')
 		->join('public.tipo_doc_identidad AS tdi', 'tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id', 'inner')
 		->join('public.ubigeo AS u', 'u.ubigeo_id = c.ubigeo_id', 'left')
@@ -55,9 +57,9 @@ class M_Clit extends CI_Model{
 		$total_count = $this->db->count_all_results();
 
 
-		$this->db->order_by('c.clit_anio', 'desc');
-		$this->db->order_by('c.clit_numero', 'desc');
-		$this->db->order_by('c.clit_id', 'asc');
+		$this->db->order_by('cl.clit_anio', 'desc');
+		$this->db->order_by('cl.clit_numero', 'desc');
+		$this->db->order_by('cl.clit_id', 'asc');
 		$this->db->limit($size, $start);
 
 		$rows = $this->db->get()->result();
@@ -85,6 +87,7 @@ class M_Clit extends CI_Model{
 			'tipo_doc_id'=>'CLIT',
 			'clit_anio'=>date('Y'), 
 			'clit_numero'=>$this->get_next_numero(date('Y')), 
+			'clit_fecha'=>date('d/m/Y'), 
 			'clit_'=>'A'
 		);
 		return $row;
@@ -219,7 +222,7 @@ class M_Clit extends CI_Model{
 		$rows = $this->db
 		->where('tipo_doc_id', 'CLIT')
 		->where('tipo_doc_requisito_estado', 'A')
-		->order_by('tipo_doc_requisito_id', 'A')
+		->order_by('tipo_doc_requisito_id', 'ASC')
 		->get('public.tipo_doc_requisito')->result();
 		
 		$ret = array(
@@ -227,18 +230,24 @@ class M_Clit extends CI_Model{
 		);
 		return $ret;
 	}
-
-	public function get_doc_requisito_list () {
+	// consulta que se cruza con tipo_doc_requisito para tener el listado completo de lo que HAY y SE TIENE ya registrado
+	public function get_doc_requisito_list ($clit_id) {
 		$rows = $this->db
 		->select("
 			tdr.*
+			dr.doc_requisito_id,
+			dr.doc_id,
+			dr.doc_requisito_pdf,
+			dr.doc_requisito_cumple_flag,
+			dr.doc_requisito_fecha,
+			dr.doc_requisito_numero
 		")
 		->from('public.tipo_doc_requisito AS tdr')
-		->join('')
-		->where('tipo_doc_id', 'CLIT')
-		->where('tipo_doc_requisito_estado', 'A')
-		->order_by('tipo_doc_requisito_id', 'A')
-		->get('public.tipo_doc_requisito')->result();
+		->join('public.doc_requisito AS AS dr', 'dr.doc_id = {$clit_id} AND dr.tipo_doc_requisito_id = tdr.tipo_doc_requisito_id', 'left')
+		->where('tdr.tipo_doc_id', 'CLIT')
+		->where('tdr.tipo_doc_requisito_estado', 'A')
+		->order_by('tdr.tipo_doc_requisito_id', 'ASC')
+		->get()->result();
 		
 		$ret = array(
 			'data'=>$rows

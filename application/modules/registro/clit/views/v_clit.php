@@ -2,17 +2,17 @@
 	/********************* generamos el name espace ***************************/
 	clit = {};
 	// general stores
-	clit.tipo_persona_store = Ext.create("Ext.data.Store", {
+	clit.contribuyente_store = Ext.create("Ext.data.Store", {
 		proxy:{
 			type: 'ajax',
-			url: 'clit/getTipoPersonaList',
+			url: 'clit/getContribuyenteList',
 			reader: {
 				type: 'json',
 				rootProperty: 'data',
 				totalProperty: 'total'
 			}
 		},
-		autoLoad: true,
+		autoLoad: false,
 		pageSize: 50,
 		listeners: {
 			load: function () {
@@ -20,10 +20,10 @@
 		}
 	});
 
-	clit.tipo_doc_identidad_store = Ext.create("Ext.data.Store", {
+	clit.plantilla_store = Ext.create("Ext.data.Store", {
 		proxy:{
 			type: 'ajax',
-			url: 'clit/getTipoDocIdentidadList',
+			url: 'clit/getPlantillaList',
 			reader: {
 				type: 'json',
 				rootProperty: 'data',
@@ -37,10 +37,27 @@
 		}
 	});
 
-	clit.ubigeo_store = Ext.create("Ext.data.Store", {
+	clit.estado_doc_store = Ext.create("Ext.data.Store", {
 		proxy:{
 			type: 'ajax',
-			url: 'clit/getUbigeoList',
+			url: 'clit/getEstadoDocList',
+			reader: {
+				type: 'json',
+				rootProperty: 'data',
+				totalProperty: 'total'
+			}
+		},
+		autoLoad: true,
+		listeners: {
+			load: function () {
+			}
+		}
+	});
+
+	clit.doc_requisito_store = Ext.create("Ext.data.Store", {
+		proxy:{
+			type: 'ajax',
+			url: 'clit/getDocRequisitoList',
 			reader: {
 				type: 'json',
 				rootProperty: 'data',
@@ -88,10 +105,10 @@
 <!--  cargamos los componentes -->
 <?php echo $this->load->view('v_clit_list'); ?>
 <?php echo $this->load->view('v_clit_new'); ?>
-<?php echo $this->load->view('v_clit_edit'); ?>
-<?php echo $this->load->view('v_clit_delete'); ?>
-<?php echo $this->load->view('v_clit_activar'); ?>
-<?php echo $this->load->view('v_clit_inactivar'); ?>
+<?php //echo $this->load->view('v_clit_edit'); ?>
+<?php //echo $this->load->view('v_clit_delete'); ?>
+<?php //echo $this->load->view('v_clit_activar'); ?>
+<?php //echo $this->load->view('v_clit_inactivar'); ?>
 <?php //echo $this->load->view('v_clit_entregar'); ?>
 <?php //echo $this->load->view('v_clit_anular'); ?>
 <?php echo $this->load->view('syslog/v_syslog'); ?>

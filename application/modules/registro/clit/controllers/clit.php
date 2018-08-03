@@ -20,7 +20,7 @@ class Clit extends MX_Controller {
 	public function getList() {
 		$search_by = $this->input->get('search_by');
 		$search_text = $this->input->get('search_text');
-		$p_anio = $this->input->get('anio');
+		$p_anio = date('Y'); //$this->input->get('anio');
 		$pagination_size = $this->input->get('limit');
 		$pagination_start = $this->input->get('start');
 		$ret = $this->model->get_list($search_by, $search_text, $p_anio, $pagination_size, $pagination_start);
@@ -57,12 +57,12 @@ class Clit extends MX_Controller {
 	public function Add() {
 		//sys_session_hasRoleOrDie('rh.clit.add, rh.clit.update');
 		$data = array(
+			'tipo_doc_id'=>'CLIT',
   			'clit_anio'=>trim($this->input->post('clit_anio')),
 			'clit_numero'=>trim($this->input->post('clit_numero')),
 			'contribuyente_id'=>$this->input->post('contribuyente_id'),
 			'clit_fecha'=>$this->input->post('clit_fecha'),
-			'clit_resultado'=>trim($this->input->post('clit_resultado')),
-			'plantilla_id'=>$this->input->post('plantilla_id')
+			'clit_resultado'=>trim($this->input->post('clit_resultado'))
 		);
 
 		if ($data['clit_anio']=='') {
@@ -95,7 +95,7 @@ class Clit extends MX_Controller {
 			)));
 		}
 
-		if ($data['contribuyente_id'] > 0) {
+		if ( !($data['contribuyente_id'] > 0) ) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Contribuyente",
@@ -111,13 +111,34 @@ class Clit extends MX_Controller {
 			)));
 		}
 
-		if ($data['plantilla_id'] == 0) {
+		// SET first default template
+		$plantilla = $this->db
+		->where('tipo_doc_id', 'CLIT')
+		->where('plantilla_estado', 'A')
+		->order_by('plantilla_id', 'ASC')
+		->get('public.plantilla')->row();
+
+		if ( is_null($plantilla) ) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"Especifique una plantilla para la generacion del PDF.",
-				'target_id'=>'clit_form_plantilla_field'
+				'msg'=>"No existe una plantilla para este tipo de documento, revise la configuracion de plantillas de documentos por favor."
 			)));
 		}
+		$data['plantilla_id'] = $plantilla->plantilla_id;
+
+		// SET first default state
+		$estado_doc = $this->db
+		->where('tipo_doc_id', 'CLIT')
+		->order_by('estado_doc_id', 'ASC')
+		->get('public.estado_doc')->row();
+
+		if ( is_null($estado_doc) ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"No existe Estado definido para este tipo de documento, revise la configuracion de Estados por documentos por favor."
+			)));
+		}
+		$data['estado_doc_id'] = $estado_doc->estado_doc_id;
 
 		try {
 			$result = $this->model->add($data);
@@ -338,19 +359,28 @@ class Clit extends MX_Controller {
 		}
 	}
 
-	public function getTipoPersonaList () {
-		$ret = $this->model->get_tipo_persona_list();
+	public function getContribuyenteList () {
+		$filter = trim($this->input->get_post('query'));
+		$ret = $this->model->get_contribuyente_list($filter);
+		foreach ($ret['data'] as $i=>$r) {
+			$ret['data'][$i]->contribuyente_nomape = $r->contribuyente_nombres.' '.$r->contribuyente_apellidos;
+		}
 		echo json_encode($ret);
 	}
 
-	public function getTipoDocIdentidadList () {
-		$ret = $this->model->get_tipo_doc_identidad_list();
+	public function getPlantillaList () {
+		$ret = $this->model->get_plantilla_list();
 		echo json_encode($ret);
 	}
 
-	public function getUbigeoList () {
-		$filter = $this->input->get('query');
-		$ret = $this->model->get_ubigeo_list($filter);
+	public function getEstadoDocList () {
+		$ret = $this->model->get_estado_doc_list();
+		echo json_encode($ret);
+	}
+
+	public function getDocRequisitoList () {
+		$doc_id = $this->input->get('doc_id');
+		$ret = $this->model->get_doc_requisito_list($doc_id);
 		echo json_encode($ret);
 	}
 

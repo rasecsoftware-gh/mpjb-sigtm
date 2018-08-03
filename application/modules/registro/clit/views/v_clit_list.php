@@ -1,49 +1,44 @@
 <script>
-	contribuyente.panel = Ext.create('Ext.Panel', {
+	clit.panel = Ext.create('Ext.Panel', {
 		region: 'center',
 		layout: 'border',
 		items: [{
 			xtype: 'grid',
-			id:'contribuyente_main_grid',
+			id:'clit_main_grid',
 			region: 'center', 
 			//split:true, 
 			//forceFit:true,
 			sortableColumns: false,
 			enableColumnHide: false,
 			columns:[
-				{text:'TP', dataIndex:'tipo_persona_id', width: 50},
-				{text:'TD', dataIndex:'tipo_doc_identidad_desc', width: 60},
-				{text:'Num. Doc.', dataIndex:'contribuyente_numero_doc', width: 70},
-				{text:'Nombres o Razon social', dataIndex:'contribuyente_nombres', width: 230},
+				{text:'Año', dataIndex:'clit_anio', width: 45},
+				{text:'Numero', dataIndex:'clit_numero', width: 60},
+				{text:'Nombres o Razon Soc.', dataIndex:'contribuyente_nombres', width: 200},
 				{text:'Apellidos', dataIndex:'contribuyente_apellidos', width: 150},
-				{text:'Direccion', dataIndex:'contribuyente_direccion', width: 150},
-				{text:'Estado', dataIndex:'contribuyente_estado', width: 50,
+				{text:'Fecha', dataIndex:'clit_fecha', width: 80},
+				{text:'Resultado', dataIndex:'clit_resultado', width: 65},
+				{text:'Estado', dataIndex:'estado_doc_desc', width: 80,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
-					    switch (value) {
-					    	case 'A':
-					    		value = '<span style="color: green;">'+value+'</span>';
-					    	break;
-					    	case 'I':
-					    		value = '<span style="color: red;">'+value+'</span>';
-					    	break;
-					    }
-					    return value;
+						if (record.estado_doc_color != '') {
+							value = '<span style="color: '+record.estado_doc_color+';">'+value+'</span>';
+						} 
+						return value;
 					}
 				}
 			],
 			tbar:[{
 				text:'Nuevo', 
 				handler: function() {
-					contribuyente.new_window();
+					clit.new_window();
 				}
 			},{
 				text:'Modificar', 
 				handler: function() {
-					var rows = Ext.getCmp('contribuyente_main_grid').getSelection();
+					var rows = Ext.getCmp('clit_main_grid').getSelection();
 					if (rows.length>0) {
-						contribuyente.edit_window(rows[0].get('contribuyente_id'));
+						clit.edit_window(rows[0].get('clit_id'));
 					} else {
-						Ext.Msg.alert('Error','Seleccione un registro');
+						Ext.Msg.alert('Error', 'Seleccione un registro');
 					}
 				}
 			},'-',{
@@ -51,33 +46,33 @@
 				menu: [{
 					text: 'Inactivar', 
 					handler: function() {
-						contribuyente.inactivar_window();
+						clit.inactivar_window();
 					}
 				},{
 					text: 'Activar', 
 					handler: function() {
-						contribuyente.activar_window();
+						clit.activar_window();
 					}
 				},'-',{
 					text: 'Eliminar', 
 					handler: function() {
-						contribuyente.delete_window();
+						clit.delete_window();
 					},
-					hidden: !<?php echo sys_session_hasRoleToString('contribuyente.delete'); ?>,
+					hidden: !<?php echo sys_session_hasRoleToString('clit.delete'); ?>,
 				},'-',{
 					text: 'Ver informacion de registro', 
 					handler: function() {
-						var rows = Ext.getCmp('contribuyente_main_grid').getSelection();
+						var rows = Ext.getCmp('clit_main_grid').getSelection();
 						if (rows.length>0) {
-							syslog.show_window('public.contribuyente', rows[0].get('contribuyente_id'));
+							syslog.show_window('public.clit', rows[0].get('clit_id'));
 						} else {
-							Ext.Msg.alert('Error','Seleccione un registro');
+							Ext.Msg.alert('Error', 'Seleccione un registro');
 						}
 					}
 				}]
 			},'->',{
 				xtype: 'combobox',
-				id: 'contribuyente_search_by_cb',
+				id: 'clit_search_by_cb',
 				displayField: 'search_desc',
 				valueField: 'search_id',
 				name: 'search_by',
@@ -87,53 +82,51 @@
 				store: Ext.create('Ext.data.Store', {
 					data : [
 						{search_id: 'all', search_desc: 'Busqueda General'},
-						{search_id: 'tp', search_desc: 'Por Tipo de Persona'},
-						{search_id: 'tdi', search_desc: 'Por Tipo Doc. Identidad'},
-						{search_id: 'numero_doc', search_desc: 'Por Numero Doc.'},
+						{search_id: 'contribuyente', search_desc: 'Por Contribuyente'},
+						{search_id: 'numero', search_desc: 'Por Numero de Constancia'},
 						{search_id: 'estado', search_desc: 'Por Estado'}
 					]
 				})
 			},{
-				xtype:'textfield',
-				id: 'contribuyente_search_text',
+				xtype: 'textfield',
+				id: 'clit_search_text',
 				enableKeyEvents: true,
 				width: 140,
 				listeners: {
 					keypress: function(sender, e, eOpts) {
 						if (e.getKey() == e.ENTER) {
-							Ext.getCmp('contribuyente_search_bt').click(e);
+							Ext.getCmp('clit_search_bt').click(e);
 						}
 					}
 				}
 			},{
-				id: 'contribuyente_search_bt',
+				id: 'clit_search_bt',
 				text:'Buscar/Actualizar', handler: function() {
-					contribuyente.reload_list();
+					clit.reload_list();
 				}
 			}],
-			store: contribuyente.main_store,
+			store: clit.main_store,
 			dockedItems: [{
 		        xtype: 'pagingtoolbar',
-		        store: contribuyente.main_store, // same store GridPanel is using
+		        store: clit.main_store, // same store GridPanel is using
 		        dock: 'bottom',
 		        displayInfo: true
 		    }],
 			listeners:{
-				select: function (ths, record, index, eOpts ) {
-					if (!contribuyente.form_editing) {
-						var f = Ext.getCmp('contribuyente_form');
+				select: function (ths, record, index, eOpts) {
+					if (!clit.form_editing) {
+						var f = Ext.getCmp('clit_form');
 						f.loadRecord(record);
-						Ext.getCmp('contribuyente_form_contribuyente_id_displayfield').setValue(record.get('contribuyente_id'));
-						Ext.getCmp('contribuyente_form_ubigeo_departamento_provincia_field').setValue(record.get('ubigeo_departamento')+' / '+record.get('ubigeo_provincia'));
-						Ext.getCmp('contribuyente_form_save_bt').hide();
-						Ext.getCmp('contribuyente_form_cancel_bt').hide();
-						Ext.getCmp('contribuyente_form_ubigeo_id_field').hide();
-						Ext.getCmp('contribuyente_form_ubigeo_distrito_field').show();
+						Ext.getCmp('clit_form_clit_id_displayfield').setValue(record.get('clit_id'));
+						Ext.getCmp('clit_form_save_bt').hide();
+						Ext.getCmp('clit_form_cancel_bt').hide();
+						Ext.getCmp('clit_form_contribuyente_id_field').hide();
+						Ext.getCmp('clit_form_contribuyente_nomape_field').show();
 					}
 				},
-				rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts ) {
-					if (!contribuyente.form_editing) {
-						contribuyente.edit_window(record.get('contribuyente_id'));
+				rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
+					if (!clit.form_editing) {
+						clit.edit_window(record.get('clit_id'));
 					}
 				}
 			}
@@ -142,35 +135,36 @@
 			region: 'east',
 			layout: 'border',
 			split: true,
-			width: 400,
+			width: 500,
 			items: [{
 				xtype: 'form',
-				id: 'contribuyente_form',
-				url: 'contribuyente/AddOrUpdate',
+				id: 'clit_form',
+				url: 'clit/AddOrUpdate',
 				layout: 'absolute',
-				region: 'center',
+				region: 'north',
+				height: 200,
 				bodyStyle: {
 					//background: '#4c9dd8'
 				},
 				tbar:[{
 					xtype: 'label',
-					text: 'Contribuyente',
+					text: 'Constancia',
 					style: {
 						fontWeight: 'bold'
 					}
 				},'-','->',{
 					text: 'Guardar',
-					id: 'contribuyente_form_save_bt',
+					id: 'clit_form_save_bt',
 					hidden: true,
 					handler: function () {
-						var frm = Ext.getCmp('contribuyente_form');
+						var frm = Ext.getCmp('clit_form');
 						frm.mask('guardando');
 						frm.submit({
 							success: function(form, action) {
 								frm.unmask();
 								if (action.result.success) {
-									contribuyente.form_editing = false;
-									contribuyente.main_store.reload(action.result.rowid);	
+									clit.form_editing = false;
+									clit.main_store.reload(action.result.rowid);	
 								} else {
 									Ext.Msg.alert('Error', action.result.msg);
 								}
@@ -185,159 +179,154 @@
 					}
 				},{
 					text: 'Cancelar',
-					id: 'contribuyente_form_cancel_bt',
+					id: 'clit_form_cancel_bt',
 					hidden: true,
 					handler: function () {
-						Ext.getCmp('contribuyente_form_save_bt').hide();
-						Ext.getCmp('contribuyente_form_cancel_bt').hide();
-						Ext.getCmp('contribuyente_form_ubigeo_id_field').hide();
-						Ext.getCmp('contribuyente_form_ubigeo_distrito_field').show();
-						contribuyente.form_editing = false;
+						Ext.getCmp('clit_form_save_bt').hide();
+						Ext.getCmp('clit_form_cancel_bt').hide();
+						Ext.getCmp('clit_form_contribuyente_id_field').hide();
+						Ext.getCmp('clit_form_contribuyente_nomape_field').show();
+						clit.form_editing = false;
 					}
 				}],
 				defaults: {
-					labelWidth: 120,
+					labelWidth: 80,
 					labelStyle: 'color: gray'
 				},
 				items: [{
 					xtype: 'hidden',
-					id: 'contribuyente_form_operation_field',
+					id: 'clit_form_operation_field',
 					name: 'operation',
 					value: 'edit'
 				},{
 					xtype: 'hidden',
-					id: 'contribuyente_form_contribuyente_id_field',
-					name: 'contribuyente_id'
+					id: 'clit_form_clit_id_field',
+					name: 'clit_id'
 				},{
 					xtype: 'displayfield',
-					id: 'contribuyente_form_contribuyente_id_displayfield',
+					id: 'clit_form_clit_id_displayfield',
 					fieldLabel: 'ID',
 					x: 10, y: 0,
 					width: 200
 				},{
-    				xtype: 'combobox',
-    				id: 'contribuyente_form_tipo_persona_id_field',
-    				name: 'tipo_persona_id',
-    				fieldLabel: 'Tipo de Persona',
-    				//fieldStyle: 'color: gray',
-    				displayField: 'tipo_persona_desc',
-    				valueField: 'tipo_persona_id',
-    				store: contribuyente.tipo_persona_store,
-    				queryMode: 'local',
-    				matchFieldWidth: false,
-    				x: 10, y: 30, width: 210,
+					fieldLabel: 'Numero y Año',
+					id: 'clit_form_clit_numero_field',
+    				xtype: 'textfield',
+    				name: 'clit_numero',
+    				x: 10, y: 30, width: 160
+				},{
+					id: 'clit_form_clit_anio_field',
+    				xtype: 'textfield',
+    				name: 'clit_anio',
     				editable: false,
-    				listeners: {
-    					select: function(combo, record, eOpts ) {						    		
-				    	}
-    				}
+    				value: '2018',
+    				x: 175, y: 30, width: 40
 				},{
     				xtype: 'combobox',
-    				id: 'contribuyente_form_tipo_doc_identidad_id_field',
-    				name: 'tipo_doc_identidad_id',
-    				fieldLabel: 'Tipo Documento',
-    				//fieldStyle: 'color: gray',
-    				displayField: 'tipo_doc_identidad_desc',
-    				valueField: 'tipo_doc_identidad_id',
-    				store: contribuyente.tipo_doc_identidad_store,
-    				queryMode: 'local',
-    				matchFieldWidth: false,
-    				x: 10, y: 60, width: 240,
-    				editable: false,
-    				listeners: {
-    					select: function(combo, record, eOpts ) {						    		
-				    	}
-    				}
-				},{
-					fieldLabel: 'Numero Doc.',
-					id: 'contribuyente_form_contribuyente_numero_doc_field',
-    				xtype: 'textfield',
-    				name: 'contribuyente_numero_doc',
-    				x: 10, y: 90, width: 240
-				},{
-					fieldLabel: 'Nombres o Razon soc.',
-					id: 'contribuyente_form_contribuyente_nombres_field',
-    				xtype: 'textfield',
-    				name: 'contribuyente_nombres',
-    				x: 10, y: 120, width: 380
-				},{
-					fieldLabel: 'Apellidos',
-					id: 'contribuyente_form_contribuyente_apellidos_field',
-    				xtype: 'textfield',
-    				name: 'contribuyente_apellidos',
-    				x: 10, y: 150, width: 380
-				},{
-					fieldLabel: 'Departam. / Provinc.',
-					id: 'contribuyente_form_ubigeo_departamento_provincia_field',
-    				xtype: 'displayfield',
-    				name: 'ubigeo_departamento_provincia',
-    				value: 'Departamento / Provincia',
-    				x: 10, y: 180, width: 380
-				},{
-    				xtype: 'combobox',
-    				id: 'contribuyente_form_ubigeo_id_field',
-    				name: 'ubigeo_id',
-    				fieldLabel: 'Distrito',
-    				displayField: 'ubigeo_distrito',
-    				valueField: 'ubigeo_id',
-    				store: contribuyente.ubigeo_store,
+    				id: 'clit_form_contribuyente_id_field',
+    				name: 'contribuyente_id',
+    				fieldLabel: 'Contribuyente',
+    				displayField: 'contribuyente_nomape',
+    				valueField: 'contribuyente_id',
+    				store: clit.contribuyente_store,
     				queryMode: 'remote',
     				triggerAction: 'last', // query
     				minChars: 2,
     				matchFieldWidth: false,
-    				x: 10, y: 210, width: 380,
+    				x: 10, y: 60, width: 380,
     				editable: true,
     				listeners: {
     					select: function(combo, record, eOpts ) {
-    						Ext.getCmp('contribuyente_form_ubigeo_departamento_provincia_field').setValue(
-    							record.get('ubigeo_departamento') + ' / ' + record.get('ubigeo_provincia')
-    						);
+    						Ext.getCmp('clit_form_contribuyente_numero_doc_field').setValue(record.get('contribuyente_numero_doc'));
 				    	}
     				},
-    				hidden: true
-				},{
-					fieldLabel: 'Distrito',
-					id: 'contribuyente_form_ubigeo_distrito_field',
+    				hidden: true // only for edit
+				},{ // only for display
+					fieldLabel: 'Contribuyente',
+					id: 'clit_form_contribuyente_nomape_field',
     				xtype: 'textfield',
-    				name: 'ubigeo_distrito',
-    				x: 10, y: 210, width: 380
+    				name: 'contribuyente_nomape',
+    				x: 10, y: 60, width: 380
 				},{
-					fieldLabel: 'Direccion',
-					id: 'contribuyente_form_contribuyente_direccion_field',
+					id: 'clit_form_contribuyente_numero_doc_field',
     				xtype: 'textfield',
-    				name: 'contribuyente_direccion',
-    				x: 10, y: 240, width: 380
+    				name: 'contribuyente_numero_doc',
+    				editable: false,
+    				x: 395, y: 60, width: 75
 				},{
-					fieldLabel: 'Telefono',
-					id: 'contribuyente_form_contribuyente_telefono_field',
-    				xtype: 'textfield',
-    				name: 'contribuyente_telefono',
-    				x: 10, y: 270, width: 250
+					fieldLabel: 'Fecha',
+					id: 'clit_form_clit_fecha_field',
+    				xtype: 'datefield',
+    				name: 'clit_fecha',
+    				format: 'd/m/Y',
+    				x: 10, y: 90, width: 200
 				},{
-					fieldLabel: 'E-mail',
-					id: 'contribuyente_form_contribuyente_email_field',
+					fieldLabel: 'Resultado',
+					id: 'clit_form_clit_resultado_field',
     				xtype: 'textfield',
-    				name: 'contribuyente_email',
-    				x: 10, y: 300, width: 380
-				},{
-					fieldLabel: 'Observacion',
-					id: 'contribuyente_form_contribuyente_observacion_field',
-    				xtype: 'textfield',
-    				name: 'contribuyente_observacion',
-    				x: 10, y: 330, width: 380
+    				name: 'clit_resultado',
+    				x: 10, y: 120, width: 200
 				}]
+			},{
+				xtype: 'grid',
+				id: 'clit_form_doc_requisito_grid',
+				region: 'center', 
+				//split:true, 
+				//forceFit:true,
+				sortableColumns: false,
+				enableColumnHide: false,
+				store: clit.doc_requisito_store,
+				columns:[
+					{text:'Documento', dataIndex: 'tipo_doc_requisito_desc', width: 212},
+					{text:'Fecha', dataIndex: 'doc_requisito_fecha', width: 70},
+					{text:'Numero', dataIndex: 'doc_requisito_numero', width: 65},
+					{text:'Requerido', dataIndex: 'tipo_doc_requisito_requerido_flag', width: 70},
+					{text:'Cumple', dataIndex: 'doc_requisito_cumple_flag', width: 65,
+						renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
+							if (value == 'S') {
+								value = '<span style="color: green;">'+value+'</span>';
+							} else {
+								return value;	
+							}
+						}
+					}
+				],
+				tbar:[{
+					text: 'Actualizar', 
+					handler: function() {
+						clit.doc_requisito_reload();
+					}
+				},{
+					text: 'Quitar', 
+					handler: function() {
+						clit.doc_requisito_delete_window();
+					}
+				}],
+				hidden: false // hide on new CLIT
 			}]
 		}]
 	});
 
-	contribuyente.reload_list = function (select_id) {
-		contribuyente.contribuyente_id_selected = select_id||0;
-		//contribuyente.main_store.reload();
-		contribuyente.main_store.reload({
+	clit.reload_list = function (select_id) {
+		clit.clit_id_selected = select_id||0;
+		//clit.main_store.reload();
+		clit.main_store.reload({
 			params: {
-				search_by: Ext.getCmp('contribuyente_search_by_cb').getValue(),
-				search_text: Ext.getCmp('contribuyente_search_text').getValue()
+				search_by: Ext.getCmp('clit_search_by_cb').getValue(),
+				search_text: Ext.getCmp('clit_search_text').getValue()
 			}
 		});
+	};
+
+	clit.doc_requisito_reload_list = function () {
+		var rows = Ext.getCmp('clit_main_grid').getSelection();
+		if (rows.length > 0) {
+			var record = rows[0];
+			clit.doc_requisito_store.reload({
+				params: {
+					doc_id: record.get('clit_id')
+				}
+			});
+		}
 	};
 </script>
