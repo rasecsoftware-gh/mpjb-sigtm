@@ -38,6 +38,7 @@
 	</style>
 	<script type ="text/javascript">
 		Ext.onReady(function(){
+			Ext.tip.QuickTipManager.init();
 			Ext.create('Ext.container.Viewport',{
 				layout: 'border',
 				renderTo: Ext.getBody(),

@@ -18,8 +18,11 @@ class M_Clit extends CI_Model{
 			u.ubigeo_departamento,
 			u.ubigeo_provincia,
 			u.ubigeo_distrito,
+			de.doc_estado_usuario,
+			de.doc_estado_fecha,
 			ed.estado_doc_desc,
-			ed.estado_doc_color
+			ed.estado_doc_color,
+			ed.estado_doc_requisito_requerido_flag
 		")
 		->from('public.clit AS cl')
 		->join('public.contribuyente AS c', 'c.contribuyente_id = cl.contribuyente_id', 'inner')
@@ -27,7 +30,8 @@ class M_Clit extends CI_Model{
 		->join('public.tipo_doc_identidad AS tdi', 'tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id', 'inner')
 		->join('public.ubigeo AS u', 'u.ubigeo_id = c.ubigeo_id', 'left')
 		->join('public.plantilla AS p', 'p.plantilla_id = cl.plantilla_id', 'left')
-		->join('public.estado_doc AS ed', 'ed.estado_doc_id = cl.estado_doc_id', 'inner')
+		->join('public.doc_estado AS de', 'de.doc_estado_id = cl.doc_estado_id', 'left')
+		->join('public.estado_doc AS ed', 'ed.estado_doc_id = de.estado_doc_id', 'left')
 		->where('cl.clit_anio', $p_anio);
 
 		switch ($search_by) {
@@ -103,7 +107,12 @@ class M_Clit extends CI_Model{
 			tdi.tipo_doc_identidad_desc,
 			u.ubigeo_departamento,
 			u.ubigeo_provincia,
-			u.ubigeo_distrito
+			u.ubigeo_distrito,
+			de.doc_estado_usuario,
+			de.doc_estado_fecha,
+			ed.estado_doc_desc,
+			ed.estado_doc_color,
+			ed.estado_doc_requisito_requerido_flag
 		")
 		->from('public.clit AS cl')
 		->join('public.contribuyente AS c', 'c.contribuyente_id = cl.contribuyente_id', 'inner')
@@ -111,27 +120,31 @@ class M_Clit extends CI_Model{
 		->join('public.tipo_doc_identidad AS tdi', 'tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id', 'inner')
 		->join('public.ubigeo AS u', 'u.ubigeo_id = c.ubigeo_id', 'left')
 		->join('public.plantilla AS p', 'p.plantilla_id = cl.plantilla_id', 'left')
-		->join('public.estado_doc AS ed', 'ed.estado_doc_id = cl.estado_doc_id', 'inner')
+		->join('public.doc_estado AS de', 'de.doc_estado_id = cl.doc_estado_id', 'left')
+		->join('public.estado_doc AS ed', 'ed.estado_doc_id = de.estado_doc_id', 'left')
 		->where('cl.clit_id', $id);
 
 		return $this->db->get()->row();
 	}
 
-	public function add ($data) {
+	public function add ($data, $estado_doc_id) {
 		$table = 'public.clit';
-		
 		$data['syslog'] = sys_session_syslog();
-
 		$this->db->trans_begin();
-
+		
 		$this->db->insert($table, $data);
+		$row_id = $this->db->insert_id();
+
+		$doc_estado_id = $this->model->add_doc_estado($row_id, $estado_doc_id);
+
+		$this->db->where('clit_id', $row_id)->update($table, array('doc_estado_id'=>$doc_estado_id));
 
 		if ($this->db->trans_status() === FALSE){
         	$this->db->trans_rollback();
         	return false;
 		} else {
         	$this->db->trans_commit();
-        	return $this->db->insert_id();
+        	return $row_id;
 		}
 	}
 
@@ -284,8 +297,9 @@ class M_Clit extends CI_Model{
 
 	public function update_doc_requisito ($data) {
 		$table = 'public.doc_requisito';
-		
-		$data['syslog'] = sys_session_syslog();
+
+		$dr = $this->get_row($data['doc_requisito_id']);
+		$data['syslog'] = sys_session_syslog('modificar', $dr->syslog);
 
 		$this->db->trans_begin();
 		$this->db
@@ -300,6 +314,57 @@ class M_Clit extends CI_Model{
         	return true;
 		}
 	}
+
+	public function delete_doc_requisito ($doc_requisito_id) {
+		$this->db->trans_begin();
+		$this->db->where('doc_requisito_id', $doc_requisito_id);
+		$this->db->delete('public.doc_requisito');
+
+		if ($this->db->trans_status() === FALSE){
+        	$this->db->trans_rollback();
+        	return false;
+		} else {
+        	$this->db->trans_commit();
+        	return true;
+		}
+	}
+
+	public function get_doc_estado_list ($doc_id) {
+		$rows = $this->db
+		->select("
+			ed.*,
+			de.doc_estado_id,
+			de.doc_id,
+			de.doc_estado_fecha,
+			de.doc_estado_usuario
+		")
+		->from('public.estado_doc AS ed')
+		->join('public.doc_estado AS de', "de.doc_id = {$doc_id} AND de.estado_doc_id = ed.estado_doc_id", 'left')
+		->where('ed.tipo_doc_id', 'CLIT')
+		->order_by('ed.estado_doc_index', 'ASC')
+		->get()->result();
+		
+		$ret = array(
+			'data'=>$rows
+		);
+		return $ret;
+	}
+
+	public function add_doc_estado ($doc_id, $estado_doc_id) {
+		$table = 'public.doc_estado';
+		$user = sys_session_getUserInfo();
+		$data = array(
+			'tipo_doc_id'=>'CLIT',
+			'doc_id'=>$doc_id,
+			'estado_doc_id'=>$estado_doc_id,
+			'doc_estado_usuario'=>$user->usuario_login,
+			'doc_estado_fecha'=>date('d/m/Y H:i:s')
+		);
+		$this->db->insert($table, $data);
+       	return $this->db->insert_id();
+	}
+
+
 
 	public function get_list_for_gen_pdf ($clit_anio='2018', $tipo_clit_id) {
 		$rows = $this->db

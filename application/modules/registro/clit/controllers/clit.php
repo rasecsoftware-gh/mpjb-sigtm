@@ -7,7 +7,7 @@ class Clit extends MX_Controller {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model('m_clit','model');
+		$this->load->model('m_clit', 'model');
 		$this->load->library('upload');
 		//sys_session_hasRoleOrDie('clit');
 	}
@@ -128,19 +128,18 @@ class Clit extends MX_Controller {
 		// SET first default state
 		$estado_doc = $this->db
 		->where('tipo_doc_id', 'CLIT')
-		->order_by('estado_doc_id', 'ASC')
+		->order_by('estado_doc_index', 'ASC')
 		->get('public.estado_doc')->row();
 
 		if ( is_null($estado_doc) ) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"No existe Estado definido para este tipo de documento, revise la configuracion de Estados por documentos por favor."
+				'msg'=>"No existe un estado definido para este tipo de documento, revise la configuracion de estados de documentos por favor."
 			)));
 		}
-		$data['estado_doc_id'] = $estado_doc->estado_doc_id;
 
 		try {
-			$result = $this->model->add($data);
+			$result = $this->model->add($data, $estado_doc->estado_doc_id);
 		} catch (Exception $ex) {
 			$error = $ex->getMessage();
 		}
@@ -414,7 +413,7 @@ class Clit extends MX_Controller {
 		if ( $tdr_count->value > 0 ) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"Ya existe un(a) {$tipo_doc_requisito->tipo_doc_requisito_desc} regiatrado."
+				'msg'=>"Ya existe un(a) {$tipo_doc_requisito->tipo_doc_requisito_desc} registrado."
 			)));
 		}
 
@@ -558,6 +557,49 @@ class Clit extends MX_Controller {
 				'msg'=>"Error al realizar la operacion.".(isset($error)?'<br>$error':'')
 			)));
 		}
+	}
+
+	public function deleteDocRequisito() {
+		//sys_session_hasRoleOrDie('rh.clit.modify');
+		$p_doc_requisito_id = intval($this->input->post('doc_requisito_id'));
+
+		if ( !($p_doc_requisito_id > 0) ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"No se ha especificado un id valido del documento."
+			)));
+		}
+
+		$doc_requisito = $this->db->where('doc_requisito_id', $p_doc_requisito_id)->get('public.doc_requisito')->row();
+		
+		$doc = $this->model->get_row($doc_requisito->doc_id);
+
+		if (to_upper($doc->estado_doc_desc) != 'REGISTRADO') {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"No es posible modificar el documento en el estado '{$doc->estado_doc_desc}' actual."
+			)));	
+		}
+
+		$result = $this->model->delete_doc_requisito($p_doc_requisito_id);
+
+		if ($result !== false) {
+			die(json_encode(array(
+				'success'=>true,
+				'msg'=>"Se elimino satisfactoriamente."
+			)));
+		} else {
+			die(json_encode(array (
+				'success'=>false,
+				'msg'=>"Error al realizar la operacion."
+			)));
+		}
+	}
+
+	public function getDocEstadoList () {
+		$p_doc_id = $this->input->get('doc_id');
+		$ret = $this->model->get_doc_estado_list($p_doc_id);
+		echo json_encode($ret);
 	}
 
 	public function printPreview() {

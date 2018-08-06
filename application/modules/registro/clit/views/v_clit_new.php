@@ -29,7 +29,8 @@
 							Ext.getCmp('clit_form_cancel_bt').show();
 							Ext.getCmp('clit_form_contribuyente_id_field').show();
 							Ext.getCmp('clit_form_contribuyente_nomape_field').hide();
-							Ext.getCmp('clit_form_doc_requisito_grid').hide();
+							Ext.getCmp('clit_form_doc_requisito_grid').disable();
+							Ext.getCmp('clit_form_doc_estado_grid').disable();
 							w.unmask();
 			    		});
 					} else {

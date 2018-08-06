@@ -13,5 +13,36 @@
 			return false;
 		} 
 		
+		Ext.Msg.show({
+		    title: 'Documento adjunto',
+		    message: 'Realmente desea quitar el documento?',
+		    buttons: Ext.Msg.YESNO,
+		    icon: Ext.Msg.QUESTION,
+		    fn: function(btn) {
+		        if (btn === 'yes') {
+		        	Ext.Ajax.request({
+						params: {
+							doc_requisito_id: record.get('doc_requisito_id')
+						},
+						url: 'clit/deleteDocRequisito',
+						success: function (response, opts) {
+							var result = Ext.decode(response.responseText);
+							if (result.success) {
+								Ext.Msg.alert('Documento', result.msg);
+								clit.doc_requisito_reload_list(record.get('doc_id'));
+							} else {
+								Ext.Msg.alert('Documento', result.msg);
+							}
+						},
+						failure: function (response, opts){
+							Ext.Msg.alert('Error', 'Ha ocurrido un error al realizar la operacion.');
+						},
+						timeout: 5*60*1000 // 5m
+					});
+		        } else {
+		            console.log('Cancel pressed');
+		        } 
+		    }
+		});
 	};
 </script>

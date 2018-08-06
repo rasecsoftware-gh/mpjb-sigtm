@@ -124,8 +124,10 @@
 						Ext.getCmp('clit_form_cancel_bt').hide();
 						Ext.getCmp('clit_form_contribuyente_id_field').hide();
 						Ext.getCmp('clit_form_contribuyente_nomape_field').show();
-						Ext.getCmp('clit_form_doc_requisito_grid').show();
+						Ext.getCmp('clit_form_doc_requisito_grid').enable();
+						Ext.getCmp('clit_form_doc_estado_grid').enable();
 						clit.doc_requisito_reload_list(record.get('clit_id'));
+						clit.doc_estado_reload_list(record.get('clit_id'));
 					}
 				},
 				rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
@@ -279,61 +281,153 @@
     				x: 10, y: 120, width: 200
 				}]
 			},{
-				xtype: 'grid',
-				id: 'clit_form_doc_requisito_grid',
-				region: 'center', 
-				//split:true, 
-				//forceFit:true,
-				sortableColumns: false,
-				enableColumnHide: false,
-				store: clit.doc_requisito_store,
-				columns:[
-					{text:'Documento', dataIndex: 'tipo_doc_requisito_desc', width: 190,
-						renderer: function (value, metaData, record) {
-							if ( record.get('doc_requisito_id') == null ) {
-								metaData.tdStyle = 'color: silver;';
+				xtype: 'panel',
+				layout: 'border',
+				region: 'center',
+				items: [{
+					xtype: 'grid',
+					id: 'clit_form_doc_requisito_grid',
+					region: 'center', 
+					//split:true, 
+					//forceFit:true,
+					sortableColumns: false,
+					enableColumnHide: false,
+					store: clit.doc_requisito_store,
+					columns:[
+						{text:'Documento', dataIndex: 'tipo_doc_requisito_desc', width: 190,
+							renderer: function (value, metaData, record) {
+								if ( record.get('doc_requisito_id') == null ) {
+									metaData.tdStyle = 'color: silver;';
+								} 
+								return value;
 							}
-							return value;
+						},
+						{
+				            xtype: 'actioncolumn',
+				            width: 25,
+				            items: [{
+				                icon: 'tools/icons/page_white_acrobat.png',  // Use a URL in the icon config
+				                tooltip: 'Ver PDF',
+				                handler: function(grid, rowIndex, colIndex, item, e, record) {
+				                    window.open('dbfiles/public.doc_requisito/'+record.get('doc_requisito_pdf'), '_blank');
+				                },
+				                isDisabled: function (view, rowIndex, colIndex, item, record) {
+				                	return !($.trim(record.get('doc_requisito_pdf')).length > 0);
+				                }
+				            }]
+				        },
+						{text:'Fecha', dataIndex: 'doc_requisito_fecha', width: 70},
+						{text:'Numero', dataIndex: 'doc_requisito_numero', width: 65},
+						{text:'Requer.', dataIndex: 'tipo_doc_requisito_requerido_flag', width: 60, align: 'center'},
+						{text:'Presentado', dataIndex: 'doc_requisito_id', width: 70, align: 'center',
+							renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
+								if (value == null) {
+									metaData.tdStyle = 'color: silver;';
+									value = 'No';
+								} else {
+									metaData.tdStyle = 'color: green; font-weight: bold;';
+									value = 'Si';
+								}
+								return value;
+							}
+						}
+					],
+					tbar:[{
+						xtype: 'label',
+						text: 'Documentos requeridos y/o adjuntados'
+					},'->',{
+						text: 'Agregar o Modifcar', 
+						tooltip: 'Agregar o Modificar documento', tooltipType: 'title',
+						handler: function() {
+							clit.doc_requisito_add_or_edit();
+						}
+					},{
+						text: '-', 
+						tooltip: 'Quitar', tooltipType: 'title',
+						handler: function() {
+							clit.doc_requisito_delete_window();
+						}
+					}],
+					listeners: {
+						rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
+							clit.doc_requisito_add_or_edit();
 						}
 					},
-					{text:'Fecha', dataIndex: 'doc_requisito_fecha', width: 70},
-					{text:'Numero', dataIndex: 'doc_requisito_numero', width: 65},
-					{text:'Requer.', dataIndex: 'tipo_doc_requisito_requerido_flag', width: 60, align: 'center'},
-					{text:'Presentado', dataIndex: 'doc_requisito_id', width: 70, align: 'center',
-						renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
-							if (value == null) {
-								metaData.tdStyle = 'color: silver;';
-								value = 'No';
-							} else {
-								metaData.tdStyle = 'color: green;';
-								value = 'Si';
-							}
-							return value;
-						}
-					}
-				],
-				tbar:[{
-					xtype: 'label',
-					text: 'Documentos requeridos y/o adjuntados'
-				},'->',{
-					text: 'Agregar o Modifcar', 
-					tooltip: 'Agregar o Modificar documento', tooltipType: 'title',
-					handler: function() {
-						clit.doc_requisito_add_or_edit();
-					}
+					hidden: false // hide on new CLIT
 				},{
-					text: '-', 
-					tooltip: 'Quitar', tooltipType: 'title',
-					handler: function() {
-						clit.doc_requisito_delete_window();
-					}
-				}],
-				listeners: {
-					rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
-						clit.doc_requisito_add_or_edit();
-					}
-				},
-				hidden: false // hide on new CLIT
+					xtype: 'grid',
+					id: 'clit_form_doc_estado_grid',
+					region: 'south', 
+					height: 200,
+					//split:true, 
+					//forceFit:true,
+					sortableColumns: false,
+					enableColumnHide: false,
+					store: clit.doc_estado_store,
+					columns:[
+						{	
+							text:'Estado', dataIndex: 'estado_doc_desc', width: 150,
+							renderer: function (value, metaData, record) {
+								if ( record.get('doc_estado_id') == null ) {
+									metaData.tdStyle = 'color: silver;';
+								} else {
+									metaData.tdStyle = 'color: '+ record.estado_doc_color +';';
+								}
+								return value;
+							}
+						},
+						{ text: 'Fecha', dataIndex: 'doc_estado_fecha', width: 130 },
+						{ text: 'Usuario', dataIndex: 'doc_estado_usuario', width: 100},
+						{
+				            xtype: 'actioncolumn',
+				            width: 50,
+				            items: [{
+				                icon: 'tools/icons/accept.png',  // Use a URL in the icon config
+				                tooltip: 'Establecer estado', tooltipType: 'title',
+				                handler: function(grid, rowIndex, colIndex, item, e, record) {
+				                    alert('go state!');
+				                },
+				                isDisabled: function (view, rowIndex, colIndex, item, record) {
+				                	return (record.get('doc_estado_id') != null);
+				                }
+				            },{
+				                icon: 'tools/icons/arrow_undo.png',  // Use a URL in the icon config
+				                tooltip: 'Cancelar estado', tooltipType: 'title',
+				                handler: function(grid, rowIndex, colIndex, item, e, record) {
+				                    alert('go undo state!');
+				                },
+				                isDisabled: function (view, rowIndex, colIndex, item, record) {
+				                	return ( 
+				                		record.get('doc_estado_id') == null // no tiene estado definido
+				                		|| record.get('estado_doc_index') == 1 // estado inicial
+				                	);
+				                }
+				            }]
+				        }
+					],
+					tbar:[{
+						xtype: 'label',
+						text: 'Control de estados'
+					},'->',{
+						text: 'Continuar', 
+						tooltip: 'Modificar documento', tooltipType: 'title',
+						handler: function() {
+							clit.doc_requisito_add_or_edit();
+						}
+					},{
+						text: '-', 
+						tooltip: 'Quitar', tooltipType: 'title',
+						handler: function() {
+							clit.doc_requisito_delete_window();
+						}
+					}],
+					listeners: {
+						rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
+							//clit.doc_requisito_add_or_edit();
+						}
+					},
+					hidden: false // hide on new CLIT
+				}]
 			}]
 		}]
 	});
@@ -369,5 +463,13 @@
 		} else {
 			Ext.Msg.alert('Agregar o Modificar documento', 'Seleccione un registro por favor.');
 		}
+	};
+
+	clit.doc_estado_reload_list = function (doc_id) {
+		clit.doc_estado_store.reload({
+			params: {
+				doc_id: doc_id
+			}
+		});
 	};
 </script>

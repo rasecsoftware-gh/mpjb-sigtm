@@ -71,6 +71,23 @@
 		}
 	});
 
+	clit.doc_estado_store = Ext.create("Ext.data.Store", {
+		proxy:{
+			type: 'ajax',
+			url: 'clit/getDocEstadoList',
+			reader: {
+				type: 'json',
+				rootProperty: 'data',
+				totalProperty: 'total'
+			}
+		},
+		autoLoad: false,
+		listeners: {
+			load: function () {
+			}
+		}
+	});
+
 	clit.form_editing = false;
 	clit.clit_id_selected = 0;
 	
@@ -109,6 +126,7 @@
 <?php //echo $this->load->view('v_clit_delete'); ?>
 <?php echo $this->load->view('v_clit_doc_requisito_add'); ?>
 <?php echo $this->load->view('v_clit_doc_requisito_edit'); ?>
+<?php echo $this->load->view('v_clit_doc_requisito_delete'); ?>
 <?php //echo $this->load->view('v_clit_inactivar'); ?>
 <?php //echo $this->load->view('v_clit_entregar'); ?>
 <?php //echo $this->load->view('v_clit_anular'); ?>
