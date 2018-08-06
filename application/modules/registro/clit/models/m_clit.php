@@ -106,7 +106,7 @@ class M_Clit extends CI_Model{
 			u.ubigeo_distrito
 		")
 		->from('public.clit AS cl')
-		->join('public.contribuyente AS c', 'c.contribuyente_id = c.contribuyente_id', 'inner')
+		->join('public.contribuyente AS c', 'c.contribuyente_id = cl.contribuyente_id', 'inner')
 		->join('public.tipo_persona AS tp', 'tp.tipo_persona_id = c.tipo_persona_id', 'inner')
 		->join('public.tipo_doc_identidad AS tdi', 'tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id', 'inner')
 		->join('public.ubigeo AS u', 'u.ubigeo_id = c.ubigeo_id', 'left')
@@ -167,7 +167,7 @@ class M_Clit extends CI_Model{
 	}
 	
 	public function get_contribuyente_list ($filter) {
-		$rows = $this->db
+		$this->db
 		->select("
 			c.*,
 			tp.tipo_persona_desc,
@@ -180,11 +180,20 @@ class M_Clit extends CI_Model{
 		->join('public.tipo_persona AS tp', 'tp.tipo_persona_id = c.tipo_persona_id', 'inner')
 		->join('public.tipo_doc_identidad AS tdi', 'tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id', 'inner')
 		->join('public.ubigeo AS u', 'u.ubigeo_id = c.ubigeo_id', 'left')
-		->where('c.contribuyente_estado', 'A')
-		->where("c.contribuyente_numero_doc||' '||c.contribuyente_nombres||' '||c.contribuyente_apellidos ILIKE '%{$filter}%'")
-		->order_by('c.contribuyente_nombres')
+		->where('c.contribuyente_estado', 'A');
+		if ( $filter != '' ) {
+			$terms = explode(' ', $filter);
+			foreach ($terms as $i=>$t) {
+				if (trim($t)!='') {
+					$this->db->where("c.contribuyente_numero_doc||' '||c.contribuyente_nombres||' '||c.contribuyente_apellidos ILIKE '%{$t}%'");
+				}
+			}
+			
+		}
+		$rows = $this->db->order_by('c.contribuyente_nombres')
 		->order_by('c.contribuyente_apellidos')
 		->order_by('c.contribuyente_id')
+		->limit(50)
 		->get()->result();
 		$total_count = count($rows);
 		$ret = array(
@@ -231,10 +240,10 @@ class M_Clit extends CI_Model{
 		return $ret;
 	}
 	// consulta que se cruza con tipo_doc_requisito para tener el listado completo de lo que HAY y SE TIENE ya registrado
-	public function get_doc_requisito_list ($clit_id) {
+	public function get_doc_requisito_list ($doc_id) {
 		$rows = $this->db
 		->select("
-			tdr.*
+			tdr.*,
 			dr.doc_requisito_id,
 			dr.doc_id,
 			dr.doc_requisito_pdf,
@@ -243,7 +252,7 @@ class M_Clit extends CI_Model{
 			dr.doc_requisito_numero
 		")
 		->from('public.tipo_doc_requisito AS tdr')
-		->join('public.doc_requisito AS AS dr', 'dr.doc_id = {$clit_id} AND dr.tipo_doc_requisito_id = tdr.tipo_doc_requisito_id', 'left')
+		->join('public.doc_requisito AS dr', "dr.doc_id = {$doc_id} AND dr.tipo_doc_requisito_id = tdr.tipo_doc_requisito_id", 'left')
 		->where('tdr.tipo_doc_id', 'CLIT')
 		->where('tdr.tipo_doc_requisito_estado', 'A')
 		->order_by('tdr.tipo_doc_requisito_id', 'ASC')
@@ -253,6 +262,43 @@ class M_Clit extends CI_Model{
 			'data'=>$rows
 		);
 		return $ret;
+	}
+
+	public function add_doc_requisito ($data) {
+		$table = 'public.doc_requisito';
+		
+		$data['syslog'] = sys_session_syslog();
+
+		$this->db->trans_begin();
+
+		$this->db->insert($table, $data);
+
+		if ($this->db->trans_status() === FALSE){
+        	$this->db->trans_rollback();
+        	return false;
+		} else {
+        	$this->db->trans_commit();
+        	return $this->db->insert_id();
+		}
+	}
+
+	public function update_doc_requisito ($data) {
+		$table = 'public.doc_requisito';
+		
+		$data['syslog'] = sys_session_syslog();
+
+		$this->db->trans_begin();
+		$this->db
+		->where('doc_requisito_id', $data['doc_requisito_id'])
+		->update($table, $data);
+
+		if ($this->db->trans_status() === FALSE){
+        	$this->db->trans_rollback();
+        	return false;
+		} else {
+        	$this->db->trans_commit();
+        	return true;
+		}
 	}
 
 	public function get_list_for_gen_pdf ($clit_anio='2018', $tipo_clit_id) {

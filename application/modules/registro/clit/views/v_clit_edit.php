@@ -1,13 +1,13 @@
 <script>
-	contribuyente.edit_window = function(id) {
-		if (contribuyente.form_editing) return;
-		contribuyente.form_editing = true;
-		var w = Ext.getCmp('contribuyente_form');
+	clit.edit_window = function(id) {
+		if (clit.form_editing) return;
+		clit.form_editing = true;
+		var w = Ext.getCmp('clit_form');
 		w.mask('cargando');
 		Ext.create("Ext.data.Store", {
 			proxy: {
 				type: 'ajax',
-				url: 'contribuyente/getRow/'+id,
+				url: 'clit/getRow/'+id,
 				reader:{
 					type: 'json',
 					rootProperty: 'data',
@@ -19,29 +19,30 @@
 				load: function (sender, records, successful, eOpts) {
 					if (successful) {
 						var record = sender.getAt(0);
-						// load plantilla
-						contribuyente.ubigeo_store.reload({
+						clit.contribuyente_store.reload({
 			    			params: {
-			    				query: record.get('ubigeo_id')
+			    				query: record.get('contribuyente_numero_doc')
 			    			}
 			    		});
+			    		clit.doc_requisito_reload_list(record.get('clit_id'));
 						sys_storeLoadMonitor([
-							contribuyente.tipo_persona_store, 
-							contribuyente.tipo_doc_identidad_store, 
-							contribuyente.ubigeo_store
+							clit.contribuyente_store,
+							clit.doc_requisito_store
 						], function () {
-							var frm = Ext.getCmp('contribuyente_form');
+							var frm = Ext.getCmp('clit_form');
 							frm.loadRecord(record);
-							Ext.getCmp('contribuyente_form_save_bt').show();
-							Ext.getCmp('contribuyente_form_cancel_bt').show();
-							Ext.getCmp('contribuyente_form_ubigeo_id_field').show();
-							Ext.getCmp('contribuyente_form_ubigeo_distrito_field').hide();
+							Ext.getCmp('clit_form_title_label').setText('Modificar Constancia');
+							Ext.getCmp('clit_form_save_bt').show();
+							Ext.getCmp('clit_form_cancel_bt').show();
+							Ext.getCmp('clit_form_contribuyente_id_field').show();
+							Ext.getCmp('clit_form_contribuyente_nomape_field').hide();
+							Ext.getCmp('clit_form_doc_requisito_grid').show();
 							w.unmask();
 						});
 					} else {
-						Ext.Msg.alert('contribuyente', eOpts.getResultSet().getMessage());
+						Ext.Msg.alert('clit', eOpts.getResultSet().getMessage());
 						w.unmask();
-						contribuyente.form_editing = false;
+						clit.form_editing = false;
 					}
 				}
 			}

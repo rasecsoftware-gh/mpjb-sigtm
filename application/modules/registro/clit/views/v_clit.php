@@ -105,9 +105,10 @@
 <!--  cargamos los componentes -->
 <?php echo $this->load->view('v_clit_list'); ?>
 <?php echo $this->load->view('v_clit_new'); ?>
-<?php //echo $this->load->view('v_clit_edit'); ?>
+<?php echo $this->load->view('v_clit_edit'); ?>
 <?php //echo $this->load->view('v_clit_delete'); ?>
-<?php //echo $this->load->view('v_clit_activar'); ?>
+<?php echo $this->load->view('v_clit_doc_requisito_add'); ?>
+<?php echo $this->load->view('v_clit_doc_requisito_edit'); ?>
 <?php //echo $this->load->view('v_clit_inactivar'); ?>
 <?php //echo $this->load->view('v_clit_entregar'); ?>
 <?php //echo $this->load->view('v_clit_anular'); ?>

@@ -19,8 +19,9 @@
 				{text:'Resultado', dataIndex:'clit_resultado', width: 65},
 				{text:'Estado', dataIndex:'estado_doc_desc', width: 80,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
-						if (record.estado_doc_color != '') {
-							value = '<span style="color: '+record.estado_doc_color+';">'+value+'</span>';
+						if (record.get('estado_doc_color') != '') {
+							metaData.tdStyle = 'color: ' + record.get('estado_doc_color');
+							//value = '<span style="color: '+record.get('estado_doc_color')+';">'+value+'</span>';
 						} 
 						return value;
 					}
@@ -117,11 +118,14 @@
 					if (!clit.form_editing) {
 						var f = Ext.getCmp('clit_form');
 						f.loadRecord(record);
+						Ext.getCmp('clit_form_title_label').setText('Constancia');
 						Ext.getCmp('clit_form_clit_id_displayfield').setValue(record.get('clit_id'));
 						Ext.getCmp('clit_form_save_bt').hide();
 						Ext.getCmp('clit_form_cancel_bt').hide();
 						Ext.getCmp('clit_form_contribuyente_id_field').hide();
 						Ext.getCmp('clit_form_contribuyente_nomape_field').show();
+						Ext.getCmp('clit_form_doc_requisito_grid').show();
+						clit.doc_requisito_reload_list(record.get('clit_id'));
 					}
 				},
 				rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
@@ -145,18 +149,21 @@
 				height: 200,
 				bodyStyle: {
 					//background: '#4c9dd8'
+					borderTop: '1px solid silver!important;'
 				},
 				tbar:[{
 					xtype: 'label',
+					id: 'clit_form_title_label',
 					text: 'Constancia',
 					style: {
 						fontWeight: 'bold'
 					}
-				},'-','->',{
+				},'->',{
 					text: 'Guardar',
 					id: 'clit_form_save_bt',
 					hidden: true,
 					handler: function () {
+						var operation = Ext.getCmp('clit_form_operation_field').getValue();
 						var frm = Ext.getCmp('clit_form');
 						frm.mask('guardando');
 						frm.submit({
@@ -164,7 +171,10 @@
 								frm.unmask();
 								if (action.result.success) {
 									clit.form_editing = false;
-									clit.main_store.reload(action.result.rowid);	
+									if ( operation == 'new' ) {
+										clit.edit_window(action.result.rowid);
+									}
+									clit.main_store.reload(action.result.rowid);
 								} else {
 									Ext.Msg.alert('Error', action.result.msg);
 								}
@@ -213,6 +223,7 @@
 					id: 'clit_form_clit_numero_field',
     				xtype: 'textfield',
     				name: 'clit_numero',
+    				fieldStyle: 'text-align: center;',
     				x: 10, y: 30, width: 160
 				},{
 					id: 'clit_form_clit_anio_field',
@@ -277,31 +288,51 @@
 				enableColumnHide: false,
 				store: clit.doc_requisito_store,
 				columns:[
-					{text:'Documento', dataIndex: 'tipo_doc_requisito_desc', width: 212},
+					{text:'Documento', dataIndex: 'tipo_doc_requisito_desc', width: 190,
+						renderer: function (value, metaData, record) {
+							if ( record.get('doc_requisito_id') == null ) {
+								metaData.tdStyle = 'color: silver;';
+							}
+							return value;
+						}
+					},
 					{text:'Fecha', dataIndex: 'doc_requisito_fecha', width: 70},
 					{text:'Numero', dataIndex: 'doc_requisito_numero', width: 65},
-					{text:'Requerido', dataIndex: 'tipo_doc_requisito_requerido_flag', width: 70},
-					{text:'Cumple', dataIndex: 'doc_requisito_cumple_flag', width: 65,
+					{text:'Requer.', dataIndex: 'tipo_doc_requisito_requerido_flag', width: 60, align: 'center'},
+					{text:'Presentado', dataIndex: 'doc_requisito_id', width: 70, align: 'center',
 						renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
-							if (value == 'S') {
-								value = '<span style="color: green;">'+value+'</span>';
+							if (value == null) {
+								metaData.tdStyle = 'color: silver;';
+								value = 'No';
 							} else {
-								return value;	
+								metaData.tdStyle = 'color: green;';
+								value = 'Si';
 							}
+							return value;
 						}
 					}
 				],
 				tbar:[{
-					text: 'Actualizar', 
+					xtype: 'label',
+					text: 'Documentos requeridos y/o adjuntados'
+				},'->',{
+					text: 'Agregar o Modifcar', 
+					tooltip: 'Agregar o Modificar documento', tooltipType: 'title',
 					handler: function() {
-						clit.doc_requisito_reload();
+						clit.doc_requisito_add_or_edit();
 					}
 				},{
-					text: 'Quitar', 
+					text: '-', 
+					tooltip: 'Quitar', tooltipType: 'title',
 					handler: function() {
 						clit.doc_requisito_delete_window();
 					}
 				}],
+				listeners: {
+					rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
+						clit.doc_requisito_add_or_edit();
+					}
+				},
 				hidden: false // hide on new CLIT
 			}]
 		}]
@@ -318,15 +349,25 @@
 		});
 	};
 
-	clit.doc_requisito_reload_list = function () {
-		var rows = Ext.getCmp('clit_main_grid').getSelection();
+	clit.doc_requisito_reload_list = function (doc_id) {
+		clit.doc_requisito_store.reload({
+			params: {
+				doc_id: doc_id
+			}
+		});
+	};
+
+	clit.doc_requisito_add_or_edit = function () {
+		var rows = Ext.getCmp('clit_form_doc_requisito_grid').getSelection();
 		if (rows.length > 0) {
-			var record = rows[0];
-			clit.doc_requisito_store.reload({
-				params: {
-					doc_id: record.get('clit_id')
-				}
-			});
+			record = rows[0];
+			if ( record.get('doc_requisito_id') > 0 ) {
+				clit.doc_requisito_edit_window();
+			} else {
+				clit.doc_requisito_add_window();
+			}
+		} else {
+			Ext.Msg.alert('Agregar o Modificar documento', 'Seleccione un registro por favor.');
 		}
 	};
 </script>

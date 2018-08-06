@@ -24,10 +24,9 @@ class Clit extends MX_Controller {
 		$pagination_size = $this->input->get('limit');
 		$pagination_start = $this->input->get('start');
 		$ret = $this->model->get_list($search_by, $search_text, $p_anio, $pagination_size, $pagination_start);
-		/*$rows = $ret['data'];
-		foreach ($rows as $i=>$r) {
-			//$ret['data'][$i]->oc_anio_numero = $r->oc_anio.'-'.$r->oc_numero;
-		}*/
+		foreach ($ret['data'] as $i=>$r) {
+			$ret['data'][$i]->contribuyente_nomape = $r->contribuyente_nombres.' '.$r->contribuyente_apellidos;
+		}
 		echo json_encode($ret);
 	}
 
@@ -382,6 +381,183 @@ class Clit extends MX_Controller {
 		$doc_id = $this->input->get('doc_id');
 		$ret = $this->model->get_doc_requisito_list($doc_id);
 		echo json_encode($ret);
+	}
+
+	public function addDocRequisito() {
+		//sys_session_hasRoleOrDie('rh.contrato.modify');
+		//var_dump($_FILES);
+		$upload_path = 'dbfiles/public.doc_requisito/';
+		$data = array(
+			'tipo_doc_id'=>'CLIT',
+			'doc_id'=>$this->input->post('doc_id'),
+			'tipo_doc_requisito_id'=>$this->input->post('tipo_doc_requisito_id'),
+			'doc_requisito_fecha'=>$this->input->post('doc_requisito_fecha'),
+			'doc_requisito_numero'=>to_upper($this->input->post('doc_requisito_numero'))
+		);
+
+		if ( !($data['tipo_doc_requisito_id'] > 0) ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique el Tipo de Documento a Adjuntar."
+			)));
+		}
+		
+		$tipo_doc_requisito = $this->db->where('tipo_doc_requisito_id', $data['tipo_doc_requisito_id'])->get('public.tipo_doc_requisito')->row();
+		
+		// revisar si el tipo_doc_requisito ya existe
+		$tdr_count = $this->db
+		->select('COUNT(*) AS value')
+		->where('doc_id', $data['doc_id'])
+		->where('tipo_doc_requisito_id', $data['tipo_doc_requisito_id'])
+		->get('public.doc_requisito')->row();
+
+		if ( $tdr_count->value > 0 ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Ya existe un(a) {$tipo_doc_requisito->tipo_doc_requisito_desc} regiatrado."
+			)));
+		}
+
+		$uploaded = false;
+		if (isset($_FILES['doc_requisito_file']) && $_FILES['doc_requisito_file']['name'] != '') {
+			$config['upload_path'] = $upload_path;
+			$config['allowed_types'] = 'pdf'; //gif|jpg|png
+			$this->upload->initialize($config);
+			if ($this->upload->do_upload('doc_requisito_file')) {
+				$data['doc_requisito_pdf'] = $this->upload->data('file_name');
+				$uploaded = true;
+			} else {
+				die(json_encode(array(
+					'success'=>false,
+					'msg'=>'UPLOAD: '.$this->upload->display_errors()
+				)));
+			}	
+		} 
+		
+		if ( $tipo_doc_requisito->tipo_doc_requisito_pdf_flag == 'S' && !$uploaded) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Este documento requiere que se adjunte el escaneado en formato PDF."
+			)));			
+		}
+
+		if ( $data['doc_requisito_fecha'] == '' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la fecha",
+				'target_id'=>'clit_doc_requisito_form_doc_requisito_fecha_field'
+			)));
+		}
+
+		if ( $data['doc_requisito_numero'] == '' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique el Numero",
+				'target_id'=>'clit_doc_requisito_form_doc_requisito_numero_field'
+			)));
+		}
+
+		try {
+			//unset($data['plantilla_id']);
+			$result = $this->model->add_doc_requisito($data);
+		} catch (Exception $ex) {
+			$error = $ex->getMessage();
+		}
+
+		if ($result !== false) {
+			die(json_encode(array(
+				'success'=>true,
+				'msg'=>"Se guardo satisfactoriamente",
+				'rowid'=>$result
+			)));
+			
+		} else {
+			die(json_encode(array (
+				'success'=>false,
+				'msg'=>"Error al realizar la operacion.".(isset($error)?'<br>$error':'')
+			)));
+		}
+	}
+
+	public function updateDocRequisito() {
+		//sys_session_hasRoleOrDie('rh.contrato.modify');
+		//var_dump($_FILES);
+		$upload_path = 'dbfiles/public.doc_requisito/';
+		$data = array(
+			'doc_requisito_id'=>$this->input->post('doc_requisito_id'),
+			'doc_requisito_fecha'=>$this->input->post('doc_requisito_fecha'),
+			'doc_requisito_numero'=>to_upper($this->input->post('doc_requisito_numero'))
+		);
+		$doc_requisito = $this->db->where('doc_requisito_id', $data['doc_requisito_id'])->get('public.doc_requisito')->row();
+		$p_tipo_doc_requisito_id = $this->input->post('tipo_doc_requisito_id');
+		if ( !($p_tipo_doc_requisito_id > 0) ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique el Tipo de Documento a Adjuntar."
+			)));
+		}
+
+		$uploaded = false;
+		if (isset($_FILES['doc_requisito_file']) && $_FILES['doc_requisito_file']['name'] != '') {
+			$config['upload_path'] = $upload_path;
+			$config['allowed_types'] = 'pdf'; //gif|jpg|png
+			$this->upload->initialize($config);
+			if ($this->upload->do_upload('doc_requisito_file')) {
+				$data['doc_requisito_pdf'] = $this->upload->data('file_name');
+				$uploaded = true;
+			} else {
+				die(json_encode(array(
+					'success'=>false,
+					'msg'=>'UPLOAD: '.$this->upload->display_errors()
+				)));
+			}	
+		}
+		
+		$tipo_doc_requisito = $this->db->where('tipo_doc_requisito_id', $p_tipo_doc_requisito_id)->get('public.tipo_doc_requisito')->row();
+		if ( $tipo_doc_requisito->tipo_doc_requisito_pdf_flag == 'S' && !$uploaded && $doc_requisito->doc_requisito_pdf == '' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"El archivo PDF es requerido para este documento."
+			)));		
+		}
+		
+
+		if ( $data['doc_requisito_fecha'] == '' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la fecha",
+				'target_id'=>'clit_doc_requisito_form_doc_requisito_fecha_field'
+			)));
+		}
+
+		if ( $data['doc_requisito_numero'] == '' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique el Numero",
+				'target_id'=>'clit_doc_requisito_form_doc_requisito_numero_field'
+			)));
+		}
+
+		try {
+			//unset($data['plantilla_id']);
+			$result = $this->model->update_doc_requisito($data);
+		} catch (Exception $ex) {
+			$error = $ex->getMessage();
+		}
+
+		if ($result !== false) {
+			die(json_encode(array(
+				'success'=>true,
+				'msg'=>"Se guardo satisfactoriamente",
+				'rowid'=>$result
+			)));
+			
+		} else {
+			die(json_encode(array (
+				'success'=>false,
+				'msg'=>"Error al realizar la operacion.".(isset($error)?'<br>$error':'')
+			)));
+		}
 	}
 
 	public function printPreview() {
