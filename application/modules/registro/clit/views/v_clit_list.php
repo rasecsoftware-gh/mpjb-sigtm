@@ -12,12 +12,27 @@
 			enableColumnHide: false,
 			columns:[
 				{text:'Año', dataIndex:'clit_anio', width: 45},
-				{text:'Numero', dataIndex:'clit_numero', width: 60},
+				{text:'Numero', dataIndex:'clit_numero', width: 55},
+				{
+		            xtype: 'actioncolumn',
+		            width: 25,
+		            items: [{
+		                icon: 'tools/icons/page_white_acrobat.png',  // Use a URL in the icon config
+		                tooltip: 'Ver constancia en formato PDF',
+		                handler: function(grid, rowIndex, colIndex, item, e, record) {
+		                    clit.print_window(record);
+		                },
+		                isDisabled: function (view, rowIndex, colIndex, item, record) {
+		                	return !($.trim(record.get('clit_pdf')).length > 0);
+		                }
+		            }]
+		        },
 				{text:'Nombres o Razon Soc.', dataIndex:'contribuyente_nombres', width: 200},
 				{text:'Apellidos', dataIndex:'contribuyente_apellidos', width: 150},
-				{text:'Fecha', dataIndex:'clit_fecha', width: 80},
-				{text:'Resultado', dataIndex:'clit_resultado', width: 65},
-				{text:'Estado', dataIndex:'estado_doc_desc', width: 80,
+				{text:'DNI/RUC', dataIndex:'contribuyente_numero_doc', width: 75},
+				{text:'Fecha', dataIndex:'clit_fecha', width: 70},
+				{text:'Resultado', dataIndex:'clit_resultado', width: 70, align: 'center'},
+				{text:'Estado', dataIndex:'estado_doc_desc', width: 70,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
 						if (record.get('estado_doc_color') != '') {
 							metaData.tdStyle = 'color: ' + record.get('estado_doc_color');
@@ -45,14 +60,14 @@
 			},'-',{
 				text: 'Opciones', 
 				menu: [{
-					text: 'Inactivar', 
+					text: 'Generar PDF', 
 					handler: function() {
-						clit.inactivar_window();
+						clit.pdf_generar_window();
 					}
 				},{
-					text: 'Activar', 
+					text: 'Cambiar plantilla', 
 					handler: function() {
-						clit.activar_window();
+						clit.plantilla_cambiar_window();
 					}
 				},'-',{
 					text: 'Eliminar', 
@@ -198,6 +213,8 @@
 						Ext.getCmp('clit_form_cancel_bt').hide();
 						Ext.getCmp('clit_form_contribuyente_id_field').hide();
 						Ext.getCmp('clit_form_contribuyente_nomape_field').show();
+						Ext.getCmp('clit_form_doc_requisito_grid').enable();
+						Ext.getCmp('clit_form_doc_estado_grid').enable();
 						clit.form_editing = false;
 					}
 				}],
@@ -214,6 +231,10 @@
 					xtype: 'hidden',
 					id: 'clit_form_clit_id_field',
 					name: 'clit_id'
+				},{
+					xtype: 'hidden',
+					id: 'clit_form_plantilla_id_field',
+					name: 'plantilla_id'
 				},{
 					xtype: 'displayfield',
 					id: 'clit_form_clit_id_displayfield',
@@ -274,11 +295,30 @@
     				format: 'd/m/Y',
     				x: 10, y: 90, width: 200
 				},{
-					fieldLabel: 'Resultado',
-					id: 'clit_form_clit_resultado_field',
-    				xtype: 'textfield',
+    				xtype: 'combobox',
+    				id: 'clit_form_clit_resultado_field',
     				name: 'clit_resultado',
-    				x: 10, y: 120, width: 200
+    				fieldLabel: 'Registra Infraccion de Transito?',
+    				displayField: 'desc',
+    				valueField: 'id',
+    				store: clit.resultado_store,
+    				queryMode: 'local',
+    				x: 10, y: 120, width: 300,
+    				editable: false,
+    				listeners: {
+    					select: function(combo, record, eOpts ) {
+				    	}
+    				},
+    				labelWidth: 170,
+    				hidden: false // only for edit
+				},{
+					xtype: 'displayfield',
+					id: 'clit_form_plantilla_desc_displayfield',
+					fieldLabel: 'Plantilla para la generacion del documento PDF',
+					name: 'plantilla_desc',
+					x: 10, y: 150,
+					width: 400,
+					labelWidth: 250
 				}]
 			},{
 				xtype: 'panel',
@@ -301,8 +341,7 @@
 								} 
 								return value;
 							}
-						},
-						{
+						},{
 				            xtype: 'actioncolumn',
 				            width: 25,
 				            items: [{
@@ -371,7 +410,7 @@
 								if ( record.get('doc_estado_id') == null ) {
 									metaData.tdStyle = 'color: silver;';
 								} else {
-									metaData.tdStyle = 'color: '+ record.estado_doc_color +';';
+									metaData.tdStyle = 'color: '+ record.get('estado_doc_color') +';';
 								}
 								return value;
 							}
@@ -402,9 +441,10 @@
 				                icon: 'tools/icons/arrow_undo.png',  // Use a URL in the icon config
 				                tooltip: 'Cancelar estado', tooltipType: 'title',
 				                handler: function(grid, rowIndex, colIndex, item, e, record) {
-				                    alert('go undo state!');
+				                    clit.doc_estado_delete_window(record);
 				                },
 				                isDisabled: function (view, rowIndex, colIndex, item, record) {
+				                	var doc = Ext.getCmp('clit_form').getRecord();
 				                	return !(
 				                		record.get('estado_doc_index') > 1 // no es inicial (el estado incial no se puede revertir)
 				                		&& record.get('doc_estado_id') != null // no tiene registro
@@ -422,13 +462,8 @@
 						tooltip: 'Modificar documento', tooltipType: 'title',
 						handler: function() {
 							clit.doc_requisito_add_or_edit();
-						}
-					},{
-						text: '-', 
-						tooltip: 'Quitar', tooltipType: 'title',
-						handler: function() {
-							clit.doc_requisito_delete_window();
-						}
+						},
+						hidden: true
 					}],
 					listeners: {
 						rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {

@@ -33,6 +33,22 @@ class Clit extends MX_Controller {
 	public function getNewRow () {
 		$row = $this->model->get_new_row();
 		$row['operation'] = 'new';
+		
+		// SET first default template
+		$plantilla = $this->db
+		->where('tipo_doc_id', 'CLIT')
+		->where('plantilla_estado', 'A')
+		->order_by('plantilla_id', 'ASC')
+		->get('public.plantilla')->row();
+
+		if ( is_null($plantilla) ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"No existe una plantilla para este tipo de documento, revise la configuracion de plantillas de documentos por favor."
+			)));
+		}
+		$row['plantilla_id'] = $plantilla->plantilla_id;
+
 		echo json_encode(array(
 			'data'=>array($row)
 		));
@@ -61,7 +77,8 @@ class Clit extends MX_Controller {
 			'clit_numero'=>trim($this->input->post('clit_numero')),
 			'contribuyente_id'=>$this->input->post('contribuyente_id'),
 			'clit_fecha'=>$this->input->post('clit_fecha'),
-			'clit_resultado'=>trim($this->input->post('clit_resultado'))
+			'clit_resultado'=>trim($this->input->post('clit_resultado')),
+			'plantilla_id'=>$this->input->post('plantilla_id')
 		);
 
 		if ($data['clit_anio']=='') {
@@ -110,20 +127,13 @@ class Clit extends MX_Controller {
 			)));
 		}
 
-		// SET first default template
-		$plantilla = $this->db
-		->where('tipo_doc_id', 'CLIT')
-		->where('plantilla_estado', 'A')
-		->order_by('plantilla_id', 'ASC')
-		->get('public.plantilla')->row();
-
-		if ( is_null($plantilla) ) {
+		if ( !($data['plantilla_id'] > 0) ) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"No existe una plantilla para este tipo de documento, revise la configuracion de plantillas de documentos por favor."
+				'msg'=>"Especifique una plantilla para la generacion del PDF.",
+				'target_id'=>'clit_form_plantilla_id_field'
 			)));
 		}
-		$data['plantilla_id'] = $plantilla->plantilla_id;
 
 		// SET first default state
 		$estado_doc = $this->db
@@ -170,6 +180,15 @@ class Clit extends MX_Controller {
 			'plantilla_id'=>$this->input->post('plantilla_id')
 		);
 
+		$doc = $this->model->get_row($data['clit_id']);
+
+		if ( $doc->estado_doc_modificar_flag == 'N' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"No es posible modificar el documento en el estado actual."
+			)));
+		}
+
 		if ($data['clit_anio']=='') {
 			die(json_encode(array(
 				'success'=>false,
@@ -201,7 +220,7 @@ class Clit extends MX_Controller {
 			)));
 		}
 
-		if ($data['contribuyente_id'] > 0) {
+		if ( !($data['contribuyente_id'] > 0) ) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Contribuyente",
@@ -209,7 +228,7 @@ class Clit extends MX_Controller {
 			)));
 		}
 
-		if (trim($data['clit_fecha'])=='') {
+		if ( trim($data['clit_fecha'])=='' ) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique la fecha",
@@ -217,11 +236,11 @@ class Clit extends MX_Controller {
 			)));
 		}
 
-		if ($data['plantilla_id'] == 0) {
+		if ( !($data['plantilla_id'] > 0) ) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique una plantilla para la generacion del PDF.",
-				'target_id'=>'clit_form_plantilla_field'
+				'target_id'=>'clit_form_plantilla_id_field'
 			)));
 		}
 
@@ -620,7 +639,7 @@ class Clit extends MX_Controller {
 				'msg'=>"Especifique el id del documento."
 			)));
 		}
-		$doc = $this->model->get_rw($data['doc_id']);
+		$doc = $this->model->get_row($data['doc_id']);
 
 		if ( !($data['estado_doc_id'] > 0) ) {
 			die(json_encode(array(
@@ -659,7 +678,6 @@ class Clit extends MX_Controller {
 			$tipo_doc_requisito_requerido_count = $this->db
 			->select('COUNT(*) AS value')
 			->where('tipo_doc_id', $data['tipo_doc_id'])
-			->where('doc_id', $data['doc_id'])
 			->where('tipo_doc_requisito_estado', 'A')
 			->where('tipo_doc_requisito_requerido_flag', 'S')
 			->get('public.tipo_doc_requisito')->row();
@@ -683,8 +701,13 @@ class Clit extends MX_Controller {
 
 		try {
 			//unset($data['plantilla_id']);
-			$result = $this->model->add_doc_requisito($data['doc_id'], $data['estado_doc_id'], $data);
-
+			$result = $this->model->add_doc_estado($data);
+			$this->model->update(
+				array(
+					'clit_id'=>$data['doc_id'],
+					'doc_estado_id'=>$result // nuevo id de estado
+				)
+			);
 		} catch (Exception $ex) {
 			$error = $ex->getMessage();
 		}
@@ -704,24 +727,137 @@ class Clit extends MX_Controller {
 		}
 	}	
 
+	public function deleteDocEstado() {
+		//sys_session_hasRoleOrDie('rh.clit.modify');
+		$p_doc_estado_id = intval($this->input->post('doc_estado_id'));
+
+		if ( !($p_doc_estado_id > 0) ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"No se ha especificado un id valido del estado a revertir."
+			)));
+		}
+
+		$doc_estado = $this->db->where('doc_estado_id', $p_doc_estado_id)->get('public.doc_estado')->row();
+
+		$result = $this->model->delete_doc_estado($p_doc_estado_id);
+		if ($result) {
+			$doc_estado_anterior = $this->db
+			->from('public.doc_estado AS de')
+			->join('public.estado_doc AS ed', 'ed.estado_doc_id = de.estado_doc_id', 'inner')
+			->where('de.doc_id', $doc_estado->doc_id)
+			->order_by('ed.estado_doc_index', 'DESC')
+			->get()->row();
+			$this->model->update(
+				array(
+					'clit_id'=>$doc_estado->doc_id,
+					'doc_estado_id'=>$doc_estado_anterior->doc_estado_id
+				)
+			);
+		}
+
+		if ($result !== false) {
+			die(json_encode(array(
+				'success'=>true,
+				'msg'=>"Se cancelar el estado satisfactoriamente."
+			)));
+		} else {
+			die(json_encode(array (
+				'success'=>false,
+				'msg'=>"Error al realizar la operacion."
+			)));
+		}
+	}
+
+	private function _generarPDF($doc_id) {
+		$c = $this->model->get_row($doc_id, 'array');
+		$td = $this->db->where('tipo_doc_id', $c['tipo_doc_id'])->get('public.tipo_doc')->row();
+		$p = $this->db->where('plantilla_id', $c['plantilla_id'])->get('public.plantilla')->row();
+
+		$cfg = array();
+		//$cfg = $this->db->where('config_id', 1)->get('sys.config')->row(0, 'array');
+		//$cfg['entidad_nombre_mayus'] = strtoupper($cfg['entidad_nombre']);
+		
+		$c['tipo_doc_desc'] = to_upper($c['tipo_doc_desc']);
+
+		// 02/06/2018
+		$c['clit_fecha_dia_numero'] = substr($c['clit_fecha'], 0, 2);
+		$meses = array('', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre');
+		$c['clit_fecha_mes_nombre'] = $meses[intval(substr($c['clit_fecha'], 3, 2))];
+		$c['clit_fecha_anio'] = substr($c['clit_fecha'], 6, 4);
+		
+		$path_archivo = FCPATH.'dbfiles/public.plantilla/'.$p->plantilla_archivo;
+		if ( !(file_exists($path_archivo) && $p->plantilla_archivo != '') ) {
+			throw new Exception("El archivo de la plantilla ('{$p->plantilla_archivo}'), no existe o no es valido!.");
+		}
+
+		$t = new TemplateProcessor(FCPATH.'dbfiles/public.plantilla/'.$p->plantilla_archivo);
+		$var_list = $t->getVariables();
+	    foreach ($var_list as $key => $value) {
+	        if (array_key_exists($value, $c)) {
+	            $t->setValue($value, $c[$value]);
+	        } elseif (array_key_exists($value, $cfg)) {
+	        	$t->setValue($value, $cfg[$value]);
+	        } elseif ($value=='no-tiene') {
+	        	$t->setValue($value, '');
+	        } else {
+	        	throw new Exception("D{$doc_id}: Falta el parametro $value.");
+	        }
+	    }
+	    // --- Guardamos el documento
+	    $filename = strtolower($td->tipo_doc_id).'_'.$c['clit_anio'].'_'.$c['clit_numero'].'_'.microtime(true);
+	    $t->saveAs("tmp/{$filename}.docx");
+	    // to PDF
+	    $word = new COM("Word.Application") or die ("MS Word: Could not initialise Object.");
+	    $word->Visible = 0;
+	    $word->DisplayAlerts = 0;
+	    $r = $word->Documents->Open(FCPATH."tmp/{$filename}.docx");
+	    $word->ActiveDocument->ExportAsFixedFormat(FCPATH."dbfiles/public.clit/{$filename}.pdf", 17, false, 0, 0, 0, 0, 7, true, true, 2, true, true, false);
+	    $word->Quit(false);
+	    unset($word);
+	    return $filename.'.pdf';
+	}
+
+	public function generarPDF() {
+		$p_doc_id = $this->input->post('doc_id');
+		$doc = $this->model->get_row($p_doc_id);
+		if ( $doc->estado_doc_generar_pdf_flag == 'S' ) {
+			try {
+				$filename = $this->_generarPDF($p_doc_id);	
+				$this->model->update(
+					array(
+						'clit_id'=>$p_doc_id,
+						'clit_pdf'=>$filename
+					)
+				);
+				die(json_encode(array (
+					'success'=>true,
+					'msg'=>"Se genero el  PDF satisfactoriamente.",
+					'filename'=>$filename
+				)));
+			} catch (Exception $ex) {
+				die(json_encode(array (
+					'success'=>false,
+					'msg'=>$ex->getMessage()
+				)));
+			}
+		} else {
+			die(json_encode(array (
+				'success'=>false,
+				'msg'=>"No es posible generar el PDF en el estado actual."
+			)));
+		}
+	}
+
 	public function printPreview() {
 		//die($this->config->item('base_url'));
 		//if (file_exists('tmp/archivo.txt')) { die(file_get_contents('tmp/archivo.txt')); } else { die('no'); }
 		//die(FCPATH);
-		$p_clit_id = $this->input->post('clit_id');
-		$clit = $this->db->where('clit_id', $p_clit_id)->get('rh.clit')->row();
-		$filename = $clit->clit_pdf;
-		if ($clit->clit_estado == 'REGISTRADO') {
-			$filename = $this->generarPDF($p_clit_id);	
-			$this->db
-			->set('clit_pdf', $filename)
-			->set('clit_estado', 'GENERADO')
-			->where('clit_id', $p_clit_id)
-			->update('rh.clit');
-			//$reload_list = "<script type=\"text/javascript\">clit.reload_list({$p_clit_id})</script>";
-		} 
-		if (file_exists(FCPATH."dbfiles/rh.clit/".$filename) && $filename != '') {
-			$url = $this->config->item('base_url')."dbfiles/rh.clit/{$filename}";
+		$p_doc_id = $this->input->post('doc_id');
+		$doc = $this->model->get_row($p_doc_id);
+		$filename = $doc->clit_pdf;
+		if (file_exists(FCPATH."dbfiles/public.clit/".$filename) && $filename != '') {
+			$url = $this->config->item('base_url')."dbfiles/public.clit/{$filename}";
 			echo "<embed src=\"{$url}\" type=\"application/pdf\" width=\"100%\" height=\"100%\"></embed>";
 		} else {
 			echo "No es posible mostrar el archivo '{$filename}'.";

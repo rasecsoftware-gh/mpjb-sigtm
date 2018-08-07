@@ -56,7 +56,7 @@
 						success: function(form, action) {
 							if (action.result.success) {
 								Ext.getCmp('clit_doc_estado_add_window').close();
-								clit.doc_estado_reload_list(doc_id);
+								clit.reload_list(doc_id);
 							} else {
 								Ext.Msg.alert('Error', action.result.msg);
 							}

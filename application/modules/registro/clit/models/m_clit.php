@@ -23,7 +23,11 @@ class M_Clit extends CI_Model{
 			ed.estado_doc_desc,
 			ed.estado_doc_color,
 			ed.estado_doc_index,
-			ed.estado_doc_requisito_requerido_flag
+			ed.estado_doc_requisito_requerido_flag,
+			ed.estado_doc_final_flag,
+			ed.estado_doc_generar_pdf_flag,
+			ed.estado_doc_modificar_flag,
+			p.plantilla_desc
 		")
 		->from('public.clit AS cl')
 		->join('public.contribuyente AS c', 'c.contribuyente_id = cl.contribuyente_id', 'inner')
@@ -93,14 +97,15 @@ class M_Clit extends CI_Model{
 			'clit_anio'=>date('Y'), 
 			'clit_numero'=>$this->get_next_numero(date('Y')), 
 			'clit_fecha'=>date('d/m/Y'), 
-			'clit_'=>'A'
+			'clit_resultado'=>'PENDIENTE'
 		);
 		return $row;
 	}
 
-	public function get_row ($id) {
+	public function get_row ($id, $format = 'object') {
 		$this->db->select("
 			cl.*,
+			td.tipo_doc_desc,
 			c.contribuyente_numero_doc,
 			c.contribuyente_nombres,
 			c.contribuyente_apellidos,
@@ -114,9 +119,14 @@ class M_Clit extends CI_Model{
 			ed.estado_doc_desc,
 			ed.estado_doc_color,
 			ed.estado_doc_index,
-			ed.estado_doc_requisito_requerido_flag
+			ed.estado_doc_requisito_requerido_flag,
+			ed.estado_doc_final_flag,
+			ed.estado_doc_generar_pdf_flag,
+			ed.estado_doc_modificar_flag,
+			p.plantilla_desc
 		")
 		->from('public.clit AS cl')
+		->join('public.tipo_doc AS td', 'td.tipo_doc_id = cl.tipo_doc_id', 'inner')
 		->join('public.contribuyente AS c', 'c.contribuyente_id = cl.contribuyente_id', 'inner')
 		->join('public.tipo_persona AS tp', 'tp.tipo_persona_id = c.tipo_persona_id', 'inner')
 		->join('public.tipo_doc_identidad AS tdi', 'tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id', 'inner')
@@ -126,7 +136,7 @@ class M_Clit extends CI_Model{
 		->join('public.estado_doc AS ed', 'ed.estado_doc_id = de.estado_doc_id', 'left')
 		->where('cl.clit_id', $id);
 
-		return $this->db->get()->row();
+		return $this->db->get()->row(0, $format);
 	}
 
 	public function add ($data, $estado_doc_id) {
@@ -136,8 +146,14 @@ class M_Clit extends CI_Model{
 		
 		$this->db->insert($table, $data);
 		$row_id = $this->db->insert_id();
-
-		$doc_estado_id = $this->model->add_doc_estado($row_id, $estado_doc_id);
+		// $row_id, $estado_doc_id
+		$doc_estado_id = $this->model->add_doc_estado(
+			array(
+				'tipo_doc_id'=>$data['tipo_doc_id'],
+				'doc_id'=>$row_id,
+				'estado_doc_id'=>$estado_doc_id
+			)
+		);
 
 		$this->db->where('clit_id', $row_id)->update($table, array('doc_estado_id'=>$doc_estado_id));
 
@@ -300,7 +316,7 @@ class M_Clit extends CI_Model{
 	public function update_doc_requisito ($data) {
 		$table = 'public.doc_requisito';
 
-		$dr = $this->get_row($data['doc_requisito_id']);
+		$dr = $this->db->where('doc_requisito_id', $data['doc_requisito_id'])->get($table)->row();
 		$data['syslog'] = sys_session_syslog('modificar', $dr->syslog);
 
 		$this->db->trans_begin();
@@ -352,13 +368,10 @@ class M_Clit extends CI_Model{
 		return $ret;
 	}
 
-	public function add_doc_estado ($doc_id, $estado_doc_id, $_data = array()) {
+	public function add_doc_estado ($_data = array()) {
 		$table = 'public.doc_estado';
 		$user = sys_session_getUserInfo();
 		$data = array(
-			'tipo_doc_id'=>'CLIT',
-			'doc_id'=>$doc_id,
-			'estado_doc_id'=>$estado_doc_id,
 			'doc_estado_usuario'=>$user->usuario_login,
 			'doc_estado_fecha'=>date('d/m/Y H:i:s')
 		);
@@ -367,6 +380,20 @@ class M_Clit extends CI_Model{
 		}
 		$this->db->insert($table, $data);
        	return $this->db->insert_id();
+	}
+
+	public function delete_doc_estado ($doc_estado_id) {
+		$this->db->trans_begin();
+		$this->db->where('doc_estado_id', $doc_estado_id);
+		$this->db->delete('public.doc_estado');
+
+		if ($this->db->trans_status() === FALSE){
+        	$this->db->trans_rollback();
+        	return false;
+		} else {
+        	$this->db->trans_commit();
+        	return true;
+		}
 	}
 
 

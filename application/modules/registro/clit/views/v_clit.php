@@ -37,6 +37,14 @@
 		}
 	});
 
+	clit.resultado_store = Ext.create("Ext.data.Store", {
+		data : [
+			{id: 'PENDIENTE', desc: 'Pendiente'},
+			{id: 'SI', desc: 'Si'},
+			{id: 'NO', desc: 'No'}
+		]
+	});
+
 	clit.estado_doc_store = Ext.create("Ext.data.Store", {
 		proxy:{
 			type: 'ajax',
@@ -128,9 +136,10 @@
 <?php echo $this->load->view('v_clit_doc_requisito_edit'); ?>
 <?php echo $this->load->view('v_clit_doc_requisito_delete'); ?>
 <?php echo $this->load->view('v_clit_doc_estado_add'); ?>
-<?php //echo $this->load->view('v_clit_inactivar'); ?>
-<?php //echo $this->load->view('v_clit_entregar'); ?>
-<?php //echo $this->load->view('v_clit_anular'); ?>
+<?php echo $this->load->view('v_clit_doc_estado_delete'); ?>
+<?php echo $this->load->view('v_clit_plantilla_cambiar'); ?>
+<?php echo $this->load->view('v_clit_pdf_generar'); ?>
+<?php echo $this->load->view('v_clit_print'); ?>
 <?php echo $this->load->view('syslog/v_syslog'); ?>
 
 <script type="text/javascript">
