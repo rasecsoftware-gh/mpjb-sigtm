@@ -385,10 +385,18 @@
 				                icon: 'tools/icons/accept.png',  // Use a URL in the icon config
 				                tooltip: 'Establecer estado', tooltipType: 'title',
 				                handler: function(grid, rowIndex, colIndex, item, e, record) {
-				                    alert('go state!');
+				                    clit.add_estado_doc(recor.get('estado_doc_id'))
 				                },
 				                isDisabled: function (view, rowIndex, colIndex, item, record) {
-				                	return (record.get('doc_estado_id') != null);
+				                	var doc = Ext.getCmp('clit_form').getRecord();
+				                	return !(
+				                		record.get('estado_doc_index') > 1 // no es inicial
+				                		&& record.get('doc_estado_id') == null // no tiene registro
+				                		&& (
+				                			parseInt(record.get('estado_doc_index')) == (parseInt(doc.get('estado_doc_index')) + 1) // es siguiente estado
+				                			|| record.get('estado_doc_correlativo_flag') == 'N' // o no es correlativo
+				                		)
+				                	);
 				                }
 				            },{
 				                icon: 'tools/icons/arrow_undo.png',  // Use a URL in the icon config
@@ -397,9 +405,10 @@
 				                    alert('go undo state!');
 				                },
 				                isDisabled: function (view, rowIndex, colIndex, item, record) {
-				                	return ( 
-				                		record.get('doc_estado_id') == null // no tiene estado definido
-				                		|| record.get('estado_doc_index') == 1 // estado inicial
+				                	return !(
+				                		record.get('estado_doc_index') > 1 // no es inicial (el estado incial no se puede revertir)
+				                		&& record.get('doc_estado_id') != null // no tiene registro
+				                		&& record.get('doc_estado_id') == doc.get('doc_estado_id') // es el estado actual
 				                	);
 				                }
 				            }]

@@ -22,6 +22,7 @@ class M_Clit extends CI_Model{
 			de.doc_estado_fecha,
 			ed.estado_doc_desc,
 			ed.estado_doc_color,
+			ed.estado_doc_index,
 			ed.estado_doc_requisito_requerido_flag
 		")
 		->from('public.clit AS cl')
@@ -112,6 +113,7 @@ class M_Clit extends CI_Model{
 			de.doc_estado_fecha,
 			ed.estado_doc_desc,
 			ed.estado_doc_color,
+			ed.estado_doc_index,
 			ed.estado_doc_requisito_requerido_flag
 		")
 		->from('public.clit AS cl')
