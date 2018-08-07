@@ -67,7 +67,7 @@
 			}],
 			buttons:[{
 				text: 'Guardar', handler: function() {
-					frm = Ext.getCmp('clit_doc_requisito_form');
+					var frm = Ext.getCmp('clit_doc_requisito_form');
 					frm.submit({
 						success: function(form, action) {
 							if (action.result.success) {

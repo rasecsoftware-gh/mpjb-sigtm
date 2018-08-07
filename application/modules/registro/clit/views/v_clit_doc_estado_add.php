@@ -1,14 +1,6 @@
 <script>
-	clit.doc_estado_add_window = function() {
+	clit.doc_estado_add_window = function(record) { // doc_estado record
 		var doc_id = Ext.getCmp('clit_form_clit_id_field').getValue();
-		var rows = Ext.getCmp('clit_form_doc_estado_grid').getSelection();
-		var record = null;
-		if (rows.length > 0) {
-			record = rows[0];
-		} else {
-			Ext.Msg.alert('Error', 'Seleccione un documento para adjuntar.');
-			return false;
-		} 
 		var w_config = {
 			id: 'clit_doc_estado_add_window',
 			title: 'Cambiar estado a', 
@@ -59,7 +51,7 @@
 			}],
 			buttons:[{
 				text: 'Guardar', handler: function() {
-					frm = Ext.getCmp('clit_doc_estado_form');
+					var frm = Ext.getCmp('clit_doc_estado_form');
 					frm.submit({
 						success: function(form, action) {
 							if (action.result.success) {
@@ -70,7 +62,7 @@
 							}
 						},
 						failure: function(form, action) {
-							Ext.Msg.alert('Adjuntar documento', action.result.msg, function () {
+							Ext.Msg.alert('Control de estado', action.result.msg, function () {
 								sys_focus(action.result.target_id);
 							});
 						}
@@ -84,10 +76,6 @@
 			listeners: {
 				show: function () {					
 					//Ext.getCmp('clit_cancelar_emitido_form').loadRecord(record);
-					if ( record.get('tipo_doc_estado_pdf_flag') == 'N' ) {
-						// opcional
-						//Ext.getCmp('clit_doc_estado_form_file_field').disable();	
-					}
 				}
 			}
 		};

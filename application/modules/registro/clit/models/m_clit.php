@@ -352,7 +352,7 @@ class M_Clit extends CI_Model{
 		return $ret;
 	}
 
-	public function add_doc_estado ($doc_id, $estado_doc_id) {
+	public function add_doc_estado ($doc_id, $estado_doc_id, $_data = array()) {
 		$table = 'public.doc_estado';
 		$user = sys_session_getUserInfo();
 		$data = array(
@@ -362,6 +362,9 @@ class M_Clit extends CI_Model{
 			'doc_estado_usuario'=>$user->usuario_login,
 			'doc_estado_fecha'=>date('d/m/Y H:i:s')
 		);
+		foreach ($_data as $field=>$value) {
+			$data[$field] = $value;
+		}
 		$this->db->insert($table, $data);
        	return $this->db->insert_id();
 	}

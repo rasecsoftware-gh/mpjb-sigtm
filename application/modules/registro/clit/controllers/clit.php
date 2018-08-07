@@ -602,6 +602,108 @@ class Clit extends MX_Controller {
 		echo json_encode($ret);
 	}
 
+	public function addDocEstado() {
+		//sys_session_hasRoleOrDie('rh.contrato.modify');
+		//var_dump($_FILES);
+		$upload_path = 'dbfiles/public.doc_requisito/';
+		$data = array(
+			'tipo_doc_id'=>'CLIT',
+			'doc_id'=>$this->input->post('doc_id'),
+			'estado_doc_id'=>$this->input->post('estado_doc_id'),
+			'doc_estado_fecha'=>$this->input->post('doc_estado_fecha'),
+			'doc_estado_obs'=>to_upper($this->input->post('doc_estado_obs'))
+		);
+
+		if ( !($data['doc_id'] > 0) ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique el id del documento."
+			)));
+		}
+		$doc = $this->model->get_rw($data['doc_id']);
+
+		if ( !($data['estado_doc_id'] > 0) ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique el nuevo estado del documento."
+			)));
+		}
+		
+		$estado_doc = $this->db->where('estado_doc_id', $data['estado_doc_id'])->get('public.estado_doc')->row();
+		
+		// revisar si el estado_doc ya existe
+		$estado_doc_count = $this->db
+		->select('COUNT(*) AS value')
+		->where('tipo_doc_id', $data['tipo_doc_id'])
+		->where('doc_id', $data['doc_id'])
+		->where('estado_doc_id', $data['estado_doc_id'])
+		->get('public.doc_estado')->row();
+
+		if ( $estado_doc_count->value > 0 ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"El estado {$estado_doc->estado_doc_desc}, ya se encuentra registrado."
+			)));
+		}
+
+		/*if ( $data['doc_requisito_fecha'] == '' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la fecha",
+				'target_id'=>'clit_doc_requisito_form_doc_requisito_fecha_field'
+			)));
+		}*/
+		$data['doc_estado_fecha'] = date('d/m/Y H:i:s');
+
+		if ($estado_doc->estado_doc_requisito_requerido_flag == 'S') {
+			$tipo_doc_requisito_requerido_count = $this->db
+			->select('COUNT(*) AS value')
+			->where('tipo_doc_id', $data['tipo_doc_id'])
+			->where('doc_id', $data['doc_id'])
+			->where('tipo_doc_requisito_estado', 'A')
+			->where('tipo_doc_requisito_requerido_flag', 'S')
+			->get('public.tipo_doc_requisito')->row();
+
+			$doc_requisito_requerido_count = $this->db
+			->select('COUNT(*) AS value')
+			->from('public.doc_requisito AS dr')
+			->join('public.tipo_doc_requisito AS tdr', 'tdr.tipo_doc_requisito_id = dr.tipo_doc_requisito_id')
+			->where('dr.tipo_doc_id', $data['tipo_doc_id'])
+			->where('dr.doc_id', $data['doc_id'])
+			->where('tdr.tipo_doc_requisito_requerido_flag', 'S')
+			->get()->row();
+
+			if ( $doc_requisito_requerido_count->value < $tipo_doc_requisito_requerido_count->value ) {
+				die(json_encode(array(
+					'success'=>false,
+					'msg'=>"No se han registrado todos los documentos requeridos."
+				)));	
+			}
+		}
+
+		try {
+			//unset($data['plantilla_id']);
+			$result = $this->model->add_doc_requisito($data['doc_id'], $data['estado_doc_id'], $data);
+
+		} catch (Exception $ex) {
+			$error = $ex->getMessage();
+		}
+
+		if ($result !== false) {
+			die(json_encode(array(
+				'success'=>true,
+				'msg'=>"Se guardo satisfactoriamente",
+				'rowid'=>$result
+			)));
+			
+		} else {
+			die(json_encode(array (
+				'success'=>false,
+				'msg'=>"Error al realizar la operacion.".(isset($error)?'<br>$error':'')
+			)));
+		}
+	}	
+
 	public function printPreview() {
 		//die($this->config->item('base_url'));
 		//if (file_exists('tmp/archivo.txt')) { die(file_get_contents('tmp/archivo.txt')); } else { die('no'); }

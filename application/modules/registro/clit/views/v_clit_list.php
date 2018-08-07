@@ -385,7 +385,7 @@
 				                icon: 'tools/icons/accept.png',  // Use a URL in the icon config
 				                tooltip: 'Establecer estado', tooltipType: 'title',
 				                handler: function(grid, rowIndex, colIndex, item, e, record) {
-				                    clit.add_estado_doc(recor.get('estado_doc_id'))
+				                    clit.doc_estado_add_window(record);
 				                },
 				                isDisabled: function (view, rowIndex, colIndex, item, record) {
 				                	var doc = Ext.getCmp('clit_form').getRecord();

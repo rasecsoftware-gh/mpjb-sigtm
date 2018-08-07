@@ -127,6 +127,7 @@
 <?php echo $this->load->view('v_clit_doc_requisito_add'); ?>
 <?php echo $this->load->view('v_clit_doc_requisito_edit'); ?>
 <?php echo $this->load->view('v_clit_doc_requisito_delete'); ?>
+<?php echo $this->load->view('v_clit_doc_estado_add'); ?>
 <?php //echo $this->load->view('v_clit_inactivar'); ?>
 <?php //echo $this->load->view('v_clit_entregar'); ?>
 <?php //echo $this->load->view('v_clit_anular'); ?>
