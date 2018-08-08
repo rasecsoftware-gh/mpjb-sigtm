@@ -2,19 +2,19 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 use PhpOffice\PhpWord\TemplateProcessor;
 
-class Clit extends MX_Controller {
+class PSP extends MX_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model('m_clit', 'model');
+		$this->load->model('m_psp', 'model');
 		$this->load->library('upload');
-		//sys_session_hasRoleOrDie('clit');
+		//sys_session_hasRoleOrDie('psp');
 	}
 
 	public function index() {
 		$data = array();
-		$this->load->view('v_clit', $data);
+		$this->load->view('v_psp', $data);
 	}
 
 	public function getList() {
@@ -36,7 +36,7 @@ class Clit extends MX_Controller {
 		
 		// SET first default template
 		$plantilla = $this->db
-		->where('tipo_doc_id', 'CLIT')
+		->where('tipo_doc_id', 'PSP')
 		->where('plantilla_estado', 'A')
 		->order_by('plantilla_id', 'ASC')
 		->get('public.plantilla')->row();
@@ -70,44 +70,47 @@ class Clit extends MX_Controller {
 	}
 
 	public function Add() {
-		//sys_session_hasRoleOrDie('rh.clit.add, rh.clit.update');
+		//sys_session_hasRoleOrDie('rh.psp.add, rh.psp.update');
 		$data = array(
-			'tipo_doc_id'=>'CLIT',
-  			'clit_anio'=>trim($this->input->post('clit_anio')),
-			'clit_numero'=>trim($this->input->post('clit_numero')),
+			'tipo_doc_id'=>'PSP',
+  			'psp_anio'=>trim($this->input->post('psp_anio')),
+			'psp_numero'=>trim($this->input->post('psp_numero')),
 			'contribuyente_id'=>$this->input->post('contribuyente_id'),
-			'clit_fecha'=>$this->input->post('clit_fecha'),
-			'clit_resultado'=>trim($this->input->post('clit_resultado')),
+			'psp_fecha'=>$this->input->post('psp_fecha'),
+			'psp_fecha_inicio'=>$this->input->post('psp_fecha_inicio'),
+			'psp_fecha_fin'=>$this->input->post('psp_fecha_fin'),
+			'psp_resolucion'=>$this->input->post('psp_resolucion'),
+			'psp_ruta'=>$this->input->post('psp_ruta'),
 			'plantilla_id'=>$this->input->post('plantilla_id')
 		);
 
-		if ($data['clit_anio']=='') {
+		if ($data['psp_anio']=='') {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Año de Documento",
-				'target_id'=>'clit_form_clit_anio_field'
+				'target_id'=>'psp_form_psp_anio_field'
 			)));
 		}
 
-		if ($data['clit_numero']=='') {
+		if ($data['psp_numero']=='') {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Numero de Documento",
-				'target_id'=>'clit_form_clit_numero_field'
+				'target_id'=>'psp_form_psp_numero_field'
 			)));
 		}
 
 		$anio_numero_count = $this->db
 		->select('COUNT(*) AS value')
-		->from('public.clit')
-		->where('clit_anio', $data['clit_anio'])
-		->where('clit_numero', $data['clit_numero'])
+		->from('public.psp')
+		->where('psp_anio', $data['psp_anio'])
+		->where('psp_numero', $data['psp_numero'])
 		->get()->row();
 		if ($anio_numero_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"El Numero del Documento ya existe.",
-				'target_id'=>'clit_form_clit_numero_field'
+				'msg'=>"El Numero del documento ya existe.",
+				'target_id'=>'psp_form_psp_numero_field'
 			)));
 		}
 
@@ -115,15 +118,31 @@ class Clit extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Contribuyente",
-				'target_id'=>'clit_form_contribuyente_id_field'
+				'target_id'=>'psp_form_contribuyente_id_field'
 			)));
 		}
 
-		if (trim($data['clit_fecha'])=='') {
+		if (trim($data['psp_fecha'])=='') {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique la fecha",
-				'target_id'=>'clit_form_clit_fecha_field'
+				'target_id'=>'psp_form_psp_fecha_field'
+			)));
+		}
+
+		if (trim($data['psp_fecha_inicio'])=='') {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la fecha de inicio",
+				'target_id'=>'psp_form_psp_fecha_inicio_field'
+			)));
+		}
+
+		if (trim($data['psp_fecha_fin'])=='') {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la fecha de termino",
+				'target_id'=>'psp_form_psp_fecha_fin_field'
 			)));
 		}
 
@@ -131,13 +150,13 @@ class Clit extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique una plantilla para la generacion del PDF.",
-				'target_id'=>'clit_form_plantilla_id_field'
+				'target_id'=>'psp_form_plantilla_id_field'
 			)));
 		}
 
 		// SET first default state
 		$estado_doc = $this->db
-		->where('tipo_doc_id', 'CLIT')
+		->where('tipo_doc_id', 'PSP')
 		->order_by('estado_doc_index', 'ASC')
 		->get('public.estado_doc')->row();
 
@@ -169,18 +188,21 @@ class Clit extends MX_Controller {
 	}
 
 	public function Update() {
-		//sys_session_hasRoleOrDie('clit.update');
+		//sys_session_hasRoleOrDie('psp.update');
 		$data = array(
-			'clit_id'=>$this->input->post('clit_id'),
-  			'clit_anio'=>trim($this->input->post('clit_anio')),
-			'clit_numero'=>trim($this->input->post('clit_numero')),
+			'psp_id'=>$this->input->post('psp_id'),
+  			'psp_anio'=>trim($this->input->post('psp_anio')),
+			'psp_numero'=>trim($this->input->post('psp_numero')),
 			'contribuyente_id'=>$this->input->post('contribuyente_id'),
-			'clit_fecha'=>$this->input->post('clit_fecha'),
-			'clit_resultado'=>trim($this->input->post('clit_resultado')),
+			'psp_fecha'=>$this->input->post('psp_fecha'),
+			'psp_fecha_inicio'=>$this->input->post('psp_fecha_inicio'),
+			'psp_fecha_fin'=>$this->input->post('psp_fecha_fin'),
+			'psp_resolucion'=>$this->input->post('psp_resolucion'),
+			'psp_ruta'=>$this->input->post('psp_ruta'),
 			'plantilla_id'=>$this->input->post('plantilla_id')
 		);
 
-		$doc = $this->model->get_row($data['clit_id']);
+		$doc = $this->model->get_row($data['psp_id']);
 
 		if ( $doc->estado_doc_modificar_flag == 'N' ) {
 			die(json_encode(array(
@@ -189,34 +211,34 @@ class Clit extends MX_Controller {
 			)));
 		}
 
-		if ($data['clit_anio']=='') {
+		if ($data['psp_anio']=='') {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Año de Documento",
-				'target_id'=>'clit_form_clit_anio_field'
+				'target_id'=>'psp_form_psp_anio_field'
 			)));
 		}
 
-		if ($data['clit_numero']=='') {
+		if ($data['psp_numero']=='') {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Numero de Documento",
-				'target_id'=>'clit_form_clit_numero_field'
+				'target_id'=>'psp_form_psp_numero_field'
 			)));
 		}
 
 		$anio_numero_count = $this->db
 		->select('COUNT(*) AS value')
-		->from('public.clit')
-		->where('clit_anio', $data['clit_anio'])
-		->where('clit_numero', $data['clit_numero'])
-		->where('clit_id <>', $data['clit_id'])
+		->from('public.psp')
+		->where('psp_anio', $data['psp_anio'])
+		->where('psp_numero', $data['psp_numero'])
+		->where('psp_id <>', $data['psp_id'])
 		->get()->row();
 		if ($anio_numero_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"El Numero del Documento ya existe.",
-				'target_id'=>'clit_form_clit_numero_field'
+				'target_id'=>'psp_form_psp_numero_field'
 			)));
 		}
 
@@ -224,15 +246,31 @@ class Clit extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Contribuyente",
-				'target_id'=>'clit_form_contribuyente_id_field'
+				'target_id'=>'psp_form_contribuyente_id_field'
 			)));
 		}
 
-		if ( trim($data['clit_fecha'])=='' ) {
+		if ( trim($data['psp_fecha'])=='' ) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique la fecha",
-				'target_id'=>'clit_form_clit_fecha_field'
+				'target_id'=>'psp_form_psp_fecha_field'
+			)));
+		}
+
+		if (trim($data['psp_fecha_inicio'])=='') {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la fecha de inicio",
+				'target_id'=>'psp_form_psp_fecha_inicio_field'
+			)));
+		}
+
+		if (trim($data['psp_fecha_fin'])=='') {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la fecha de termino",
+				'target_id'=>'psp_form_psp_fecha_fin_field'
 			)));
 		}
 
@@ -240,7 +278,7 @@ class Clit extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique una plantilla para la generacion del PDF.",
-				'target_id'=>'clit_form_plantilla_id_field'
+				'target_id'=>'psp_form_plantilla_id_field'
 			)));
 		}
 
@@ -264,104 +302,19 @@ class Clit extends MX_Controller {
 		}
 	}
 
-	public function Activar() {
-		//sys_session_hasRoleOrDie('rh.clit.modify');
-		$data = array(
-			'clit_id'=>$this->input->post('clit_id'),
-			'clit_estado'=>'A'
-		);
-
-		$r = $this->model->get_row($data['clit_id']);
-		if ($r->clit_estado == 'A') {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"El clit ya se encuentra Activo."
-			)));
-		}
-
-		$result = $this->model->update($data);
-
-		if ($result !== false) {
-			die(json_encode(array(
-				'success'=>true,
-				'msg'=>"Se Activo satisfactoriamente."
-			)));
-			
-		} else {
-			die(json_encode(array (
-				'success'=>false,
-				'msg'=>"Error al realizar la operacion."
-			)));
-		}
-	}
-
-	public function Inactivar() {
-		//sys_session_hasRoleOrDie('rh.clit.modify');
-		$data = array(
-			'clit_id'=>$this->input->post('clit_id'),
-			'clit_estado'=>'I'
-		);
-		$r = $this->model->get_row($data['clit_id']);
-		if ($r->clit_estado == 'I') {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"El clit ya se encuentra Inactivo."
-			)));
-		}
-
-		$result = $this->model->update($data);
-
-		if ($result !== false) {
-			die(json_encode(array(
-				'success'=>true,
-				'msg'=>"Se inactivo satisfactoriamente."
-			)));
-			
-		} else {
-			die(json_encode(array (
-				'success'=>false,
-				'msg'=>"Error al realizar la operacion."
-			)));
-		}
-	}
-
 	public function Delete() {
-		//sys_session_hasRoleOrDie('rh.clit.modify');
-		$p_clit_id = $this->input->post('clit_id');
+		//sys_session_hasRoleOrDie('rh.psp.modify');
+		$p_psp_id = $this->input->post('psp_id');
 
-		$clit_count = $this->db->select('COUNT(*) AS value')->where('clit_id', $p_clit_id)->get('public.clit')->row();
-		if ($clit_count->value > 0) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"El clit tiene Constancias de Libre Infraccion de Transito registrado(s)."
-			)));
-		}
-
-		$psp_count = $this->db->select('COUNT(*) AS value')->where('clit_id', $p_clit_id)->get('public.psp')->row();
+		/*$psp_count = $this->db->select('COUNT(*) AS value')->where('psp_id', $p_psp_id)->get('public.psp')->row();
 		if ($psp_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"El clit tiene Permisos de Servicio Publico registrado(s)."
+				'msg'=>"El psp tiene Constancias de Libre Infraccion de Transito registrado(s)."
 			)));
-		}
+		}*/
 
-		$lc_count = $this->db->select('COUNT(*) AS value')->where('clit_id', $p_clit_id)->get('public.lc')->row();
-		if ($lc_count->value > 0) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"El clit tiene Licencias de Conducir registrado(s)."
-			)));
-		}
-
-		$cat_count = $this->db->select('COUNT(*) AS value')->where('clit_id', $p_clit_id)->get('public.cat')->row();
-		if ($cat_count->value > 0) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"El clit tiene Constancias de Autorizacion Temporal registrado(s)."
-			)));
-		}
-
-		$result = $this->model->delete($p_clit_id);
+		$result = $this->model->delete($p_psp_id);
 
 		if ($result !== false) {
 			die(json_encode(array(
@@ -406,7 +359,7 @@ class Clit extends MX_Controller {
 		//var_dump($_FILES);
 		$upload_path = 'dbfiles/public.doc_requisito/';
 		$data = array(
-			'tipo_doc_id'=>'CLIT',
+			'tipo_doc_id'=>'PSP',
 			'doc_id'=>$this->input->post('doc_id'),
 			'tipo_doc_requisito_id'=>$this->input->post('tipo_doc_requisito_id'),
 			'doc_requisito_fecha'=>$this->input->post('doc_requisito_fecha'),
@@ -464,7 +417,7 @@ class Clit extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique la fecha",
-				'target_id'=>'clit_doc_requisito_form_doc_requisito_fecha_field'
+				'target_id'=>'psp_doc_requisito_form_doc_requisito_fecha_field'
 			)));
 		}
 
@@ -472,7 +425,7 @@ class Clit extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Numero",
-				'target_id'=>'clit_doc_requisito_form_doc_requisito_numero_field'
+				'target_id'=>'psp_doc_requisito_form_doc_requisito_numero_field'
 			)));
 		}
 
@@ -545,7 +498,7 @@ class Clit extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique la fecha",
-				'target_id'=>'clit_doc_requisito_form_doc_requisito_fecha_field'
+				'target_id'=>'psp_doc_requisito_form_doc_requisito_fecha_field'
 			)));
 		}
 
@@ -553,7 +506,7 @@ class Clit extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Numero",
-				'target_id'=>'clit_doc_requisito_form_doc_requisito_numero_field'
+				'target_id'=>'psp_doc_requisito_form_doc_requisito_numero_field'
 			)));
 		}
 
@@ -580,7 +533,7 @@ class Clit extends MX_Controller {
 	}
 
 	public function deleteDocRequisito() {
-		//sys_session_hasRoleOrDie('rh.clit.modify');
+		//sys_session_hasRoleOrDie('rh.psp.modify');
 		$p_doc_requisito_id = intval($this->input->post('doc_requisito_id'));
 
 		if ( !($p_doc_requisito_id > 0) ) {
@@ -625,9 +578,9 @@ class Clit extends MX_Controller {
 	public function addDocEstado() {
 		//sys_session_hasRoleOrDie('rh.contrato.modify');
 		//var_dump($_FILES);
-		$upload_path = 'dbfiles/public.doc_requisito/';
+		//$upload_path = 'dbfiles/public.doc_requisito/';
 		$data = array(
-			'tipo_doc_id'=>'CLIT',
+			'tipo_doc_id'=>'psp',
 			'doc_id'=>$this->input->post('doc_id'),
 			'estado_doc_id'=>$this->input->post('estado_doc_id'),
 			'doc_estado_fecha'=>$this->input->post('doc_estado_fecha'),
@@ -670,7 +623,7 @@ class Clit extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique la fecha",
-				'target_id'=>'clit_doc_requisito_form_doc_requisito_fecha_field'
+				'target_id'=>'psp_doc_requisito_form_doc_requisito_fecha_field'
 			)));
 		}*/
 		$data['doc_estado_fecha'] = date('d/m/Y H:i:s');
@@ -705,7 +658,7 @@ class Clit extends MX_Controller {
 			$result = $this->model->add_doc_estado($data);
 			$this->model->update(
 				array(
-					'clit_id'=>$data['doc_id'],
+					'psp_id'=>$data['doc_id'],
 					'doc_estado_id'=>$result // nuevo id de estado
 				)
 			);
@@ -729,7 +682,7 @@ class Clit extends MX_Controller {
 	}	
 
 	public function deleteDocEstado() {
-		//sys_session_hasRoleOrDie('rh.clit.modify');
+		//sys_session_hasRoleOrDie('rh.psp.modify');
 		$p_doc_estado_id = intval($this->input->post('doc_estado_id'));
 
 		if ( !($p_doc_estado_id > 0) ) {
@@ -751,7 +704,7 @@ class Clit extends MX_Controller {
 			->get()->row();
 			$this->model->update(
 				array(
-					'clit_id'=>$doc_estado->doc_id,
+					'psp_id'=>$doc_estado->doc_id,
 					'doc_estado_id'=>$doc_estado_anterior->doc_estado_id
 				)
 			);
@@ -782,10 +735,10 @@ class Clit extends MX_Controller {
 		$c['tipo_doc_desc'] = to_upper($c['tipo_doc_desc']);
 
 		// 02/06/2018
-		$c['clit_fecha_dia_numero'] = substr($c['clit_fecha'], 0, 2);
+		$c['psp_fecha_dia_numero'] = substr($c['psp_fecha'], 0, 2);
 		$meses = array('', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre');
-		$c['clit_fecha_mes_nombre'] = $meses[intval(substr($c['clit_fecha'], 3, 2))];
-		$c['clit_fecha_anio'] = substr($c['clit_fecha'], 6, 4);
+		$c['psp_fecha_mes_nombre'] = $meses[intval(substr($c['psp_fecha'], 3, 2))];
+		$c['psp_fecha_anio'] = substr($c['psp_fecha'], 6, 4);
 		
 		$path_archivo = FCPATH.'dbfiles/public.plantilla/'.$p->plantilla_archivo;
 		if ( !(file_exists($path_archivo) && $p->plantilla_archivo != '') ) {
@@ -806,14 +759,14 @@ class Clit extends MX_Controller {
 	        }
 	    }
 	    // --- Guardamos el documento
-	    $filename = strtolower($td->tipo_doc_id).'_'.$c['clit_anio'].'_'.$c['clit_numero'].'_'.microtime(true);
+	    $filename = strtolower($td->tipo_doc_id).'_'.$c['psp_anio'].'_'.$c['psp_numero'].'_'.microtime(true);
 	    $t->saveAs("tmp/{$filename}.docx");
 	    // to PDF
 	    $word = new COM("Word.Application") or die ("MS Word: Could not initialise Object.");
 	    $word->Visible = 0;
 	    $word->DisplayAlerts = 0;
 	    $r = $word->Documents->Open(FCPATH."tmp/{$filename}.docx");
-	    $word->ActiveDocument->ExportAsFixedFormat(FCPATH."dbfiles/public.clit/{$filename}.pdf", 17, false, 0, 0, 0, 0, 7, true, true, 2, true, true, false);
+	    $word->ActiveDocument->ExportAsFixedFormat(FCPATH."dbfiles/public.psp/{$filename}.pdf", 17, false, 0, 0, 0, 0, 7, true, true, 2, true, true, false);
 	    $word->Quit(false);
 	    unset($word);
 	    return $filename.'.pdf';
@@ -827,8 +780,8 @@ class Clit extends MX_Controller {
 				$filename = $this->_generarPDF($p_doc_id);	
 				$this->model->update(
 					array(
-						'clit_id'=>$p_doc_id,
-						'clit_pdf'=>$filename
+						'psp_id'=>$p_doc_id,
+						'psp_pdf'=>$filename
 					)
 				);
 				die(json_encode(array (
@@ -856,9 +809,9 @@ class Clit extends MX_Controller {
 		//die(FCPATH);
 		$p_doc_id = $this->input->post('doc_id');
 		$doc = $this->model->get_row($p_doc_id);
-		$filename = $doc->clit_pdf;
-		if (file_exists(FCPATH."dbfiles/public.clit/".$filename) && $filename != '') {
-			$url = $this->config->item('base_url')."dbfiles/public.clit/{$filename}";
+		$filename = $doc->psp_pdf;
+		if (file_exists(FCPATH."dbfiles/public.psp/".$filename) && $filename != '') {
+			$url = $this->config->item('base_url')."dbfiles/public.psp/{$filename}";
 			echo "<embed src=\"{$url}\" type=\"application/pdf\" width=\"100%\" height=\"100%\"></embed>";
 		} else {
 			echo "No es posible mostrar el archivo '{$filename}'.";
