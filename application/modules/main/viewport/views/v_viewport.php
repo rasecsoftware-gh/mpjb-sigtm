@@ -78,7 +78,7 @@
 								url: 'tdr/tdr'
 							},
 							handler: sys_menu_item_handler,
-							hidden: !<?php echo sys_session_hasRoleToString('matenimiento.tdr'); ?>
+							hidden: !<?php echo sys_session_hasRoleToString('mantenimiento.tdr'); ?>
 						},{
 							text: 'Estados por Tipo de Documento', 
 							module: {
@@ -87,7 +87,7 @@
 								url: 'estado_doc/estado_doc'
 							},
 							handler: sys_menu_item_handler,
-							hidden: !<?php echo sys_session_hasRoleToString('matenimiento.estado_doc'); ?>
+							hidden: !<?php echo sys_session_hasRoleToString('mantenimiento.estado_doc'); ?>
 						},{
 							text: 'Plantillas de Documento', 
 							module: {
@@ -96,7 +96,7 @@
 								url: 'plantilla/plantilla'
 							},
 							handler: sys_menu_item_handler,
-							hidden: !<?php echo sys_session_hasRoleToString('matenimiento.plantilla'); ?>
+							hidden: !<?php echo sys_session_hasRoleToString('mantenimiento.plantilla'); ?>
 						}]
 					},{
 						text: 'Registro', 
