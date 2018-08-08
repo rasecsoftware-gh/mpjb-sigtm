@@ -188,10 +188,10 @@
 								frm.unmask();
 								if (action.result.success) {
 									clit.form_editing = false;
-									if ( operation == 'new' ) {
-										clit.edit_window(action.result.rowid);
-									}
-									clit.main_store.reload(action.result.rowid);
+									//if ( operation == 'new' ) {
+									//	clit.edit_window(action.result.rowid);
+									//}
+									clit.reload_list(action.result.rowid);
 								} else {
 									Ext.Msg.alert('Error', action.result.msg);
 								}

@@ -170,7 +170,7 @@
 								frm.unmask();
 								if (action.result.success) {
 									contribuyente.form_editing = false;
-									contribuyente.main_store.reload(action.result.rowid);	
+									contribuyente.reload_list(action.result.rowid);	
 								} else {
 									Ext.Msg.alert('Error', action.result.msg);
 								}

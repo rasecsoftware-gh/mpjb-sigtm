@@ -37,10 +37,10 @@ class M_Contribuyente extends CI_Model{
 				}
 			break;
 			case 'tp':
-				$this->db->where('tp.tipo_persona_desc', $search_text);	
+				$this->db->like('tp.tipo_persona_desc', $search_text);	
 			break;
 			case 'tdi':
-				$this->db->where('tdi.tipo_doc_identidad_desc', $search_text);	
+				$this->db->like('tdi.tipo_doc_identidad_desc', $search_text);	
 			break;
 			case 'numero_doc':
 				$this->db->like('c.contribuyente_numero_doc', $search_text);	

@@ -285,7 +285,7 @@ class M_Clit extends CI_Model{
 		->join('public.doc_requisito AS dr', "dr.doc_id = {$doc_id} AND dr.tipo_doc_requisito_id = tdr.tipo_doc_requisito_id", 'left')
 		->where('tdr.tipo_doc_id', 'CLIT')
 		->where('tdr.tipo_doc_requisito_estado', 'A')
-		->order_by('tdr.tipo_doc_requisito_id', 'ASC')
+		->order_by('tdr.tipo_doc_requisito_index', 'ASC')
 		->get()->result();
 		
 		$ret = array(

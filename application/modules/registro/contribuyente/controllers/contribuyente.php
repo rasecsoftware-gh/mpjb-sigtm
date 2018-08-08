@@ -64,7 +64,7 @@ class Contribuyente extends MX_Controller {
 			'contribuyente_nombres'=>to_upper($this->input->post('contribuyente_nombres')),
 			'contribuyente_apellidos'=>to_upper($this->input->post('contribuyente_apellidos')),
 			'ubigeo_id'=>$this->input->post('ubigeo_id'),
-			'contribuyente_direccion'=>$this->input->post('contribuyente_direccion'),
+			'contribuyente_direccion'=>to_upper($this->input->post('contribuyente_direccion')),
 			'contribuyente_telefono'=>$this->input->post('contribuyente_telefono'),
 			'contribuyente_email'=>$this->input->post('contribuyente_email'),
 			'contribuyente_observacion'=>$this->input->post('contribuyente_observacion'),
@@ -149,7 +149,7 @@ class Contribuyente extends MX_Controller {
 			'contribuyente_apellidos'=>to_upper($this->input->post('contribuyente_apellidos')),
 
 			'ubigeo_id'=>$this->input->post('ubigeo_id'),
-			'contribuyente_direccion'=>$this->input->post('contribuyente_direccion'),
+			'contribuyente_direccion'=>to_upper($this->input->post('contribuyente_direccion')),
 			'contribuyente_telefono'=>$this->input->post('contribuyente_telefono'),
 			'contribuyente_email'=>$this->input->post('contribuyente_email'),
 			'contribuyente_observacion'=>$this->input->post('contribuyente_observacion')
@@ -203,7 +203,8 @@ class Contribuyente extends MX_Controller {
 		if ($result !== false) {
 			die(json_encode(array(
 				'success'=>true,
-				'msg'=>"Se actualizo satisfactoriamente"
+				'msg'=>"Se actualizo satisfactoriamente",
+				'rowid'=>$data['contribuyente_id']
 			)));
 			
 		} else {
