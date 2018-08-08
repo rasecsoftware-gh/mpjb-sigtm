@@ -69,6 +69,36 @@
 							}
 						}]
 					},{
+						text: 'Mantenimiento',
+						menu: [{
+							text: 'Requisitos por Tipo de Documento', 
+							module: {
+								title: 'Requisitos por Tipo de Documento',
+								name: 'tdr',
+								url: 'tdr/tdr'
+							},
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('matenimiento.tdr'); ?>
+						},{
+							text: 'Estados por Tipo de Documento', 
+							module: {
+								title: 'Estados por Tipo de Documento',
+								name: 'estado_doc',
+								url: 'estado_doc/estado_doc'
+							},
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('matenimiento.estado_doc'); ?>
+						},{
+							text: 'Plantillas de Documento', 
+							module: {
+								title: 'Plantillas de Documento',
+								name: 'plantilla',
+								url: 'plantilla/plantilla'
+							},
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('matenimiento.plantilla'); ?>
+						}]
+					},{
 						text: 'Registro', 
 						menu:[{
 							text: 'Contribuyentes &nbsp;', 
@@ -78,7 +108,7 @@
 								url: 'contribuyente/contribuyente'
 							},
 							handler: sys_menu_item_handler,
-							hidden: !<?php echo sys_session_hasRoleToString('contribuyente'); ?>
+							hidden: !<?php echo sys_session_hasRoleToString('registro.contribuyente'); ?>
 						},'-',{
 							text: 'Constancia de Libre Infraccion de Transito &nbsp;', 
 							module: {
@@ -86,7 +116,8 @@
 								name: 'clit',
 								url: 'clit/clit'
 							},
-							handler: sys_menu_item_handler
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('registro.clit'); ?>
 						},{
 							text: 'Permiso de Servicio Publico &nbsp;', 
 							module: {
@@ -94,26 +125,83 @@
 								name: 'psp',
 								url: 'psp/psp'
 							},
-							handler: sys_menu_item_handler
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('registro.psp'); ?>
 						},{
-							text: 'Permiso de Servicio Publico &nbsp;', 
+							text: 'Licencias de Conducir &nbsp;', 
 							module: {
-								title: 'Permiso de Servicio Publico',
-								name: 'psp',
-								url: 'psp/psp'
+								title: 'Licencias de Conducir',
+								name: 'lc',
+								url: 'lc/lc'
 							},
-							handler: sys_menu_item_handler
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('registro.lc'); ?>
+						},{
+							text: 'Autorizaciones Temporales &nbsp;', 
+							module: {
+								title: 'Autorizaciones Temporales',
+								name: 'at',
+								url: 'at/at'
+							},
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('registro.at'); ?>
 						}]
 					},{
 						text: 'Consultas y Reportes', 
 						menu:[{
+							text: 'Consulta de Ficha Tecnica &nbsp;', 
+							module: {
+								title: 'Consulta de Ficha Tecnica',
+								name: 'con_ficha_tecnica',
+								url: 'con_ficha_tecnica/con_ficha_tecnica'
+							},
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('cr.con_ficha_tecnica'); ?>
+						},'-',{
 							text: 'Reporte de Contribuyentes &nbsp;', 
 							module: {
 								title: 'Reporte de Contribuyentes',
 								name: 'rep_contribuyente',
 								url: 'rep_contribuyente/rep_contribuyente'
 							},
-							handler: sys_menu_item_handler
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('cr.rep_contribuyente'); ?>
+						},{
+							text: 'Reporte de Constancias de Libre Infraccion de Transito &nbsp;', 
+							module: {
+								title: 'Reporte de Constancias de Libre Infraccion de Transito',
+								name: 'rep_clit',
+								url: 'rep_clit/rep_clit'
+							},
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('cr.rep_clit'); ?>
+						},{
+							text: 'Reporte de Permisos de Servicio Publico &nbsp;', 
+							module: {
+								title: 'Reporte de Permisos de Servicio Publico',
+								name: 'rep_psp',
+								url: 'rep_psp/rep_psp'
+							},
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('cr.rep_psp'); ?>
+						},{
+							text: 'Reporte de Licencias de Conducir &nbsp;', 
+							module: {
+								title: 'Reporte de Licencias de Conducir',
+								name: 'rep_lc',
+								url: 'rep_lc/rep_lc'
+							},
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('cr.rep_lc'); ?>
+						},{
+							text: 'Reporte de Autorizaciones Temporales &nbsp;', 
+							module: {
+								title: 'Reporte de Autorizaciones Temporales',
+								name: 'rep_at',
+								url: 'rep_at/rep_at'
+							},
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('cr.rep_at'); ?>
 						}]
 					},{
 						text: '?'

@@ -107,7 +107,7 @@
 				show: function () {					
 					Ext.getCmp('clit_doc_requisito_form').loadRecord(record);
 					if ( record.get('tipo_doc_requisito_pdf_flag') == 'N' ) {
-						Ext.getCmp('clit_doc_requisito_form_file_field').disable();	
+						//Ext.getCmp('clit_doc_requisito_form_file_field').disable();	
 					}
 				}
 			}
