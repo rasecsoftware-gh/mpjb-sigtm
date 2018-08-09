@@ -1,11 +1,11 @@
 <script type="text/javascript">
 	/********************* generamos el name espace ***************************/
-	clit = {};
+	psp = {};
 	// general stores
-	clit.contribuyente_store = Ext.create("Ext.data.Store", {
+	psp.contribuyente_store = Ext.create("Ext.data.Store", {
 		proxy:{
 			type: 'ajax',
-			url: 'clit/getContribuyenteList',
+			url: 'psp/getContribuyenteList',
 			reader: {
 				type: 'json',
 				rootProperty: 'data',
@@ -20,10 +20,10 @@
 		}
 	});
 
-	clit.plantilla_store = Ext.create("Ext.data.Store", {
+	psp.plantilla_store = Ext.create("Ext.data.Store", {
 		proxy:{
 			type: 'ajax',
-			url: 'clit/getPlantillaList',
+			url: 'psp/getPlantillaList',
 			reader: {
 				type: 'json',
 				rootProperty: 'data',
@@ -37,18 +37,18 @@
 		}
 	});
 
-	clit.resultado_store = Ext.create("Ext.data.Store", {
+	/*psp.resultado_store = Ext.create("Ext.data.Store", {
 		data : [
 			{id: 'PENDIENTE', desc: 'Pendiente'},
 			{id: 'SI', desc: 'Si'},
 			{id: 'NO', desc: 'No'}
 		]
-	});
+	});*/
 
-	clit.estado_doc_store = Ext.create("Ext.data.Store", {
+	psp.estado_doc_store = Ext.create("Ext.data.Store", {
 		proxy:{
 			type: 'ajax',
-			url: 'clit/getEstadoDocList',
+			url: 'psp/getEstadoDocList',
 			reader: {
 				type: 'json',
 				rootProperty: 'data',
@@ -62,10 +62,10 @@
 		}
 	});
 
-	clit.doc_requisito_store = Ext.create("Ext.data.Store", {
+	psp.doc_requisito_store = Ext.create("Ext.data.Store", {
 		proxy:{
 			type: 'ajax',
-			url: 'clit/getDocRequisitoList',
+			url: 'psp/getDocRequisitoList',
 			reader: {
 				type: 'json',
 				rootProperty: 'data',
@@ -79,10 +79,10 @@
 		}
 	});
 
-	clit.doc_estado_store = Ext.create("Ext.data.Store", {
+	psp.doc_estado_store = Ext.create("Ext.data.Store", {
 		proxy:{
 			type: 'ajax',
-			url: 'clit/getDocEstadoList',
+			url: 'psp/getDocEstadoList',
 			reader: {
 				type: 'json',
 				rootProperty: 'data',
@@ -96,13 +96,13 @@
 		}
 	});
 
-	clit.form_editing = false;
-	clit.clit_id_selected = 0;
+	psp.form_editing = false;
+	psp.psp_id_selected = 0;
 	
-	clit.main_store = Ext.create("Ext.data.Store", {
+	psp.main_store = Ext.create("Ext.data.Store", {
 		proxy:{
 			type: 'ajax',
-			url: 'clit/getList',
+			url: 'psp/getList',
 			reader: {
 				type: 'json',
 				rootProperty: 'data',
@@ -113,14 +113,14 @@
 		pageSize: 100,
 		listeners: {
 			load: function () {
-				if (clit.clit_id_selected > 0) {
-					Ext.getCmp('clit_main_grid').getSelectionModel().select(
-						clit.main_store.getAt(
-							clit.main_store.find('clit_id', clit.clit_id_selected)
+				if (psp.psp_id_selected > 0) {
+					Ext.getCmp('psp_main_grid').getSelectionModel().select(
+						psp.main_store.getAt(
+							psp.main_store.find('psp_id', psp.psp_id_selected)
 						)
 					);
 				} else {
-					Ext.getCmp('clit_main_grid').getSelectionModel().selectAll();
+					Ext.getCmp('psp_main_grid').getSelectionModel().selectAll();
 				}
 			}
 		}
@@ -128,21 +128,21 @@
 </script>
 
 <!--  cargamos los componentes -->
-<?php echo $this->load->view('v_clit_list'); ?>
-<?php echo $this->load->view('v_clit_new'); ?>
-<?php echo $this->load->view('v_clit_edit'); ?>
-<?php //echo $this->load->view('v_clit_delete'); ?>
-<?php echo $this->load->view('v_clit_doc_requisito_add'); ?>
-<?php echo $this->load->view('v_clit_doc_requisito_edit'); ?>
-<?php echo $this->load->view('v_clit_doc_requisito_delete'); ?>
-<?php echo $this->load->view('v_clit_doc_estado_add'); ?>
-<?php echo $this->load->view('v_clit_doc_estado_delete'); ?>
-<?php echo $this->load->view('v_clit_plantilla_cambiar'); ?>
-<?php echo $this->load->view('v_clit_pdf_generar'); ?>
-<?php echo $this->load->view('v_clit_print'); ?>
-<?php echo $this->load->view('syslog/v_syslog'); ?>
+<?php echo $this->load->view('v_psp_list'); ?>
+<?php //echo $this->load->view('v_psp_new'); ?>
+<?php //echo $this->load->view('v_psp_edit'); ?>
+<?php ////echo $this->load->view('v_psp_delete'); ?>
+<?php //echo $this->load->view('v_psp_doc_requisito_add'); ?>
+<?php //echo $this->load->view('v_psp_doc_requisito_edit'); ?>
+<?php //echo $this->load->view('v_psp_doc_requisito_delete'); ?>
+<?php //echo $this->load->view('v_psp_doc_estado_add'); ?>
+<?php //echo $this->load->view('v_psp_doc_estado_delete'); ?>
+<?php //echo $this->load->view('v_psp_plantilla_cambiar'); ?>
+<?php //echo $this->load->view('v_psp_pdf_generar'); ?>
+<?php //echo $this->load->view('v_psp_print'); ?>
+<?php //echo $this->load->view('syslog/v_syslog'); ?>
 
 <script type="text/javascript">
-	var tab = Ext.getCmp('tab-clit');
-	tab.add(clit.panel);
+	var tab = Ext.getCmp('tab-psp');
+	tab.add(psp.panel);
 </script>

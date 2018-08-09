@@ -547,10 +547,10 @@ class PSP extends MX_Controller {
 		
 		$doc = $this->model->get_row($doc_requisito->doc_id);
 
-		if (to_upper($doc->estado_doc_desc) != 'REGISTRADO') {
+		if ( $doc->estado_doc_modificar_flag == 'N') {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"No es posible modificar el documento en el estado '{$doc->estado_doc_desc}' actual."
+				'msg'=>"No es posible modificar el documento en el estado actual."
 			)));	
 		}
 
@@ -580,7 +580,7 @@ class PSP extends MX_Controller {
 		//var_dump($_FILES);
 		//$upload_path = 'dbfiles/public.doc_requisito/';
 		$data = array(
-			'tipo_doc_id'=>'psp',
+			'tipo_doc_id'=>'PSP',
 			'doc_id'=>$this->input->post('doc_id'),
 			'estado_doc_id'=>$this->input->post('estado_doc_id'),
 			'doc_estado_fecha'=>$this->input->post('doc_estado_fecha'),
@@ -745,7 +745,7 @@ class PSP extends MX_Controller {
 			throw new Exception("El archivo de la plantilla ('{$p->plantilla_archivo}'), no existe o no es valido!.");
 		}
 
-		$t = new TemplateProcessor(FCPATH.'dbfiles/public.plantilla/'.$p->plantilla_archivo);
+		$t = new TemplateProcessor($path_archivo);
 		$var_list = $t->getVariables();
 	    foreach ($var_list as $key => $value) {
 	        if (array_key_exists($value, $c)) {
@@ -759,7 +759,7 @@ class PSP extends MX_Controller {
 	        }
 	    }
 	    // --- Guardamos el documento
-	    $filename = strtolower($td->tipo_doc_id).'_'.$c['psp_anio'].'_'.$c['psp_numero'].'_'.microtime(true);
+	    $filename = strtolower($td->tipo_doc_id).'_'.$c['psp_anio'].'_'.$c['psp_numero'].'_res'.microtime(true);
 	    $t->saveAs("tmp/{$filename}.docx");
 	    // to PDF
 	    $word = new COM("Word.Application") or die ("MS Word: Could not initialise Object.");
@@ -781,7 +781,7 @@ class PSP extends MX_Controller {
 				$this->model->update(
 					array(
 						'psp_id'=>$p_doc_id,
-						'psp_pdf'=>$filename
+						'psp_pdf_resolucion'=>$filename
 					)
 				);
 				die(json_encode(array (
