@@ -150,7 +150,7 @@
 			xtype: 'panel',
 			region: 'east',
 			layout: 'border',
-			width: 500,
+			width: 600,
 			split: true,
 			items: [{
 				xtype: 'grid',
@@ -206,15 +206,37 @@
 				},
 				columns:[
 					{text: 'Descripcion', dataIndex: 'permiso_desc', width: 350},
-					{text: 'Accion', dataIndex: 'permiso_accion', width: 100}
+					{text: 'Accion', dataIndex: 'permiso_accion', width: 215}
 				],
 				listeners:{
 					select: function(ths, record, index, eOpts ) {
+						Ext.getCmp('ccu_permiso_view_form').loadRecord(record);
 					},
 					rowdblclick: function(ths, record, tr, rowIndex, e, eOpts) {
 						//ccu.plani_traba_window(record);
 					}
 				}
+			},{
+				xtype: 'form',
+				id: 'ccu_permiso_view_form',
+				layout: 'form',
+				region: 'south',
+				height: 120,
+				bodyStyle: {
+					//background: '#4c9dd8'
+				},
+				tbar:[],
+				items: [{
+					fieldLabel: 'Descripcion',
+    				xtype: 'textfield',
+    				name: 'permiso_desc',
+    				readOnly: true
+				},{
+					fieldLabel: 'Descripcion',
+    				xtype: 'textfield',
+    				name: 'permiso_accion',
+    				readOnly: true
+				}]
 			}]
 		}],
 		listeners: {

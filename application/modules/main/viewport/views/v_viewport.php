@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
 	<title>Sistema de Informacion y Gestion de Transporte Municipal</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="shortcut icon" href="sigtm.ico"/>
 	<link rel="stylesheet" type="text/css" href="../ext-6/build/classic/theme-neptune/resources/theme-neptune-all.css">
 	<link rel="stylesheet" type="text/css" href="../ext-6/build/packages/charts/classic/neptune/resources/charts-all.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url('tools/css/icons.css')?>">
@@ -149,14 +150,14 @@
 					},{
 						text: 'Consultas y Reportes', 
 						menu:[{
-							text: 'Consulta de Ficha Tecnica &nbsp;', 
+							text: 'Consulta de Ficha Tecnica de Transporte&nbsp;', 
 							module: {
-								title: 'Consulta de Ficha Tecnica',
-								name: 'con_ficha_tecnica',
-								url: 'con_ficha_tecnica/con_ficha_tecnica'
+								title: 'Consulta de Ficha Tecnica de Transporte',
+								name: 'con_ftt',
+								url: 'con_ftt/con_ftt'
 							},
 							handler: sys_menu_item_handler,
-							hidden: !<?php echo sys_session_hasRoleToString('cr.con_ficha_tecnica'); ?>
+							hidden: !<?php echo sys_session_hasRoleToString('cr.con_ftt'); ?>
 						},'-',{
 							text: 'Reporte de Contribuyentes &nbsp;', 
 							module: {

@@ -163,7 +163,7 @@
 				url: 'clit/AddOrUpdate',
 				layout: 'absolute',
 				region: 'north',
-				height: 200,
+				height: 235,
 				bodyStyle: {
 					//background: '#4c9dd8'
 					borderTop: '1px solid silver!important;'
@@ -188,10 +188,11 @@
 								frm.unmask();
 								if (action.result.success) {
 									clit.form_editing = false;
-									//if ( operation == 'new' ) {
-									//	clit.edit_window(action.result.rowid);
-									//}
-									clit.reload_list(action.result.rowid);
+									if ( operation == 'new' ) {
+										clit.reload_list(action.result.rowid);
+									} else {
+										clit.reload_list(frm.getRecord().get('clit_id'));
+									}
 								} else {
 									Ext.Msg.alert('Error', action.result.msg);
 								}
@@ -313,10 +314,18 @@
     				hidden: false // only for edit
 				},{
 					xtype: 'displayfield',
+					id: 'clit_form_clit_recibo_validado_flag_displayfield',
+					fieldLabel: 'Se ha validado el recibo?',
+					name: 'clit_recibo_validado_flag',
+					x: 10, y: 150,
+					width: 30,
+					labelWidth: 160
+				},{
+					xtype: 'displayfield',
 					id: 'clit_form_plantilla_desc_displayfield',
 					fieldLabel: 'Plantilla para la generacion del documento PDF',
 					name: 'plantilla_desc',
-					x: 10, y: 150,
+					x: 10, y: 180,
 					width: 400,
 					labelWidth: 250
 				}]

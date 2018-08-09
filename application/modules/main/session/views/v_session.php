@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
 	<title>Sistema de Informacion y Gestion de Transporte Municipal</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="shortcut icon" href="sigtm.ico"/>
 	<link rel="stylesheet" type="text/css" href="../ext-6/build/classic/theme-neptune/resources/theme-neptune-all.css">
 	<script type="text/javascript" src="../ext-6/build/ext-all.js"></script>
 	<script type="text/javascript" src="../ext-6/build/classic/theme-neptune/theme-neptune.js"></script>
@@ -18,14 +19,14 @@
             		autoShow: true,
             		closable: false,
             		bodyPadding: 10,
-					title: 'Ingreso al Sistema',
+					title: 'Inicio de sesion',
             		items: [{
 						xtype: 'textfield',
 						name: 'username',
 						fieldLabel: 'Usuario',
 						allowBlank: false,
 						id: 'login.username'
-				    }, {
+				    },{
 						xtype: 'textfield',
 						name: 'password',
 						inputType: 'password',
@@ -73,5 +74,7 @@
 	</script>
 </head>
 <body>
+	<div style="padding: 20px 0 0 30px; color: gray; font-size: 11pt; ">Municipalidad Provincial Jorge Basadre</div>
+	<div style="padding: 10px 0 0 30px; color: silver; font-size: 17pt; ">Sistema de Informaci&oacute;n y Gesti&oacute;n de Transporte Municipal</div>
 </body>
 </html>
