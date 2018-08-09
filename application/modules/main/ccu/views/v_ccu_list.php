@@ -232,7 +232,7 @@
     				name: 'permiso_desc',
     				readOnly: true
 				},{
-					fieldLabel: 'Descripcion',
+					fieldLabel: 'Accion',
     				xtype: 'textfield',
     				name: 'permiso_accion',
     				readOnly: true
