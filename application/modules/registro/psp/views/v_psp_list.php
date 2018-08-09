@@ -164,7 +164,7 @@
 				url: 'psp/AddOrUpdate',
 				layout: 'absolute',
 				region: 'north',
-				height: 200,
+				height: 350,
 				bodyStyle: {
 					//background: '#4c9dd8'
 					borderTop: '1px solid silver!important;'
@@ -296,28 +296,46 @@
     				format: 'd/m/Y',
     				x: 10, y: 90, width: 200
 				},{
-    				xtype: 'combobox',
-    				id: 'psp_form_psp_resultado_field',
-    				name: 'psp_resultado',
-    				fieldLabel: 'Registra Infraccion de Transito?',
-    				displayField: 'desc',
-    				valueField: 'id',
-    				store: psp.resultado_store,
-    				queryMode: 'local',
-    				x: 10, y: 120, width: 300,
-    				editable: false,
-    				listeners: {
-    					select: function(combo, record, eOpts ) {
-				    	}
-    				},
-    				labelWidth: 170,
-    				hidden: false // only for edit
+					fieldLabel: 'Fecha de Inicio',
+					id: 'psp_form_psp_fecha_inicio_field',
+    				xtype: 'datefield',
+    				name: 'psp_fecha_inicio',
+    				format: 'd/m/Y',
+    				x: 10, y: 120, width: 200,
+    				labelWidth: 95
+				},{
+					fieldLabel: 'Fecha de Termino',
+					id: 'psp_form_psp_fecha_fin_field',
+    				xtype: 'datefield',
+    				name: 'psp_fecha_fin',
+    				format: 'd/m/Y',
+    				x: 10, y: 150, width: 200,
+    				labelWidth: 95
+				},{
+					id: 'psp_form_psp_ruta_field',
+    				xtype: 'textfield',
+    				fieldLabel: 'Ruta',
+    				name: 'psp_ruta',
+    				x: 10, y: 180, width: 380
+				},{
+					id: 'psp_form_psp_resolucion_field',
+    				xtype: 'textfield',
+    				fieldLabel: 'Resolucion',
+    				name: 'psp_resolucion',
+    				x: 10, y: 210, width: 380
+				},{
+					xtype: 'displayfield',
+					id: 'clit_form_clit_recibo_validado_flag_displayfield',
+					fieldLabel: 'Se ha validado el recibo?',
+					name: 'clit_recibo_validado_flag',
+					x: 10, y: 240, width: 30,
+					labelWidth: 160
 				},{
 					xtype: 'displayfield',
 					id: 'psp_form_plantilla_desc_displayfield',
 					fieldLabel: 'Plantilla para la generacion del documento PDF',
 					name: 'plantilla_desc',
-					x: 10, y: 150,
+					x: 10, y: 270,
 					width: 400,
 					labelWidth: 250
 				}]
