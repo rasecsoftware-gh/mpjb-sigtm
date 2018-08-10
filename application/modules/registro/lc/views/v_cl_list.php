@@ -1,18 +1,18 @@
 <script>
-	clit.panel = Ext.create('Ext.Panel', {
+	lc.panel = Ext.create('Ext.Panel', {
 		region: 'center',
 		layout: 'border',
 		items: [{
 			xtype: 'grid',
-			id:'clit_main_grid',
+			id:'lc_main_grid',
 			region: 'center', 
 			//split:true, 
 			//forceFit:true,
 			sortableColumns: false,
 			enableColumnHide: false,
 			columns:[
-				{text:'Año', dataIndex:'clit_anio', width: 45},
-				{text:'Numero', dataIndex:'clit_numero', width: 55},
+				{text:'Año', dataIndex:'lc_anio', width: 45},
+				{text:'Numero', dataIndex:'lc_numero', width: 55},
 				{
 		            xtype: 'actioncolumn',
 		            width: 25,
@@ -20,18 +20,18 @@
 		                icon: 'tools/icons/page_white_acrobat.png',  // Use a URL in the icon config
 		                tooltip: 'Ver constancia en formato PDF',
 		                handler: function(grid, rowIndex, colIndex, item, e, record) {
-		                    clit.print_window(record);
+		                    lc.print_window(record);
 		                },
 		                isDisabled: function (view, rowIndex, colIndex, item, record) {
-		                	return !($.trim(record.get('clit_pdf')).length > 0);
+		                	return !($.trim(record.get('lc_pdf')).length > 0);
 		                }
 		            }]
 		        },
 				{text:'Nombres o Razon Soc.', dataIndex:'contribuyente_nombres', width: 200},
 				{text:'Apellidos', dataIndex:'contribuyente_apellidos', width: 150},
 				{text:'DNI/RUC', dataIndex:'contribuyente_numero_doc', width: 75},
-				{text:'Fecha', dataIndex:'clit_fecha', width: 70},
-				{text:'Resultado', dataIndex:'clit_resultado', width: 70, align: 'center'},
+				{text:'Fecha', dataIndex:'lc_fecha', width: 70},
+				{text:'Resultado', dataIndex:'lc_resultado', width: 70, align: 'center'},
 				{text:'Estado', dataIndex:'estado_doc_desc', width: 70,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
 						if (record.get('estado_doc_color') != '') {
@@ -45,14 +45,14 @@
 			tbar:[{
 				text:'Nuevo', 
 				handler: function() {
-					clit.new_window();
+					lc.new_window();
 				}
 			},{
 				text:'Modificar', 
 				handler: function() {
-					var rows = Ext.getCmp('clit_main_grid').getSelection();
+					var rows = Ext.getCmp('lc_main_grid').getSelection();
 					if (rows.length>0) {
-						clit.edit_window(rows[0].get('clit_id'));
+						lc.edit_window(rows[0].get('lc_id'));
 					} else {
 						Ext.Msg.alert('Error', 'Seleccione un registro');
 					}
@@ -62,25 +62,25 @@
 				menu: [{
 					text: 'Generar PDF', 
 					handler: function() {
-						clit.pdf_generar_window();
+						lc.pdf_generar_window();
 					}
 				},{
 					text: 'Cambiar plantilla', 
 					handler: function() {
-						clit.plantilla_cambiar_window();
+						lc.plantilla_cambiar_window();
 					}
 				},'-',{
 					text: 'Eliminar', 
 					handler: function() {
-						clit.delete_window();
+						lc.delete_window();
 					},
-					hidden: !<?php echo sys_session_hasRoleToString('clit.delete'); ?>,
+					hidden: !<?php echo sys_session_hasRoleToString('lc.delete'); ?>,
 				},'-',{
 					text: 'Ver informacion de registro', 
 					handler: function() {
-						var rows = Ext.getCmp('clit_main_grid').getSelection();
+						var rows = Ext.getCmp('lc_main_grid').getSelection();
 						if (rows.length>0) {
-							syslog.show_window('public.clit', rows[0].get('clit_id'));
+							syslog.show_window('public.lc', rows[0].get('lc_id'));
 						} else {
 							Ext.Msg.alert('Error', 'Seleccione un registro');
 						}
@@ -88,7 +88,7 @@
 				}]
 			},'->',{
 				xtype: 'combobox',
-				id: 'clit_search_by_cb',
+				id: 'lc_search_by_cb',
 				displayField: 'search_desc',
 				valueField: 'search_id',
 				name: 'search_by',
@@ -105,49 +105,49 @@
 				})
 			},{
 				xtype: 'textfield',
-				id: 'clit_search_text',
+				id: 'lc_search_text',
 				enableKeyEvents: true,
 				width: 140,
 				listeners: {
 					keypress: function(sender, e, eOpts) {
 						if (e.getKey() == e.ENTER) {
-							Ext.getCmp('clit_search_bt').click(e);
+							Ext.getCmp('lc_search_bt').click(e);
 						}
 					}
 				}
 			},{
-				id: 'clit_search_bt',
+				id: 'lc_search_bt',
 				text:'Buscar/Actualizar', handler: function() {
-					clit.reload_list();
+					lc.reload_list();
 				}
 			}],
-			store: clit.main_store,
+			store: lc.main_store,
 			dockedItems: [{
 		        xtype: 'pagingtoolbar',
-		        store: clit.main_store, // same store GridPanel is using
+		        store: lc.main_store, // same store GridPanel is using
 		        dock: 'bottom',
 		        displayInfo: true
 		    }],
 			listeners:{
 				select: function (ths, record, index, eOpts) {
-					if (!clit.form_editing) {
-						var f = Ext.getCmp('clit_form');
+					if (!lc.form_editing) {
+						var f = Ext.getCmp('lc_form');
 						f.loadRecord(record);
-						Ext.getCmp('clit_form_title_label').setText('Constancia');
-						Ext.getCmp('clit_form_clit_id_displayfield').setValue(record.get('clit_id'));
-						Ext.getCmp('clit_form_save_bt').hide();
-						Ext.getCmp('clit_form_cancel_bt').hide();
-						Ext.getCmp('clit_form_contribuyente_id_field').hide();
-						Ext.getCmp('clit_form_contribuyente_nomape_field').show();
-						Ext.getCmp('clit_form_doc_requisito_grid').enable();
-						Ext.getCmp('clit_form_doc_estado_grid').enable();
-						clit.doc_requisito_reload_list(record.get('clit_id'));
-						clit.doc_estado_reload_list(record.get('clit_id'));
+						Ext.getCmp('lc_form_title_label').setText('Constancia');
+						Ext.getCmp('lc_form_lc_id_displayfield').setValue(record.get('lc_id'));
+						Ext.getCmp('lc_form_save_bt').hide();
+						Ext.getCmp('lc_form_cancel_bt').hide();
+						Ext.getCmp('lc_form_contribuyente_id_field').hide();
+						Ext.getCmp('lc_form_contribuyente_nomape_field').show();
+						Ext.getCmp('lc_form_doc_requisito_grid').enable();
+						Ext.getCmp('lc_form_doc_estado_grid').enable();
+						lc.doc_requisito_reload_list(record.get('lc_id'));
+						lc.doc_estado_reload_list(record.get('lc_id'));
 					}
 				},
 				rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
-					if (!clit.form_editing) {
-						clit.edit_window(record.get('clit_id'));
+					if (!lc.form_editing) {
+						lc.edit_window(record.get('lc_id'));
 					}
 				}
 			}
@@ -159,8 +159,8 @@
 			width: 500,
 			items: [{
 				xtype: 'form',
-				id: 'clit_form',
-				url: 'clit/AddOrUpdate',
+				id: 'lc_form',
+				url: 'lc/AddOrUpdate',
 				layout: 'absolute',
 				region: 'north',
 				height: 235,
@@ -170,28 +170,28 @@
 				},
 				tbar:[{
 					xtype: 'label',
-					id: 'clit_form_title_label',
+					id: 'lc_form_title_label',
 					text: 'Constancia',
 					style: {
 						fontWeight: 'bold'
 					}
 				},'->',{
 					text: 'Guardar',
-					id: 'clit_form_save_bt',
+					id: 'lc_form_save_bt',
 					hidden: true,
 					handler: function () {
-						var operation = Ext.getCmp('clit_form_operation_field').getValue();
-						var frm = Ext.getCmp('clit_form');
+						var operation = Ext.getCmp('lc_form_operation_field').getValue();
+						var frm = Ext.getCmp('lc_form');
 						frm.mask('guardando');
 						frm.submit({
 							success: function(form, action) {
 								frm.unmask();
 								if (action.result.success) {
-									clit.form_editing = false;
+									lc.form_editing = false;
 									if ( operation == 'new' ) {
-										clit.reload_list(action.result.rowid);
+										lc.reload_list(action.result.rowid);
 									} else {
-										clit.reload_list(frm.getRecord().get('clit_id'));
+										lc.reload_list(frm.getRecord().get('lc_id'));
 									}
 								} else {
 									Ext.Msg.alert('Error', action.result.msg);
@@ -207,16 +207,16 @@
 					}
 				},{
 					text: 'Cancelar',
-					id: 'clit_form_cancel_bt',
+					id: 'lc_form_cancel_bt',
 					hidden: true,
 					handler: function () {
-						Ext.getCmp('clit_form_save_bt').hide();
-						Ext.getCmp('clit_form_cancel_bt').hide();
-						Ext.getCmp('clit_form_contribuyente_id_field').hide();
-						Ext.getCmp('clit_form_contribuyente_nomape_field').show();
-						Ext.getCmp('clit_form_doc_requisito_grid').enable();
-						Ext.getCmp('clit_form_doc_estado_grid').enable();
-						clit.form_editing = false;
+						Ext.getCmp('lc_form_save_bt').hide();
+						Ext.getCmp('lc_form_cancel_bt').hide();
+						Ext.getCmp('lc_form_contribuyente_id_field').hide();
+						Ext.getCmp('lc_form_contribuyente_nomape_field').show();
+						Ext.getCmp('lc_form_doc_requisito_grid').enable();
+						Ext.getCmp('lc_form_doc_estado_grid').enable();
+						lc.form_editing = false;
 					}
 				}],
 				defaults: {
@@ -225,45 +225,45 @@
 				},
 				items: [{
 					xtype: 'hidden',
-					id: 'clit_form_operation_field',
+					id: 'lc_form_operation_field',
 					name: 'operation',
 					value: 'edit'
 				},{
 					xtype: 'hidden',
-					id: 'clit_form_clit_id_field',
-					name: 'clit_id'
+					id: 'lc_form_lc_id_field',
+					name: 'lc_id'
 				},{
 					xtype: 'hidden',
-					id: 'clit_form_plantilla_id_field',
+					id: 'lc_form_plantilla_id_field',
 					name: 'plantilla_id'
 				},{
 					xtype: 'displayfield',
-					id: 'clit_form_clit_id_displayfield',
+					id: 'lc_form_lc_id_displayfield',
 					fieldLabel: 'ID',
 					x: 10, y: 0,
 					width: 200
 				},{
 					fieldLabel: 'Numero y Año',
-					id: 'clit_form_clit_numero_field',
+					id: 'lc_form_lc_numero_field',
     				xtype: 'textfield',
-    				name: 'clit_numero',
+    				name: 'lc_numero',
     				fieldStyle: 'text-align: center;',
     				x: 10, y: 30, width: 160
 				},{
-					id: 'clit_form_clit_anio_field',
+					id: 'lc_form_lc_anio_field',
     				xtype: 'textfield',
-    				name: 'clit_anio',
+    				name: 'lc_anio',
     				editable: false,
     				value: '2018',
     				x: 175, y: 30, width: 40
 				},{
     				xtype: 'combobox',
-    				id: 'clit_form_contribuyente_id_field',
+    				id: 'lc_form_contribuyente_id_field',
     				name: 'contribuyente_id',
     				fieldLabel: 'Contribuyente',
     				displayField: 'contribuyente_nomape',
     				valueField: 'contribuyente_id',
-    				store: clit.contribuyente_store,
+    				store: lc.contribuyente_store,
     				queryMode: 'remote',
     				triggerAction: 'last', // query
     				minChars: 2,
@@ -272,37 +272,37 @@
     				editable: true,
     				listeners: {
     					select: function(combo, record, eOpts ) {
-    						Ext.getCmp('clit_form_contribuyente_numero_doc_field').setValue(record.get('contribuyente_numero_doc'));
+    						Ext.getCmp('lc_form_contribuyente_numero_doc_field').setValue(record.get('contribuyente_numero_doc'));
 				    	}
     				},
     				hidden: true // only for edit
 				},{ // only for display
 					fieldLabel: 'Contribuyente',
-					id: 'clit_form_contribuyente_nomape_field',
+					id: 'lc_form_contribuyente_nomape_field',
     				xtype: 'textfield',
     				name: 'contribuyente_nomape',
     				x: 10, y: 60, width: 380
 				},{
-					id: 'clit_form_contribuyente_numero_doc_field',
+					id: 'lc_form_contribuyente_numero_doc_field',
     				xtype: 'textfield',
     				name: 'contribuyente_numero_doc',
     				editable: false,
     				x: 395, y: 60, width: 75
 				},{
 					fieldLabel: 'Fecha',
-					id: 'clit_form_clit_fecha_field',
+					id: 'lc_form_lc_fecha_field',
     				xtype: 'datefield',
-    				name: 'clit_fecha',
+    				name: 'lc_fecha',
     				format: 'd/m/Y',
     				x: 10, y: 90, width: 200
 				},{
     				xtype: 'combobox',
-    				id: 'clit_form_clit_resultado_field',
-    				name: 'clit_resultado',
+    				id: 'lc_form_lc_resultado_field',
+    				name: 'lc_resultado',
     				fieldLabel: 'Registra Infraccion de Transito?',
     				displayField: 'desc',
     				valueField: 'id',
-    				store: clit.resultado_store,
+    				store: lc.resultado_store,
     				queryMode: 'local',
     				x: 10, y: 120, width: 300,
     				editable: false,
@@ -314,15 +314,15 @@
     				hidden: false // only for edit
 				},{
 					xtype: 'displayfield',
-					id: 'clit_form_clit_recibo_validado_flag_displayfield',
+					id: 'lc_form_lc_recibo_validado_flag_displayfield',
 					fieldLabel: 'Se ha validado el recibo?',
-					name: 'clit_recibo_validado_flag',
+					name: 'lc_recibo_validado_flag',
 					x: 10, y: 150,
 					width: 30,
 					labelWidth: 160
 				},{
 					xtype: 'displayfield',
-					id: 'clit_form_plantilla_desc_displayfield',
+					id: 'lc_form_plantilla_desc_displayfield',
 					fieldLabel: 'Plantilla para la generacion del documento PDF',
 					name: 'plantilla_desc',
 					x: 10, y: 180,
@@ -335,13 +335,13 @@
 				region: 'center',
 				items: [{
 					xtype: 'grid',
-					id: 'clit_form_doc_requisito_grid',
+					id: 'lc_form_doc_requisito_grid',
 					region: 'center', 
 					//split:true, 
 					//forceFit:true,
 					sortableColumns: false,
 					enableColumnHide: false,
-					store: clit.doc_requisito_store,
+					store: lc.doc_requisito_store,
 					columns:[
 						{text:'Documento', dataIndex: 'tipo_doc_requisito_desc', width: 190,
 							renderer: function (value, metaData, record) {
@@ -387,31 +387,31 @@
 						text: 'Agregar o Modifcar', 
 						tooltip: 'Agregar o Modificar documento', tooltipType: 'title',
 						handler: function() {
-							clit.doc_requisito_add_or_edit();
+							lc.doc_requisito_add_or_edit();
 						}
 					},{
 						text: '-', 
 						tooltip: 'Quitar', tooltipType: 'title',
 						handler: function() {
-							clit.doc_requisito_delete_window();
+							lc.doc_requisito_delete_window();
 						}
 					}],
 					listeners: {
 						rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
-							clit.doc_requisito_add_or_edit();
+							lc.doc_requisito_add_or_edit();
 						}
 					},
-					hidden: false // hide on new CLIT
+					hidden: false // hide on new lc
 				},{
 					xtype: 'grid',
-					id: 'clit_form_doc_estado_grid',
+					id: 'lc_form_doc_estado_grid',
 					region: 'south', 
 					height: 200,
 					//split:true, 
 					//forceFit:true,
 					sortableColumns: false,
 					enableColumnHide: false,
-					store: clit.doc_estado_store,
+					store: lc.doc_estado_store,
 					columns:[
 						{	
 							text:'Estado', dataIndex: 'estado_doc_desc', width: 150,
@@ -433,10 +433,10 @@
 				                icon: 'tools/icons/accept.png',  // Use a URL in the icon config
 				                tooltip: 'Establecer estado', tooltipType: 'title',
 				                handler: function(grid, rowIndex, colIndex, item, e, record) {
-				                    clit.doc_estado_add_window(record);
+				                    lc.doc_estado_add_window(record);
 				                },
 				                isDisabled: function (view, rowIndex, colIndex, item, record) {
-				                	var doc = Ext.getCmp('clit_form').getRecord();
+				                	var doc = Ext.getCmp('lc_form').getRecord();
 				                	return !(
 				                		record.get('estado_doc_index') > 1 // no es inicial
 				                		&& record.get('doc_estado_id') == null // no tiene registro
@@ -450,10 +450,10 @@
 				                icon: 'tools/icons/arrow_undo.png',  // Use a URL in the icon config
 				                tooltip: 'Cancelar estado', tooltipType: 'title',
 				                handler: function(grid, rowIndex, colIndex, item, e, record) {
-				                    clit.doc_estado_delete_window(record);
+				                    lc.doc_estado_delete_window(record);
 				                },
 				                isDisabled: function (view, rowIndex, colIndex, item, record) {
-				                	var doc = Ext.getCmp('clit_form').getRecord();
+				                	var doc = Ext.getCmp('lc_form').getRecord();
 				                	return !(
 				                		record.get('estado_doc_index') > 1 // no es inicial (el estado incial no se puede revertir)
 				                		&& record.get('doc_estado_id') != null // no tiene registro
@@ -470,56 +470,56 @@
 						text: 'Continuar', 
 						tooltip: 'Modificar documento', tooltipType: 'title',
 						handler: function() {
-							clit.doc_requisito_add_or_edit();
+							lc.doc_requisito_add_or_edit();
 						},
 						hidden: true
 					}],
 					listeners: {
 						rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
-							//clit.doc_requisito_add_or_edit();
+							//lc.doc_requisito_add_or_edit();
 						}
 					},
-					hidden: false // hide on new CLIT
+					hidden: false // hide on new lc
 				}]
 			}]
 		}]
 	});
 
-	clit.reload_list = function (select_id) {
-		clit.clit_id_selected = select_id||0;
-		//clit.main_store.reload();
-		clit.main_store.reload({
+	lc.reload_list = function (select_id) {
+		lc.lc_id_selected = select_id||0;
+		//lc.main_store.reload();
+		lc.main_store.reload({
 			params: {
-				search_by: Ext.getCmp('clit_search_by_cb').getValue(),
-				search_text: Ext.getCmp('clit_search_text').getValue()
+				search_by: Ext.getCmp('lc_search_by_cb').getValue(),
+				search_text: Ext.getCmp('lc_search_text').getValue()
 			}
 		});
 	};
 
-	clit.doc_requisito_reload_list = function (doc_id) {
-		clit.doc_requisito_store.reload({
+	lc.doc_requisito_reload_list = function (doc_id) {
+		lc.doc_requisito_store.reload({
 			params: {
 				doc_id: doc_id
 			}
 		});
 	};
 
-	clit.doc_requisito_add_or_edit = function () {
-		var rows = Ext.getCmp('clit_form_doc_requisito_grid').getSelection();
+	lc.doc_requisito_add_or_edit = function () {
+		var rows = Ext.getCmp('lc_form_doc_requisito_grid').getSelection();
 		if (rows.length > 0) {
 			record = rows[0];
 			if ( record.get('doc_requisito_id') > 0 ) {
-				clit.doc_requisito_edit_window();
+				lc.doc_requisito_edit_window();
 			} else {
-				clit.doc_requisito_add_window();
+				lc.doc_requisito_add_window();
 			}
 		} else {
 			Ext.Msg.alert('Agregar o Modificar documento', 'Seleccione un registro por favor.');
 		}
 	};
 
-	clit.doc_estado_reload_list = function (doc_id) {
-		clit.doc_estado_store.reload({
+	lc.doc_estado_reload_list = function (doc_id) {
+		lc.doc_estado_store.reload({
 			params: {
 				doc_id: doc_id
 			}

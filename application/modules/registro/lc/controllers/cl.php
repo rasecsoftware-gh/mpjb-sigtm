@@ -72,12 +72,18 @@ class CL extends MX_Controller {
 	public function Add() {
 		//sys_session_hasRoleOrDie('rh.lc.add, rh.lc.update');
 		$data = array(
-			'tipo_doc_id'=>'lc',
+			'tipo_doc_id'=>'LC',
   			'lc_anio'=>trim($this->input->post('lc_anio')),
 			'lc_numero'=>trim($this->input->post('lc_numero')),
 			'contribuyente_id'=>$this->input->post('contribuyente_id'),
 			'lc_fecha'=>$this->input->post('lc_fecha'),
-			'lc_resultado'=>trim($this->input->post('lc_resultado')),
+			'lc_clase'=>to_upper(trim($this->input->post('lc_clase'))),
+			'lc_categoria'=>to_upper(trim($this->input->post('lc_categoria'))),
+			'lc_resolucion'=>to_upper(trim($this->input->post('lc_resolucion'))),
+			'lc_fecha_exp'=>trim($this->input->post('lc_fecha_exp')),
+			'lc_fecha_ven'=>trim($this->input->post('lc_fecha_ven')),
+			'lc_codigo'=>trim($this->input->post('lc_codigo')),
+			'lc_observacion'=>trim($this->input->post('lc_observacion')),
 			'plantilla_id'=>$this->input->post('plantilla_id')
 		);
 
@@ -106,7 +112,7 @@ class CL extends MX_Controller {
 		if ($anio_numero_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"El Numero del Documento ya existe.",
+				'msg'=>"El Numero de Registro ya existe.",
 				'target_id'=>'lc_form_lc_numero_field'
 			)));
 		}
@@ -130,14 +136,53 @@ class CL extends MX_Controller {
 		if ( !($data['plantilla_id'] > 0) ) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"Especifique una plantilla para la generacion del PDF.",
-				'target_id'=>'lc_form_plantilla_id_field'
+				'msg'=>"Especifique una plantilla para la generacion del PDF."
+			)));
+		}
+
+		if ( trim($data['lc_clase'])=='' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la Clase",
+				'target_id'=>'lc_form_lc_clase_field'
+			)));
+		}
+
+		if ( trim($data['lc_categoria'])=='' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la Categoria",
+				'target_id'=>'lc_form_lc_categoria_field'
+			)));
+		}
+
+		if ( trim($data['lc_resolucion'])=='' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la resolucion",
+				'target_id'=>'lc_form_lc_resolucion_field'
+			)));
+		}
+
+		if ( trim($data['lc_fecha_exp'])=='' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la Fecha de Expedicion",
+				'target_id'=>'lc_form_lc_fecha_exp_field'
+			)));
+		}
+
+		if ( trim($data['lc_fecha_ven'])=='' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la fecha de vencimiento",
+				'target_id'=>'lc_form_lc_fecha_ven_field'
 			)));
 		}
 
 		// SET first default state
 		$estado_doc = $this->db
-		->where('tipo_doc_id', 'lc')
+		->where('tipo_doc_id', 'LC')
 		->order_by('estado_doc_index', 'ASC')
 		->get('public.estado_doc')->row();
 
@@ -176,18 +221,15 @@ class CL extends MX_Controller {
 			'lc_numero'=>trim($this->input->post('lc_numero')),
 			'contribuyente_id'=>$this->input->post('contribuyente_id'),
 			'lc_fecha'=>$this->input->post('lc_fecha'),
-			'lc_resultado'=>trim($this->input->post('lc_resultado')),
+			'lc_clase'=>to_upper(trim($this->input->post('lc_clase'))),
+			'lc_categoria'=>to_upper(trim($this->input->post('lc_categoria'))),
+			'lc_resolucion'=>to_upper(trim($this->input->post('lc_resolucion'))),
+			'lc_fecha_exp'=>trim($this->input->post('lc_fecha_exp')),
+			'lc_fecha_ven'=>trim($this->input->post('lc_fecha_ven')),
+			'lc_codigo'=>trim($this->input->post('lc_codigo')),
+			'lc_observacion'=>trim($this->input->post('lc_observacion')),
 			'plantilla_id'=>$this->input->post('plantilla_id')
 		);
-
-		$doc = $this->model->get_row($data['lc_id']);
-
-		if ( $doc->estado_doc_modificar_flag == 'N' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"No es posible modificar el documento en el estado actual."
-			)));
-		}
 
 		if ($data['lc_anio']=='') {
 			die(json_encode(array(
@@ -215,7 +257,7 @@ class CL extends MX_Controller {
 		if ($anio_numero_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"El Numero del Documento ya existe.",
+				'msg'=>"El Numero de Registro ya existe.",
 				'target_id'=>'lc_form_lc_numero_field'
 			)));
 		}
@@ -228,7 +270,7 @@ class CL extends MX_Controller {
 			)));
 		}
 
-		if ( trim($data['lc_fecha'])=='' ) {
+		if (trim($data['lc_fecha'])=='') {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique la fecha",
@@ -239,8 +281,47 @@ class CL extends MX_Controller {
 		if ( !($data['plantilla_id'] > 0) ) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"Especifique una plantilla para la generacion del PDF.",
-				'target_id'=>'lc_form_plantilla_id_field'
+				'msg'=>"Especifique una plantilla para la generacion del PDF."
+			)));
+		}
+
+		if ( trim($data['lc_clase'])=='' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la Clase",
+				'target_id'=>'lc_form_lc_clase_field'
+			)));
+		}
+
+		if ( trim($data['lc_categoria'])=='' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la Categoria",
+				'target_id'=>'lc_form_lc_categoria_field'
+			)));
+		}
+
+		if ( trim($data['lc_resolucion'])=='' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la resolucion",
+				'target_id'=>'lc_form_lc_resolucion_field'
+			)));
+		}
+
+		if ( trim($data['lc_fecha_exp'])=='' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la Fecha de Expedicion",
+				'target_id'=>'lc_form_lc_fecha_exp_field'
+			)));
+		}
+
+		if ( trim($data['lc_fecha_ven'])=='' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la fecha de vencimiento",
+				'target_id'=>'lc_form_lc_fecha_ven_field'
 			)));
 		}
 
@@ -253,9 +334,8 @@ class CL extends MX_Controller {
 		if ($result !== false) {
 			die(json_encode(array(
 				'success'=>true,
-				'msg'=>"Se actualizo satisfactoriamente"
+				'msg'=>"Se guardo satisfactoriamente"
 			)));
-			
 		} else {
 			die(json_encode(array (
 				'success'=>false,
@@ -264,95 +344,10 @@ class CL extends MX_Controller {
 		}
 	}
 
-	public function Activar() {
-		//sys_session_hasRoleOrDie('rh.lc.modify');
-		$data = array(
-			'lc_id'=>$this->input->post('lc_id'),
-			'lc_estado'=>'A'
-		);
-
-		$r = $this->model->get_row($data['lc_id']);
-		if ($r->lc_estado == 'A') {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"El lc ya se encuentra Activo."
-			)));
-		}
-
-		$result = $this->model->update($data);
-
-		if ($result !== false) {
-			die(json_encode(array(
-				'success'=>true,
-				'msg'=>"Se Activo satisfactoriamente."
-			)));
-			
-		} else {
-			die(json_encode(array (
-				'success'=>false,
-				'msg'=>"Error al realizar la operacion."
-			)));
-		}
-	}
-
-	public function Inactivar() {
-		//sys_session_hasRoleOrDie('rh.lc.modify');
-		$data = array(
-			'lc_id'=>$this->input->post('lc_id'),
-			'lc_estado'=>'I'
-		);
-		$r = $this->model->get_row($data['lc_id']);
-		if ($r->lc_estado == 'I') {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"El lc ya se encuentra Inactivo."
-			)));
-		}
-
-		$result = $this->model->update($data);
-
-		if ($result !== false) {
-			die(json_encode(array(
-				'success'=>true,
-				'msg'=>"Se inactivo satisfactoriamente."
-			)));
-			
-		} else {
-			die(json_encode(array (
-				'success'=>false,
-				'msg'=>"Error al realizar la operacion."
-			)));
-		}
-	}
-
-	public function Delete() {
+	public function Delete () {
 		//sys_session_hasRoleOrDie('rh.lc.modify');
 		$p_lc_id = $this->input->post('lc_id');
-
-		$lc_count = $this->db->select('COUNT(*) AS value')->where('lc_id', $p_lc_id)->get('public.lc')->row();
-		if ($lc_count->value > 0) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"El lc tiene Constancias de Libre Infraccion de Transito registrado(s)."
-			)));
-		}
-
-		$psp_count = $this->db->select('COUNT(*) AS value')->where('lc_id', $p_lc_id)->get('public.psp')->row();
-		if ($psp_count->value > 0) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"El lc tiene Permisos de Servicio Publico registrado(s)."
-			)));
-		}
-
-		$lc_count = $this->db->select('COUNT(*) AS value')->where('lc_id', $p_lc_id)->get('public.lc')->row();
-		if ($lc_count->value > 0) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"El lc tiene Licencias de Conducir registrado(s)."
-			)));
-		}
-
+		/*
 		$cat_count = $this->db->select('COUNT(*) AS value')->where('lc_id', $p_lc_id)->get('public.cat')->row();
 		if ($cat_count->value > 0) {
 			die(json_encode(array(
@@ -360,6 +355,7 @@ class CL extends MX_Controller {
 				'msg'=>"El lc tiene Constancias de Autorizacion Temporal registrado(s)."
 			)));
 		}
+		*/
 
 		$result = $this->model->delete($p_lc_id);
 
@@ -406,7 +402,7 @@ class CL extends MX_Controller {
 		//var_dump($_FILES);
 		$upload_path = 'dbfiles/public.doc_requisito/';
 		$data = array(
-			'tipo_doc_id'=>'lc',
+			'tipo_doc_id'=>'LC',
 			'doc_id'=>$this->input->post('doc_id'),
 			'tipo_doc_requisito_id'=>$this->input->post('tipo_doc_requisito_id'),
 			'doc_requisito_fecha'=>$this->input->post('doc_requisito_fecha'),
@@ -627,7 +623,7 @@ class CL extends MX_Controller {
 		//var_dump($_FILES);
 		$upload_path = 'dbfiles/public.doc_requisito/';
 		$data = array(
-			'tipo_doc_id'=>'lc',
+			'tipo_doc_id'=>'LC',
 			'doc_id'=>$this->input->post('doc_id'),
 			'estado_doc_id'=>$this->input->post('estado_doc_id'),
 			'doc_estado_fecha'=>$this->input->post('doc_estado_fecha'),
@@ -746,6 +742,7 @@ class CL extends MX_Controller {
 			$doc_estado_anterior = $this->db
 			->from('public.doc_estado AS de')
 			->join('public.estado_doc AS ed', 'ed.estado_doc_id = de.estado_doc_id', 'inner')
+			->where('de.tipo_doc_id', $doc_estado->tipo_doc_id)
 			->where('de.doc_id', $doc_estado->doc_id)
 			->order_by('ed.estado_doc_index', 'DESC')
 			->get()->row();

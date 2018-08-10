@@ -55,7 +55,7 @@ class M_Clit extends CI_Model{
 				}
 			break;
 			case 'numero':
-				$this->db->like('c.clit_numero', $search_text);	
+				$this->db->like('cl.clit_numero', $search_text);	
 			break;
 			case 'estado':
 				$this->db->like('ed.estado_doc_desc', strtoupper($search_text));

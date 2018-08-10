@@ -715,6 +715,7 @@ class PSP extends MX_Controller {
 			$doc_estado_anterior = $this->db
 			->from('public.doc_estado AS de')
 			->join('public.estado_doc AS ed', 'ed.estado_doc_id = de.estado_doc_id', 'inner')
+			->where('de.tipo_doc_id', $doc_estado->tipo_doc_id)
 			->where('de.doc_id', $doc_estado->doc_id)
 			->order_by('ed.estado_doc_index', 'DESC')
 			->get()->row();
