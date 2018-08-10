@@ -20,6 +20,22 @@
 		}
 	});
 
+	psp.tipo_permiso_store = Ext.create("Ext.data.Store", {
+		proxy:{
+			type: 'ajax',
+			url: 'psp/getTipoPermisoList',
+			reader: {
+				type: 'json',
+				rootProperty: 'data'
+			}
+		},
+		autoLoad: true,
+		listeners: {
+			load: function () {
+			}
+		}
+	});
+
 	psp.plantilla_store = Ext.create("Ext.data.Store", {
 		proxy:{
 			type: 'ajax',
@@ -132,15 +148,16 @@
 <?php echo $this->load->view('v_psp_new'); ?>
 <?php echo $this->load->view('v_psp_edit'); ?>
 <?php ////echo $this->load->view('v_psp_delete'); ?>
-<?php //echo $this->load->view('v_psp_doc_requisito_add'); ?>
-<?php //echo $this->load->view('v_psp_doc_requisito_edit'); ?>
-<?php //echo $this->load->view('v_psp_doc_requisito_delete'); ?>
-<?php //echo $this->load->view('v_psp_doc_estado_add'); ?>
-<?php //echo $this->load->view('v_psp_doc_estado_delete'); ?>
+<?php echo $this->load->view('v_psp_doc_requisito_add'); ?>
+<?php echo $this->load->view('v_psp_doc_requisito_edit'); ?>
+<?php echo $this->load->view('v_psp_doc_requisito_delete'); ?>
+<?php echo $this->load->view('v_psp_doc_estado_add'); ?>
+<?php echo $this->load->view('v_psp_doc_estado_delete'); ?>
 <?php //echo $this->load->view('v_psp_plantilla_cambiar'); ?>
 <?php //echo $this->load->view('v_psp_pdf_generar'); ?>
 <?php //echo $this->load->view('v_psp_print'); ?>
-<?php //echo $this->load->view('syslog/v_syslog'); ?>
+<?php echo $this->load->view('v_psp_vehiculo_list'); ?>
+<?php echo $this->load->view('syslog/v_syslog'); ?>
 
 <script type="text/javascript">
 	var tab = Ext.getCmp('tab-psp');

@@ -2,19 +2,19 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 use PhpOffice\PhpWord\TemplateProcessor;
 
-class PSP extends MX_Controller {
+class CL extends MX_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model('m_psp', 'model');
+		$this->load->model('m_lc', 'model');
 		$this->load->library('upload');
-		//sys_session_hasRoleOrDie('psp');
+		//sys_session_hasRoleOrDie('lc');
 	}
 
 	public function index() {
 		$data = array();
-		$this->load->view('v_psp', $data);
+		$this->load->view('v_lc', $data);
 	}
 
 	public function getList() {
@@ -36,7 +36,7 @@ class PSP extends MX_Controller {
 		
 		// SET first default template
 		$plantilla = $this->db
-		->where('tipo_doc_id', 'PSP')
+		->where('tipo_doc_id', 'lc')
 		->where('plantilla_estado', 'A')
 		->order_by('plantilla_id', 'ASC')
 		->get('public.plantilla')->row();
@@ -70,56 +70,44 @@ class PSP extends MX_Controller {
 	}
 
 	public function Add() {
-		//sys_session_hasRoleOrDie('rh.psp.add, rh.psp.update');
+		//sys_session_hasRoleOrDie('rh.lc.add, rh.lc.update');
 		$data = array(
-			'tipo_doc_id'=>'PSP',
-  			'psp_anio'=>trim($this->input->post('psp_anio')),
-			'psp_numero'=>trim($this->input->post('psp_numero')),
-			'tipo_permiso_id'=>$this->input->post('tipo_permiso_id'),
+			'tipo_doc_id'=>'lc',
+  			'lc_anio'=>trim($this->input->post('lc_anio')),
+			'lc_numero'=>trim($this->input->post('lc_numero')),
 			'contribuyente_id'=>$this->input->post('contribuyente_id'),
-			'psp_fecha'=>$this->input->post('psp_fecha'),
-			'psp_fecha_inicio'=>$this->input->post('psp_fecha_inicio'),
-			'psp_fecha_fin'=>$this->input->post('psp_fecha_fin'),
-			'psp_resolucion'=>$this->input->post('psp_resolucion'),
-			'psp_ruta'=>to_upper($this->input->post('psp_ruta')),
+			'lc_fecha'=>$this->input->post('lc_fecha'),
+			'lc_resultado'=>trim($this->input->post('lc_resultado')),
 			'plantilla_id'=>$this->input->post('plantilla_id')
 		);
 
-		if ($data['psp_anio']=='') {
+		if ($data['lc_anio']=='') {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Año de Documento",
-				'target_id'=>'psp_form_psp_anio_field'
+				'target_id'=>'lc_form_lc_anio_field'
 			)));
 		}
 
-		if ($data['psp_numero']=='') {
+		if ($data['lc_numero']=='') {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Numero de Documento",
-				'target_id'=>'psp_form_psp_numero_field'
+				'target_id'=>'lc_form_lc_numero_field'
 			)));
 		}
 
 		$anio_numero_count = $this->db
 		->select('COUNT(*) AS value')
-		->from('public.psp')
-		->where('psp_anio', $data['psp_anio'])
-		->where('psp_numero', $data['psp_numero'])
+		->from('public.lc')
+		->where('lc_anio', $data['lc_anio'])
+		->where('lc_numero', $data['lc_numero'])
 		->get()->row();
 		if ($anio_numero_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"El Numero del documento ya existe.",
-				'target_id'=>'psp_form_psp_numero_field'
-			)));
-		}
-
-		if ( !($data['tipo_permiso_id'] > 0) ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique el Tipo de Permiso",
-				'target_id'=>'psp_form_tipo_permiso_id_field'
+				'msg'=>"El Numero del Documento ya existe.",
+				'target_id'=>'lc_form_lc_numero_field'
 			)));
 		}
 
@@ -127,31 +115,15 @@ class PSP extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Contribuyente",
-				'target_id'=>'psp_form_contribuyente_id_field'
+				'target_id'=>'lc_form_contribuyente_id_field'
 			)));
 		}
 
-		if (trim($data['psp_fecha'])=='') {
+		if (trim($data['lc_fecha'])=='') {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique la fecha",
-				'target_id'=>'psp_form_psp_fecha_field'
-			)));
-		}
-
-		if (trim($data['psp_fecha_inicio'])=='') {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique la fecha de inicio",
-				'target_id'=>'psp_form_psp_fecha_inicio_field'
-			)));
-		}
-
-		if (trim($data['psp_fecha_fin'])=='') {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique la fecha de termino",
-				'target_id'=>'psp_form_psp_fecha_fin_field'
+				'target_id'=>'lc_form_lc_fecha_field'
 			)));
 		}
 
@@ -159,13 +131,13 @@ class PSP extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique una plantilla para la generacion del PDF.",
-				'target_id'=>'psp_form_plantilla_id_field'
+				'target_id'=>'lc_form_plantilla_id_field'
 			)));
 		}
 
 		// SET first default state
 		$estado_doc = $this->db
-		->where('tipo_doc_id', 'PSP')
+		->where('tipo_doc_id', 'lc')
 		->order_by('estado_doc_index', 'ASC')
 		->get('public.estado_doc')->row();
 
@@ -197,22 +169,18 @@ class PSP extends MX_Controller {
 	}
 
 	public function Update() {
-		//sys_session_hasRoleOrDie('psp.update');
+		//sys_session_hasRoleOrDie('lc.update');
 		$data = array(
-			'psp_id'=>$this->input->post('psp_id'),
-  			'psp_anio'=>trim($this->input->post('psp_anio')),
-			'psp_numero'=>trim($this->input->post('psp_numero')),
+			'lc_id'=>$this->input->post('lc_id'),
+  			'lc_anio'=>trim($this->input->post('lc_anio')),
+			'lc_numero'=>trim($this->input->post('lc_numero')),
 			'contribuyente_id'=>$this->input->post('contribuyente_id'),
-			'tipo_permiso_id'=>$this->input->post('tipo_permiso_id'),
-			'psp_fecha'=>$this->input->post('psp_fecha'),
-			'psp_fecha_inicio'=>$this->input->post('psp_fecha_inicio'),
-			'psp_fecha_fin'=>$this->input->post('psp_fecha_fin'),
-			'psp_resolucion'=>$this->input->post('psp_resolucion'),
-			'psp_ruta'=>to_upper($this->input->post('psp_ruta')),
+			'lc_fecha'=>$this->input->post('lc_fecha'),
+			'lc_resultado'=>trim($this->input->post('lc_resultado')),
 			'plantilla_id'=>$this->input->post('plantilla_id')
 		);
 
-		$doc = $this->model->get_row($data['psp_id']);
+		$doc = $this->model->get_row($data['lc_id']);
 
 		if ( $doc->estado_doc_modificar_flag == 'N' ) {
 			die(json_encode(array(
@@ -221,34 +189,34 @@ class PSP extends MX_Controller {
 			)));
 		}
 
-		if ($data['psp_anio']=='') {
+		if ($data['lc_anio']=='') {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Año de Documento",
-				'target_id'=>'psp_form_psp_anio_field'
+				'target_id'=>'lc_form_lc_anio_field'
 			)));
 		}
 
-		if ($data['psp_numero']=='') {
+		if ($data['lc_numero']=='') {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Numero de Documento",
-				'target_id'=>'psp_form_psp_numero_field'
+				'target_id'=>'lc_form_lc_numero_field'
 			)));
 		}
 
 		$anio_numero_count = $this->db
 		->select('COUNT(*) AS value')
-		->from('public.psp')
-		->where('psp_anio', $data['psp_anio'])
-		->where('psp_numero', $data['psp_numero'])
-		->where('psp_id <>', $data['psp_id'])
+		->from('public.lc')
+		->where('lc_anio', $data['lc_anio'])
+		->where('lc_numero', $data['lc_numero'])
+		->where('lc_id <>', $data['lc_id'])
 		->get()->row();
 		if ($anio_numero_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"El Numero del Documento ya existe.",
-				'target_id'=>'psp_form_psp_numero_field'
+				'target_id'=>'lc_form_lc_numero_field'
 			)));
 		}
 
@@ -256,31 +224,15 @@ class PSP extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Contribuyente",
-				'target_id'=>'psp_form_contribuyente_id_field'
+				'target_id'=>'lc_form_contribuyente_id_field'
 			)));
 		}
 
-		if ( trim($data['psp_fecha'])=='' ) {
+		if ( trim($data['lc_fecha'])=='' ) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique la fecha",
-				'target_id'=>'psp_form_psp_fecha_field'
-			)));
-		}
-
-		if (trim($data['psp_fecha_inicio'])=='') {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique la fecha de inicio",
-				'target_id'=>'psp_form_psp_fecha_inicio_field'
-			)));
-		}
-
-		if (trim($data['psp_fecha_fin'])=='') {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique la fecha de termino",
-				'target_id'=>'psp_form_psp_fecha_fin_field'
+				'target_id'=>'lc_form_lc_fecha_field'
 			)));
 		}
 
@@ -288,7 +240,7 @@ class PSP extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique una plantilla para la generacion del PDF.",
-				'target_id'=>'psp_form_plantilla_id_field'
+				'target_id'=>'lc_form_plantilla_id_field'
 			)));
 		}
 
@@ -312,19 +264,104 @@ class PSP extends MX_Controller {
 		}
 	}
 
-	public function Delete() {
-		//sys_session_hasRoleOrDie('rh.psp.modify');
-		$p_psp_id = $this->input->post('psp_id');
+	public function Activar() {
+		//sys_session_hasRoleOrDie('rh.lc.modify');
+		$data = array(
+			'lc_id'=>$this->input->post('lc_id'),
+			'lc_estado'=>'A'
+		);
 
-		/*$psp_count = $this->db->select('COUNT(*) AS value')->where('psp_id', $p_psp_id)->get('public.psp')->row();
+		$r = $this->model->get_row($data['lc_id']);
+		if ($r->lc_estado == 'A') {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"El lc ya se encuentra Activo."
+			)));
+		}
+
+		$result = $this->model->update($data);
+
+		if ($result !== false) {
+			die(json_encode(array(
+				'success'=>true,
+				'msg'=>"Se Activo satisfactoriamente."
+			)));
+			
+		} else {
+			die(json_encode(array (
+				'success'=>false,
+				'msg'=>"Error al realizar la operacion."
+			)));
+		}
+	}
+
+	public function Inactivar() {
+		//sys_session_hasRoleOrDie('rh.lc.modify');
+		$data = array(
+			'lc_id'=>$this->input->post('lc_id'),
+			'lc_estado'=>'I'
+		);
+		$r = $this->model->get_row($data['lc_id']);
+		if ($r->lc_estado == 'I') {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"El lc ya se encuentra Inactivo."
+			)));
+		}
+
+		$result = $this->model->update($data);
+
+		if ($result !== false) {
+			die(json_encode(array(
+				'success'=>true,
+				'msg'=>"Se inactivo satisfactoriamente."
+			)));
+			
+		} else {
+			die(json_encode(array (
+				'success'=>false,
+				'msg'=>"Error al realizar la operacion."
+			)));
+		}
+	}
+
+	public function Delete() {
+		//sys_session_hasRoleOrDie('rh.lc.modify');
+		$p_lc_id = $this->input->post('lc_id');
+
+		$lc_count = $this->db->select('COUNT(*) AS value')->where('lc_id', $p_lc_id)->get('public.lc')->row();
+		if ($lc_count->value > 0) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"El lc tiene Constancias de Libre Infraccion de Transito registrado(s)."
+			)));
+		}
+
+		$psp_count = $this->db->select('COUNT(*) AS value')->where('lc_id', $p_lc_id)->get('public.psp')->row();
 		if ($psp_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"El psp tiene Constancias de Libre Infraccion de Transito registrado(s)."
+				'msg'=>"El lc tiene Permisos de Servicio Publico registrado(s)."
 			)));
-		}*/
+		}
 
-		$result = $this->model->delete($p_psp_id);
+		$lc_count = $this->db->select('COUNT(*) AS value')->where('lc_id', $p_lc_id)->get('public.lc')->row();
+		if ($lc_count->value > 0) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"El lc tiene Licencias de Conducir registrado(s)."
+			)));
+		}
+
+		$cat_count = $this->db->select('COUNT(*) AS value')->where('lc_id', $p_lc_id)->get('public.cat')->row();
+		if ($cat_count->value > 0) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"El lc tiene Constancias de Autorizacion Temporal registrado(s)."
+			)));
+		}
+
+		$result = $this->model->delete($p_lc_id);
 
 		if ($result !== false) {
 			die(json_encode(array(
@@ -337,11 +374,6 @@ class PSP extends MX_Controller {
 				'msg'=>"Error al realizar la operacion."
 			)));
 		}
-	}
-
-	public function getTipoPermisoList () {
-		$ret = $this->model->get_tipo_permiso_list();
-		echo json_encode($ret);
 	}
 
 	public function getContribuyenteList () {
@@ -365,8 +397,7 @@ class PSP extends MX_Controller {
 
 	public function getDocRequisitoList () {
 		$doc_id = $this->input->get('doc_id');
-		$doc = $this->db->where('psp_id', $doc_id)->get('public.psp')->row();
-		$ret = $this->model->get_doc_requisito_list($doc_id, $doc->tipo_permiso_id);
+		$ret = $this->model->get_doc_requisito_list($doc_id);
 		echo json_encode($ret);
 	}
 
@@ -375,7 +406,7 @@ class PSP extends MX_Controller {
 		//var_dump($_FILES);
 		$upload_path = 'dbfiles/public.doc_requisito/';
 		$data = array(
-			'tipo_doc_id'=>'PSP',
+			'tipo_doc_id'=>'lc',
 			'doc_id'=>$this->input->post('doc_id'),
 			'tipo_doc_requisito_id'=>$this->input->post('tipo_doc_requisito_id'),
 			'doc_requisito_fecha'=>$this->input->post('doc_requisito_fecha'),
@@ -433,7 +464,7 @@ class PSP extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique la fecha",
-				'target_id'=>'psp_doc_requisito_form_doc_requisito_fecha_field'
+				'target_id'=>'lc_doc_requisito_form_doc_requisito_fecha_field'
 			)));
 		}
 
@@ -441,7 +472,7 @@ class PSP extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Numero",
-				'target_id'=>'psp_doc_requisito_form_doc_requisito_numero_field'
+				'target_id'=>'lc_doc_requisito_form_doc_requisito_numero_field'
 			)));
 		}
 
@@ -514,7 +545,7 @@ class PSP extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique la fecha",
-				'target_id'=>'psp_doc_requisito_form_doc_requisito_fecha_field'
+				'target_id'=>'lc_doc_requisito_form_doc_requisito_fecha_field'
 			)));
 		}
 
@@ -522,7 +553,7 @@ class PSP extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Numero",
-				'target_id'=>'psp_doc_requisito_form_doc_requisito_numero_field'
+				'target_id'=>'lc_doc_requisito_form_doc_requisito_numero_field'
 			)));
 		}
 
@@ -549,7 +580,7 @@ class PSP extends MX_Controller {
 	}
 
 	public function deleteDocRequisito() {
-		//sys_session_hasRoleOrDie('rh.psp.modify');
+		//sys_session_hasRoleOrDie('rh.lc.modify');
 		$p_doc_requisito_id = intval($this->input->post('doc_requisito_id'));
 
 		if ( !($p_doc_requisito_id > 0) ) {
@@ -563,10 +594,10 @@ class PSP extends MX_Controller {
 		
 		$doc = $this->model->get_row($doc_requisito->doc_id);
 
-		if ( $doc->estado_doc_modificar_flag == 'N') {
+		if (to_upper($doc->estado_doc_desc) != 'REGISTRADO') {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"No es posible modificar el documento en el estado actual."
+				'msg'=>"No es posible modificar el documento en el estado '{$doc->estado_doc_desc}' actual."
 			)));	
 		}
 
@@ -594,9 +625,9 @@ class PSP extends MX_Controller {
 	public function addDocEstado() {
 		//sys_session_hasRoleOrDie('rh.contrato.modify');
 		//var_dump($_FILES);
-		//$upload_path = 'dbfiles/public.doc_requisito/';
+		$upload_path = 'dbfiles/public.doc_requisito/';
 		$data = array(
-			'tipo_doc_id'=>'PSP',
+			'tipo_doc_id'=>'lc',
 			'doc_id'=>$this->input->post('doc_id'),
 			'estado_doc_id'=>$this->input->post('estado_doc_id'),
 			'doc_estado_fecha'=>$this->input->post('doc_estado_fecha'),
@@ -639,7 +670,7 @@ class PSP extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique la fecha",
-				'target_id'=>'psp_doc_requisito_form_doc_requisito_fecha_field'
+				'target_id'=>'lc_doc_requisito_form_doc_requisito_fecha_field'
 			)));
 		}*/
 		$data['doc_estado_fecha'] = date('d/m/Y H:i:s');
@@ -674,7 +705,7 @@ class PSP extends MX_Controller {
 			$result = $this->model->add_doc_estado($data);
 			$this->model->update(
 				array(
-					'psp_id'=>$data['doc_id'],
+					'lc_id'=>$data['doc_id'],
 					'doc_estado_id'=>$result // nuevo id de estado
 				)
 			);
@@ -698,7 +729,7 @@ class PSP extends MX_Controller {
 	}	
 
 	public function deleteDocEstado() {
-		//sys_session_hasRoleOrDie('rh.psp.modify');
+		//sys_session_hasRoleOrDie('rh.lc.modify');
 		$p_doc_estado_id = intval($this->input->post('doc_estado_id'));
 
 		if ( !($p_doc_estado_id > 0) ) {
@@ -720,7 +751,7 @@ class PSP extends MX_Controller {
 			->get()->row();
 			$this->model->update(
 				array(
-					'psp_id'=>$doc_estado->doc_id,
+					'lc_id'=>$doc_estado->doc_id,
 					'doc_estado_id'=>$doc_estado_anterior->doc_estado_id
 				)
 			);
@@ -739,272 +770,6 @@ class PSP extends MX_Controller {
 		}
 	}
 
-	public function getVehiculoList () {
-		$p_doc_id = $this->input->get('doc_id');
-		$ret = $this->model->get_vehiculo_list($p_doc_id);
-		echo json_encode($ret);
-	}
-
-	public function getVehiculoNewRow () {
-		$row['operation'] = 'new';
-		$row['psp_vehiculo_estado'] = 'CORRECTO';
-
-		echo json_encode(array(
-			'data'=>array($row)
-		));
-	}
-
-	public function getVehiculoRow ($id){
-		$row = $this->model->get_vehiculo_row($id);
-		$row->operation = 'edit';
-		die(json_encode(array(
-			'data'=>array($row)
-		)));
-	}
-
-	public function addOrUpdateVehiculo() {
-		if ($this->input->post('operation') == 'new') {
-			$this->addVehiculo();
-		} else {
-			$this->updateVehiculo();
-		}
-	}
-
-	public function addVehiculo() {
-		$data = array(
-			'psp_id'=>$this->input->post('psp_id'),
-			'psp_vehiculo_categoria'=>to_upper($this->input->post('psp_vehiculo_categoria')),
-			'psp_vehiculo_marca'=>to_upper($this->input->post('psp_vehiculo_marca')),
-			'psp_vehiculo_modelo'=>to_upper($this->input->post('psp_vehiculo_modelo')),
-			'psp_vehiculo_color'=>to_upper($this->input->post('psp_vehiculo_color')),
-			'psp_vehiculo_placa'=>to_upper($this->input->post('psp_vehiculo_placa')),
-			'psp_vehiculo_ntp'=>to_upper($this->input->post('psp_vehiculo_ntp')),
-			'psp_vehiculo_estado'=>$this->input->post('psp_vehiculo_estado'),
-			'psp_vehiculo_observacion'=>to_upper($this->input->post('psp_vehiculo_observacion')),
-			'psp_vehiculo_conductor_nomape'=>to_upper($this->input->post('psp_vehiculo_conductor_nomape')),
-			'psp_vehiculo_conductor_dni'=>to_upper($this->input->post('psp_vehiculo_conductor_dni')),
-			'psp_vehiculo_conductor_nlc'=>to_upper($this->input->post('psp_vehiculo_conductor_nlc'))
-		);
-
-		if ( !($data['psp_id'] > 0) ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique el Id del permiso de servicio publico."
-			)));
-		}
-
-		if ( $data['psp_vehiculo_categoria'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique la Categoria",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_categoria_field'
-			)));
-		}
-
-		if ( $data['psp_vehiculo_marca'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique la Marca",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_marca_field'
-			)));
-		}
-
-		if ( $data['psp_vehiculo_modelo'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique la Modelo",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_modelo_field'
-			)));
-		}
-
-		if ( $data['psp_vehiculo_color'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique el Color",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_color_field'
-			)));
-		}
-
-		if ( $data['psp_vehiculo_placa'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique la Placa",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_placa_field'
-			)));
-		}
-
-		if ( $data['psp_vehiculo_ntp'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique el Numero de tarjeta de propiedad",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_ntp_field'
-			)));
-		}
-		// conductor
-		if ( $data['psp_vehiculo_conductor_nomape'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique los nombres y apellidos del conductor",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_conductor_nomape_field'
-			)));
-		}
-		
-		if ( $data['psp_vehiculo_conductor_dni'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique el DNI del conductor",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_conductor_dni_field'
-			)));
-		}
-
-		if ( $data['psp_vehiculo_conductor_nlc'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique Numero de licencia de conducir",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_conductor_nlc_field'
-			)));
-		}
-
-		try {
-			//unset($data['plantilla_id']);
-			$result = $this->model->add_vehiculo($data);
-		} catch (Exception $ex) {
-			$error = $ex->getMessage();
-		}
-
-		if ($result !== false) {
-			die(json_encode(array(
-				'success'=>true,
-				'msg'=>"Se guardo satisfactoriamente",
-				'rowid'=>$result
-			)));
-			
-		} else {
-			die(json_encode(array (
-				'success'=>false,
-				'msg'=>"Error al realizar la operacion.".(isset($error)?'<br>$error':'')
-			)));
-		}
-	}
-
-	public function updateVehiculo() {
-		$data = array(
-			'psp_vehiculo_id'=>$this->input->post('psp_vehiculo_id'),
-			'psp_id'=>$this->input->post('psp_id'),
-			'psp_vehiculo_categoria'=>to_upper($this->input->post('psp_vehiculo_categoria')),
-			'psp_vehiculo_marca'=>to_upper($this->input->post('psp_vehiculo_marca')),
-			'psp_vehiculo_modelo'=>to_upper($this->input->post('psp_vehiculo_modelo')),
-			'psp_vehiculo_color'=>to_upper($this->input->post('psp_vehiculo_color')),
-			'psp_vehiculo_placa'=>to_upper($this->input->post('psp_vehiculo_placa')),
-			'psp_vehiculo_ntp'=>to_upper($this->input->post('psp_vehiculo_ntp')),
-			'psp_vehiculo_estado'=>$this->input->post('psp_vehiculo_estado'),
-			'psp_vehiculo_observacion'=>to_upper($this->input->post('psp_vehiculo_observacion')),
-			'psp_vehiculo_conductor_nomape'=>to_upper($this->input->post('psp_vehiculo_conductor_nomape')),
-			'psp_vehiculo_conductor_dni'=>to_upper($this->input->post('psp_vehiculo_conductor_dni')),
-			'psp_vehiculo_conductor_nlc'=>to_upper($this->input->post('psp_vehiculo_conductor_nlc'))
-		);
-
-		if ( !($data['psp_id'] > 0) ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique el Id del permiso de servicio publico."
-			)));
-		}
-
-		if ( $data['psp_vehiculo_categoria'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique la Categoria",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_categoria_field'
-			)));
-		}
-
-		if ( $data['psp_vehiculo_marca'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique la Marca",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_marca_field'
-			)));
-		}
-
-		if ( $data['psp_vehiculo_modelo'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique la Modelo",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_modelo_field'
-			)));
-		}
-
-		if ( $data['psp_vehiculo_color'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique el Color",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_color_field'
-			)));
-		}
-
-		if ( $data['psp_vehiculo_placa'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique la Placa",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_placa_field'
-			)));
-		}
-
-		if ( $data['psp_vehiculo_ntp'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique el Numero de tarjeta de propiedad",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_ntp_field'
-			)));
-		}
-		// conductor
-		if ( $data['psp_vehiculo_conductor_nomape'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique los nombres y apellidos del conductor",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_conductor_nomape_field'
-			)));
-		}
-		
-		if ( $data['psp_vehiculo_conductor_dni'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique el DNI del conductor",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_conductor_dni_field'
-			)));
-		}
-
-		if ( $data['psp_vehiculo_conductor_nlc'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique Numero de licencia de conducir",
-				'target_id'=>'psp_vehiculo_form_psp_vehiculo_conductor_nlc_field'
-			)));
-		}
-
-		try {
-			//unset($data['plantilla_id']);
-			$result = $this->model->update_vehiculo($data);
-		} catch (Exception $ex) {
-			$error = $ex->getMessage();
-		}
-
-		if ($result !== false) {
-			die(json_encode(array(
-				'success'=>true,
-				'msg'=>"Se guardo satisfactoriamente",
-				'rowid'=>$result
-			)));
-			
-		} else {
-			die(json_encode(array (
-				'success'=>false,
-				'msg'=>"Error al realizar la operacion.".(isset($error)?'<br>$error':'')
-			)));
-		}
-	}
-
 	private function _generarPDF($doc_id) {
 		$c = $this->model->get_row($doc_id, 'array');
 		$td = $this->db->where('tipo_doc_id', $c['tipo_doc_id'])->get('public.tipo_doc')->row();
@@ -1017,17 +782,17 @@ class PSP extends MX_Controller {
 		$c['tipo_doc_desc'] = to_upper($c['tipo_doc_desc']);
 
 		// 02/06/2018
-		$c['psp_fecha_dia_numero'] = substr($c['psp_fecha'], 0, 2);
+		$c['lc_fecha_dia_numero'] = substr($c['lc_fecha'], 0, 2);
 		$meses = array('', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre');
-		$c['psp_fecha_mes_nombre'] = $meses[intval(substr($c['psp_fecha'], 3, 2))];
-		$c['psp_fecha_anio'] = substr($c['psp_fecha'], 6, 4);
+		$c['lc_fecha_mes_nombre'] = $meses[intval(substr($c['lc_fecha'], 3, 2))];
+		$c['lc_fecha_anio'] = substr($c['lc_fecha'], 6, 4);
 		
 		$path_archivo = FCPATH.'dbfiles/public.plantilla/'.$p->plantilla_archivo;
 		if ( !(file_exists($path_archivo) && $p->plantilla_archivo != '') ) {
 			throw new Exception("El archivo de la plantilla ('{$p->plantilla_archivo}'), no existe o no es valido!.");
 		}
 
-		$t = new TemplateProcessor($path_archivo);
+		$t = new TemplateProcessor(FCPATH.'dbfiles/public.plantilla/'.$p->plantilla_archivo);
 		$var_list = $t->getVariables();
 	    foreach ($var_list as $key => $value) {
 	        if (array_key_exists($value, $c)) {
@@ -1041,14 +806,14 @@ class PSP extends MX_Controller {
 	        }
 	    }
 	    // --- Guardamos el documento
-	    $filename = strtolower($td->tipo_doc_id).'_'.$c['psp_anio'].'_'.$c['psp_numero'].'_res'.microtime(true);
+	    $filename = strtolower($td->tipo_doc_id).'_'.$c['lc_anio'].'_'.$c['lc_numero'].'_'.microtime(true);
 	    $t->saveAs("tmp/{$filename}.docx");
 	    // to PDF
 	    $word = new COM("Word.Application") or die ("MS Word: Could not initialise Object.");
 	    $word->Visible = 0;
 	    $word->DisplayAlerts = 0;
 	    $r = $word->Documents->Open(FCPATH."tmp/{$filename}.docx");
-	    $word->ActiveDocument->ExportAsFixedFormat(FCPATH."dbfiles/public.psp/{$filename}.pdf", 17, false, 0, 0, 0, 0, 7, true, true, 2, true, true, false);
+	    $word->ActiveDocument->ExportAsFixedFormat(FCPATH."dbfiles/public.lc/{$filename}.pdf", 17, false, 0, 0, 0, 0, 7, true, true, 2, true, true, false);
 	    $word->Quit(false);
 	    unset($word);
 	    return $filename.'.pdf';
@@ -1062,8 +827,8 @@ class PSP extends MX_Controller {
 				$filename = $this->_generarPDF($p_doc_id);	
 				$this->model->update(
 					array(
-						'psp_id'=>$p_doc_id,
-						'psp_pdf_resolucion'=>$filename
+						'lc_id'=>$p_doc_id,
+						'lc_pdf'=>$filename
 					)
 				);
 				die(json_encode(array (
@@ -1091,9 +856,9 @@ class PSP extends MX_Controller {
 		//die(FCPATH);
 		$p_doc_id = $this->input->post('doc_id');
 		$doc = $this->model->get_row($p_doc_id);
-		$filename = $doc->psp_pdf;
-		if (file_exists(FCPATH."dbfiles/public.psp/".$filename) && $filename != '') {
-			$url = $this->config->item('base_url')."dbfiles/public.psp/{$filename}";
+		$filename = $doc->lc_pdf;
+		if (file_exists(FCPATH."dbfiles/public.lc/".$filename) && $filename != '') {
+			$url = $this->config->item('base_url')."dbfiles/public.lc/{$filename}";
 			echo "<embed src=\"{$url}\" type=\"application/pdf\" width=\"100%\" height=\"100%\"></embed>";
 		} else {
 			echo "No es posible mostrar el archivo '{$filename}'.";
