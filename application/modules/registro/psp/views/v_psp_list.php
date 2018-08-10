@@ -17,7 +17,7 @@
 				{text:'Apellidos', dataIndex:'contribuyente_apellidos', width: 150},
 				{text:'DNI/RUC', dataIndex:'contribuyente_numero_doc', width: 75},
 				{text:'Fecha', dataIndex:'psp_fecha', width: 70},
-				{text:'Resolucion', dataIndex:'psp_resultado', width: 70, align: 'left'},
+				{text:'Resolucion', dataIndex:'psp_resolucion', width: 70, align: 'left'},
 				{
 		            xtype: 'actioncolumn',
 		            width: 25,
@@ -164,7 +164,7 @@
 				url: 'psp/AddOrUpdate',
 				layout: 'absolute',
 				region: 'north',
-				height: 350,
+				height: 330,
 				bodyStyle: {
 					//background: '#4c9dd8'
 					borderTop: '1px solid silver!important;'
@@ -172,7 +172,7 @@
 				tbar:[{
 					xtype: 'label',
 					id: 'psp_form_title_label',
-					text: 'Constancia',
+					text: 'Permiso de Servicio Publico',
 					style: {
 						fontWeight: 'bold'
 					}
@@ -190,9 +190,10 @@
 								if (action.result.success) {
 									psp.form_editing = false;
 									if ( operation == 'new' ) {
-										psp.edit_window(action.result.rowid);
+										psp.reload_list(action.result.rowid);
+									} else {
+										psp.reload_list(frm.getRecord().get('psp_id'));
 									}
-									psp.main_store.reload(action.result.rowid);
 								} else {
 									Ext.Msg.alert('Error', action.result.msg);
 								}

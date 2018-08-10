@@ -362,7 +362,7 @@ class M_PSP extends CI_Model{
 		")
 		->from('public.estado_doc AS ed')
 		->join('public.doc_estado AS de', "de.doc_id = {$doc_id} AND de.estado_doc_id = ed.estado_doc_id", 'left')
-		->where('ed.tipo_doc_id', 'psp')
+		->where('ed.tipo_doc_id', 'PSP')
 		->order_by('ed.estado_doc_index', 'ASC')
 		->get()->result();
 		
@@ -399,30 +399,6 @@ class M_PSP extends CI_Model{
         	return true;
 		}
 	}
-
-
-
-	public function get_list_for_gen_pdf ($psp_anio='2018', $tipo_psp_id) {
-		$rows = $this->db
-		->select("c.psp_id")
-		->from('rh.psp AS c')
-		->where('c.psp_anio', $psp_anio)	
-		->where('c.tipo_psp_id', $tipo_psp_id)
-		->where('c.psp_estado <>', 'ANULADO')
-		->where('c.psp_pdf', '')
-		->order_by('c.psp_anio', 'desc')
-		->order_by('c.tipo_psp_id', 'asc')
-		->order_by('c.psp_numero', 'desc')
-		->order_by('c.psp_id', 'desc')
-		->get()->result();
-		
-		$ret = array(
-			'data'=>$rows,
-			'total'=>count($rows)
-		);
-		return $ret;
-	}
-	
 
 }
 ?>

@@ -1,13 +1,13 @@
 <script>
-	clit.edit_window = function(id) {
-		if (clit.form_editing) return;
-		clit.form_editing = true;
-		var w = Ext.getCmp('clit_form');
+	psp.edit_window = function(id) {
+		if (psp.form_editing) return;
+		psp.form_editing = true;
+		var w = Ext.getCmp('psp_form');
 		w.mask('cargando');
 		Ext.create("Ext.data.Store", {
 			proxy: {
 				type: 'ajax',
-				url: 'clit/getRow/'+id,
+				url: 'psp/getRow/'+id,
 				reader:{
 					type: 'json',
 					rootProperty: 'data',
@@ -19,31 +19,31 @@
 				load: function (sender, records, successful, eOpts) {
 					if (successful) {
 						var record = sender.getAt(0);
-						clit.contribuyente_store.reload({
+						psp.contribuyente_store.reload({
 			    			params: {
 			    				query: record.get('contribuyente_numero_doc')
 			    			}
 			    		});
-			    		clit.doc_requisito_reload_list(record.get('clit_id'));
+			    		psp.doc_requisito_reload_list(record.get('psp_id'));
 						sys_storeLoadMonitor([
-							clit.contribuyente_store,
-							clit.doc_requisito_store
+							psp.contribuyente_store,
+							psp.doc_requisito_store
 						], function () {
-							var frm = Ext.getCmp('clit_form');
+							var frm = Ext.getCmp('psp_form');
 							frm.loadRecord(record);
-							Ext.getCmp('clit_form_title_label').setText('Modificar Constancia');
-							Ext.getCmp('clit_form_save_bt').show();
-							Ext.getCmp('clit_form_cancel_bt').show();
-							Ext.getCmp('clit_form_contribuyente_id_field').show();
-							Ext.getCmp('clit_form_contribuyente_nomape_field').hide();
-							Ext.getCmp('clit_form_doc_requisito_grid').disable();
-							Ext.getCmp('clit_form_doc_estado_grid').disable();
+							Ext.getCmp('psp_form_title_label').setText('Modificar Permiso');
+							Ext.getCmp('psp_form_save_bt').show();
+							Ext.getCmp('psp_form_cancel_bt').show();
+							Ext.getCmp('psp_form_contribuyente_id_field').show();
+							Ext.getCmp('psp_form_contribuyente_nomape_field').hide();
+							Ext.getCmp('psp_form_doc_requisito_grid').disable();
+							Ext.getCmp('psp_form_doc_estado_grid').disable();
 							w.unmask();
 						});
 					} else {
-						Ext.Msg.alert('clit', eOpts.getResultSet().getMessage());
+						Ext.Msg.alert('psp', eOpts.getResultSet().getMessage());
 						w.unmask();
-						clit.form_editing = false;
+						psp.form_editing = false;
 					}
 				}
 			}

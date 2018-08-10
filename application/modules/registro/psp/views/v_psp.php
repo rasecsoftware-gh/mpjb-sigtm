@@ -129,8 +129,8 @@
 
 <!--  cargamos los componentes -->
 <?php echo $this->load->view('v_psp_list'); ?>
-<?php //echo $this->load->view('v_psp_new'); ?>
-<?php //echo $this->load->view('v_psp_edit'); ?>
+<?php echo $this->load->view('v_psp_new'); ?>
+<?php echo $this->load->view('v_psp_edit'); ?>
 <?php ////echo $this->load->view('v_psp_delete'); ?>
 <?php //echo $this->load->view('v_psp_doc_requisito_add'); ?>
 <?php //echo $this->load->view('v_psp_doc_requisito_edit'); ?>
