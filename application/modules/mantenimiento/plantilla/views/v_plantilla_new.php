@@ -1,13 +1,13 @@
 <script>
-	estado_doc.new_window = function() {
-		if (estado_doc.form_editing) return;
-		estado_doc.form_editing = true;
-		var w = Ext.getCmp('estado_doc_form');
+	plantilla.new_window = function() {
+		if (plantilla.form_editing) return;
+		plantilla.form_editing = true;
+		var w = Ext.getCmp('plantilla_form');
 		w.mask('cargando');
 		Ext.create("Ext.data.Store", {
 			proxy: {
 				type: 'ajax',
-				url: 'estado_doc/getNewRow/',
+				url: 'plantilla/getNewRow/',
 				reader:{
 					type: 'json',
 					rootProperty: 'data',
@@ -20,18 +20,18 @@
 					if (successful) {
 						var record = sender.getAt(0);
 						sys_storeLoadMonitor([], function () {
-			    			var frm = Ext.getCmp('estado_doc_form');
+			    			var frm = Ext.getCmp('plantilla_form');
 			    			frm.reset();
 							frm.loadRecord(record);
-							Ext.getCmp('estado_doc_form_title_label').setText('Nuevo ' + estado_doc.title);
-							Ext.getCmp('estado_doc_form_save_bt').show();
-							Ext.getCmp('estado_doc_form_cancel_bt').show();
+							Ext.getCmp('plantilla_form_title_label').setText('Nuevo ' + plantilla.title);
+							Ext.getCmp('plantilla_form_save_bt').show();
+							Ext.getCmp('plantilla_form_cancel_bt').show();
 							w.unmask();
 			    		});
 					} else {
-						Ext.Msg.alert(estado_doc.title, eOpts.getResultSet().getMessage());
+						Ext.Msg.alert(plantilla.title, eOpts.getResultSet().getMessage());
 						w.unmask();
-						estado_doc.form_editing = false;
+						plantilla.form_editing = false;
 					}
 				}
 			}

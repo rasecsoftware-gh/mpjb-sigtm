@@ -84,7 +84,7 @@ class LC extends MX_Controller {
 			'lc_fecha_ven'=>trim($this->input->post('lc_fecha_ven')),
 			'lc_codigo'=>trim($this->input->post('lc_codigo')),
 			'lc_grupo_s'=>trim($this->input->post('lc_grupo_s')),
-			'lc_restricciones'=>trim($this->input->post('lc_restricciones')),
+			'lc_restricciones'=>to_upper(trim($this->input->post('lc_restricciones'))),
 			'lc_observacion'=>trim($this->input->post('lc_observacion')),
 			'plantilla_id'=>$this->input->post('plantilla_id')
 		);
@@ -222,10 +222,19 @@ class LC extends MX_Controller {
 			'lc_fecha_ven'=>trim($this->input->post('lc_fecha_ven')),
 			'lc_codigo'=>trim($this->input->post('lc_codigo')),
 			'lc_grupo_s'=>trim($this->input->post('lc_grupo_s')),
-			'lc_restricciones'=>trim($this->input->post('lc_restricciones')),
+			'lc_restricciones'=>to_upper(trim($this->input->post('lc_restricciones'))),
 			'lc_observacion'=>trim($this->input->post('lc_observacion')),
 			'plantilla_id'=>$this->input->post('plantilla_id')
 		);
+		
+		$doc = $this->model->get_row($data['lc_id']);
+
+		if ( $doc->estado_doc_modificar_flag == 'N' ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"No es posible modificar el documento en el estado actual."
+			)));
+		}
 
 		if ($data['lc_anio']=='') {
 			die(json_encode(array(
@@ -460,7 +469,7 @@ class LC extends MX_Controller {
 			)));
 		}
 
-		if ( $data['doc_requisito_numero'] == '' ) {
+		if ( $data['doc_requisito_numero'] == '' && $tipo_doc_requisito->tipo_doc_requisito_numero_flag == 'S' ) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Numero",
@@ -541,7 +550,7 @@ class LC extends MX_Controller {
 			)));
 		}
 
-		if ( $data['doc_requisito_numero'] == '' ) {
+		if ( $data['doc_requisito_numero'] == '' && $tipo_doc_requisito->tipo_doc_requisito_numero_flag == 'S' ) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Numero",
@@ -768,17 +777,39 @@ class LC extends MX_Controller {
 		$td = $this->db->where('tipo_doc_id', $c['tipo_doc_id'])->get('public.tipo_doc')->row();
 		$p = $this->db->where('plantilla_id', $c['plantilla_id'])->get('public.plantilla')->row();
 
-		$cfg = array();
-		//$cfg = $this->db->where('config_id', 1)->get('sys.config')->row(0, 'array');
-		//$cfg['entidad_nombre_mayus'] = strtoupper($cfg['entidad_nombre']);
+		$config_list = $this->db->select('config_id, config_value')->get('sys.config')->result();
+		$config = array();
+		foreach ($config_list as $r) {
+			$config[$r->config_id] = $r->config_value;
+		}
+
 		
 		$c['tipo_doc_desc'] = to_upper($c['tipo_doc_desc']);
 
 		// 02/06/2018
 		$c['lc_fecha_dia_numero'] = substr($c['lc_fecha'], 0, 2);
-		$meses = array('', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre');
-		$c['lc_fecha_mes_nombre'] = $meses[intval(substr($c['lc_fecha'], 3, 2))];
+		$c['lc_fecha_mes_nombre'] = month_name(intval(substr($c['lc_fecha'], 3, 2)));
 		$c['lc_fecha_anio'] = substr($c['lc_fecha'], 6, 4);
+		// resolucion
+		$c['lc_resolucion_fecha_dia'] = substr($c['lc_resolucion_fecha'], 0, 2);
+		$c['lc_resolucion_fecha_mes'] = substr($c['lc_resolucion_fecha'], 3, 2);
+		$c['lc_resolucion_fecha_anio'] = substr($c['lc_resolucion_fecha'], 6, 4);
+		$c['lc_resolucion_fecha_desc'] = $c['lc_resolucion_fecha_dia'].' de '.month_name(intval($c['lc_resolucion_fecha_mes'])).' del '.$c['lc_resolucion_fecha_anio'];
+
+		// documentos adjuntos requeridos con keyname
+		$doc_requisito_list = $this->model->get_doc_requisito_list($doc_id);
+		foreach ($doc_requisito_list as $dr) {
+			if ($dr->tipo_doc_requisito_keyname != '') {
+				$prefijo = 'dr_'.$dr->tipo_doc_requisito_keyname;
+				$c["{$prefijo}_fecha_dia"] = substr($dr->doc_requisito_fecha, 0, 2);
+				$c["{$prefijo}_fecha_mes"] = substr($dr->doc_requisito_fecha, 3, 2);
+				$c["{$prefijo}_fecha_anio"] = substr($dr->doc_requisito_fecha, 6, 4);
+				$c["{$prefijo}_fecha_desc"] = $c["{$prefijo}_fecha_dia"].' de '.month_name(intval($c["{$prefijo}_fecha_mes"])).' del '.$c["{$prefijo}_fecha_anio"];
+				$c["{$prefijo}_fecha"] = $dr->doc_requisito_fecha;
+				$c["{$prefijo}_numero"] = $dr->doc_requisito_numero;
+			}
+		}
+		
 		
 		$path_archivo = FCPATH.'dbfiles/public.plantilla/'.$p->plantilla_archivo;
 		if ( !(file_exists($path_archivo) && $p->plantilla_archivo != '') ) {
@@ -790,8 +821,8 @@ class LC extends MX_Controller {
 	    foreach ($var_list as $key => $value) {
 	        if (array_key_exists($value, $c)) {
 	            $t->setValue($value, $c[$value]);
-	        } elseif (array_key_exists($value, $cfg)) {
-	        	$t->setValue($value, $cfg[$value]);
+	        } elseif (array_key_exists($value, $config)) {
+	        	$t->setValue($value, $config[$value]);
 	        } elseif ($value=='no-tiene') {
 	        	$t->setValue($value, '');
 	        } else {

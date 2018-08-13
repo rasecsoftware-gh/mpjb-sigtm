@@ -107,7 +107,8 @@ class M_LC extends CI_Model{
 			'lc_fecha_exp'=>date('d/m/Y'), 
 			'lc_fecha_ven'=>date('d/m/Y'),
 			'lc_clase'=>'B',
-			'lc_categoria'=>'II-C'
+			'lc_categoria'=>'II-C',
+			'lc_restricciones'=>'SIN RESTRICCIONES'
 		);
 		return $row;
 	}

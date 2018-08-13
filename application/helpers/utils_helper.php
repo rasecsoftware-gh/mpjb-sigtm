@@ -24,4 +24,9 @@
         $to = 'ÁÉÍÓÚÑ';
         return strtr(strtoupper($str), $from, $to);
     }
+
+    function month_name($mes) {
+        $meses = array('', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre');
+        return $meses[intval($mes)];
+    }
 ?>

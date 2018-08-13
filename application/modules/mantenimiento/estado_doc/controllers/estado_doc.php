@@ -65,8 +65,7 @@ class Estado_Doc extends MX_Controller {
 			'estado_doc_final_flag'=>$this->input->post('estado_doc_final_flag'),
 			'estado_doc_generar_pdf_flag'=>$this->input->post('estado_doc_generar_pdf_flag'),
 			'estado_doc_modificar_flag'=>$this->input->post('estado_doc_modificar_flag'),
-			'estado_doc_index'=>$this->input->post('estado_doc_index'),
-			'estado_doc_estado'=>$this->input->post('estado_doc_estado')
+			'estado_doc_index'=>$this->input->post('estado_doc_index')
 		);
 
 		if ( $data['tipo_doc_id']=='' ) {
@@ -115,13 +114,13 @@ class Estado_Doc extends MX_Controller {
 			)));
 		}
 
-		if ( $data['estado_doc_estado'] == '' ) {
+		/*if ( $data['estado_doc_estado'] == '' ) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el estado",
 				'target_id'=>'estado_doc_form_estado_doc_estado_field'
 			)));
-		}
+		}*/
 
 		try {
 			$result = $this->model->add($data);
@@ -156,8 +155,8 @@ class Estado_Doc extends MX_Controller {
 			'estado_doc_final_flag'=>$this->input->post('estado_doc_final_flag'),
 			'estado_doc_generar_pdf_flag'=>$this->input->post('estado_doc_generar_pdf_flag'),
 			'estado_doc_modificar_flag'=>$this->input->post('estado_doc_modificar_flag'),
-			'estado_doc_index'=>$this->input->post('estado_doc_index'),
-			'estado_doc_estado'=>$this->input->post('estado_doc_estado')
+			'estado_doc_index'=>$this->input->post('estado_doc_index')
+			//'estado_doc_estado'=>$this->input->post('estado_doc_estado')
 		);
 
 		if ( $data['tipo_doc_id']=='' ) {
@@ -168,74 +167,7 @@ class Estado_Doc extends MX_Controller {
 			)));
 		}
 
-		if ( !($data['tipo_permiso_id'] > 0) ) {
-			$data['tipo_permiso_id'] = null;
-		}
-
-		$keyname_count = $this->db
-		->select('COUNT(*) AS value')
-		->from('public.estado_doc')
-		->where('tipo_doc_id', $data['tipo_doc_id'])
-		->where('tipo_permiso_id', $data['tipo_permiso_id'])
-		->where('estado_doc_keyname <>', '')
-		->where('estado_doc_keyname', $data['estado_doc_keyname'])
-		->where('estado_doc_id <>', $data['estado_doc_id'])
-		->get()->row();
-		if ($keyname_count->value > 0) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"El nombre clave ya existe. Los nombres claves no se deben repetir por tipo de documento.",
-				'target_id'=>'estado_doc_form_estado_doc_keyname_field'
-			)));
-		}
-
 		if ( $data['estado_doc_desc'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique la descripcion",
-				'target_id'=>'estado_doc_form_estado_doc_desc_field'
-			)));
-		}
-
-		if ( $data['estado_doc_requerido_flag'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique un valor valido (Si o No)",
-				'target_id'=>'estado_doc_form_estado_doc_requerido_flag_field'
-			)));
-		}
-
-		if ( $data['estado_doc_pdf_flag'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique un valor valido (Si o No)",
-				'target_id'=>'estado_doc_form_estado_doc_pdf_flag_field'
-			)));
-		}
-		
-		if ( $data['estado_doc_numero_flag'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique un valor valido (Si o No)",
-				'target_id'=>'estado_doc_form_estado_doc_numero_flag_field'
-			)));
-		}
-
-		if ( !($data['estado_doc_index'] > 0) ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique el valor del indice mayor que zero.",
-				'target_id'=>'estado_doc_form_estado_doc_index_field'
-			)));
-		}
-
-		if ( $data['estado_doc_estado'] == '' ) {
-			die(json_encode(array(
-				'success'=>false,
-				'msg'=>"Especifique el estado",
-				'target_id'=>'estado_doc_form_estado_doc_estado_field'
-			)));
-		}if ( $data['estado_doc_desc'] == '' ) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique la descripcion",
@@ -269,18 +201,18 @@ class Estado_Doc extends MX_Controller {
 		if ( !($data['estado_doc_index'] > 0) ) {
 			die(json_encode(array(
 				'success'=>false,
-				'msg'=>"Especifique el numero de orden mayor que zero.",
+				'msg'=>"Especifique el valor del indice mayor que zero.",
 				'target_id'=>'estado_doc_form_estado_doc_index_field'
 			)));
 		}
-
-		if ( $data['estado_doc_estado'] == '' ) {
+		
+		/*if ( $data['estado_doc_estado'] == '' ) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el estado",
 				'target_id'=>'estado_doc_form_estado_doc_estado_field'
 			)));
-		}
+		}*/
 
 
 		try {

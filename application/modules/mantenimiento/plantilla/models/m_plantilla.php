@@ -1,5 +1,5 @@
 <?php
-class M_Estado_doc extends CI_Model{
+class M_Plantilla extends CI_Model{
 	
 	public function __construct() { 
 		parent::__construct();
@@ -9,14 +9,14 @@ class M_Estado_doc extends CI_Model{
 		$this->db->start_cache();
 		
 		$this->db->select("
-			ed.*,
+			p.*,
 			td.tipo_doc_desc
 		")
-		->from('public.estado_doc AS ed')
-		->join('public.tipo_doc AS td', 'td.tipo_doc_id = ed.tipo_doc_id', 'inner');
+		->from('public.plantilla AS p')
+		->join('public.tipo_doc AS td', 'td.tipo_doc_id = p.tipo_doc_id', 'inner');
 
 		if ( $tipo_doc_id != '') {
-			$this->db->where('ed.tipo_doc_id', $tipo_doc_id);	
+			$this->db->where('p.tipo_doc_id', $tipo_doc_id);	
 		}
 		
 		switch ($search_by) {
@@ -25,7 +25,7 @@ class M_Estado_doc extends CI_Model{
 				foreach ($terms as $i=>$t) {
 					if (trim($t)!='') {
 						$this->db->like(
-							"UPPER(ed.estado_doc_desc)", 
+							"UPPER(p.plantilla_desc)", 
 							to_upper($t)
 						);
 					}
@@ -33,16 +33,16 @@ class M_Estado_doc extends CI_Model{
 			break;
 			
 			case 'estado':
-				$this->db->like('ed.estado_doc_estado', strtoupper($search_text));
+				$this->db->like('p.plantilla_estado', strtoupper($search_text));
 			break;
 		}
 
 		$this->db->stop_cache();
 		$total_count = $this->db->count_all_results();
 
-		$this->db->order_by('ed.tipo_doc_id', 'asc');
-		$this->db->order_by('ed.estado_doc_index', 'asc');
-		$this->db->order_by('ed.estado_doc_desc', 'asc');
+		$this->db->order_by('p.tipo_doc_id', 'asc');
+		//$this->db->order_by('p.plantilla_index', 'asc');
+		$this->db->order_by('p.plantilla_desc', 'asc');
 		$this->db->limit($size, $start);
 
 		$rows = $this->db->get()->result();
@@ -59,14 +59,8 @@ class M_Estado_doc extends CI_Model{
 	public function get_new_row () {
 		$row = array(
 			'tipo_doc_id'=>'CLIT',
-			'estado_doc_color'=>'gray',
-			'estado_doc_requisito_requerido_flag'=>'S', 
-			'estado_doc_correlativo_flag'=>'S', 
-			'estado_doc_final_flag'=>'S',
-			'estado_doc_generar_pdf_flag'=>'S',
-			'estado_doc_modificar_flag'=>'S',
-			'estado_doc_index'=>1,
-			'estado_doc_estado'=>'A'
+			'plantilla_original_flag'=>'N',
+			'plantilla_estado'=>'A'
 		);
 		return $row;
 	}
@@ -74,17 +68,17 @@ class M_Estado_doc extends CI_Model{
 	public function get_row ($id) {
 		$this->db
 		->select("
-			ed.*, 
+			p.*, 
 			td.tipo_doc_desc
 		")
-		->from("public.estado_doc AS ed")
-		->join("public.tipo_doc AS td", "td.tipo_doc_id = ed.tipo_doc_id", "inner")
-		->where('ed.estado_doc_id', $id);
+		->from("public.plantilla AS p")
+		->join("public.tipo_doc AS td", "td.tipo_doc_id = p.tipo_doc_id", "inner")
+		->where('p.plantilla_id', $id);
 		return $this->db->get()->row();
 	}
 
 	public function add ($data) {
-		$table = 'public.estado_doc';
+		$table = 'public.plantilla';
 		
 		$data['syslog'] = sys_session_syslog();
 
@@ -102,26 +96,26 @@ class M_Estado_doc extends CI_Model{
 	}
 
 	public function update ($data) {
-		$c = $this->get_row($data['estado_doc_id']);
+		$c = $this->get_row($data['plantilla_id']);
 		$data['syslog'] = sys_session_syslog('modificar', $c->syslog);
 		
 		$this->db->trans_begin();
-		$this->db->where('estado_doc_id', $data['estado_doc_id']);
-		$this->db->update('public.estado_doc', $data);
+		$this->db->where('plantilla_id', $data['plantilla_id']);
+		$this->db->update('public.plantilla', $data);
 
 		if ($this->db->trans_status() === FALSE){
         	$this->db->trans_rollback();
         	return false;
 		} else {
         	$this->db->trans_commit();
-        	return true;
+        	return $data['plantilla_id'];
 		}
 	}	
 
 	public function delete ($id) {
 		$this->db->trans_begin();
-		$this->db->where('estado_doc_id', $id);
-		$this->db->delete('public.estado_doc');
+		$this->db->where('plantilla_id', $id);
+		$this->db->delete('public.plantilla');
 
 		if ($this->db->trans_status() === FALSE){
         	$this->db->trans_rollback();
@@ -137,17 +131,6 @@ class M_Estado_doc extends CI_Model{
 		->order_by('tipo_doc_id', 'ASC')
 		->get('public.tipo_doc')->result();
 		$total_count = count($rows);
-		$ret = array(
-			'data'=>$rows,
-			'total'=>$total_count
-		);
-		return $ret;
-	}
-
-	public function get_tipo_permiso_list () {
-		$rows = $this->db->get('public.tipo_permiso')->result();
-		$total_count = count($rows);
-		
 		$ret = array(
 			'data'=>$rows,
 			'total'=>$total_count

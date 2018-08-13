@@ -11,26 +11,19 @@
 			sortableColumns: false,
 			enableColumnHide: false,
 			columns:[
-				{text:'Tipo Doc.', dataIndex:'tipo_doc_id', width: 60},
-				{text:'Descripcion', dataIndex:'tipo_doc_requisito_desc', width: 300},
-				{text:'Ver. Requisito Req.', dataIndex:'estado_doc_requisito_requerido_flag', width: 70},
-				{text:'', dataIndex:'tipo_doc_requisito_pdf_flag', width: 70},
-				{text:'Numero Req.', dataIndex:'tipo_doc_requisito_numero_flag', width: 60},
-				{text:'Tipo Permiso', dataIndex:'tipo_permiso_desc', width: 60},
-				{text:'Orden', dataIndex:'tipo_doc_requisito_index', width: 50},
-				{text:'Estado', dataIndex:'tipo_doc_requisito_estado', width: 50,
+				{text:'Tipo Doc.', dataIndex:'tipo_doc_id', width: 75},
+				{text:'Descripcion', dataIndex:'estado_doc_desc', width: 200,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
-					    switch (value) {
-					    	case 'A':
-					    		metaData.tdStyle = 'color: green;';
-					    	break;
-					    	case 'I':
-					    		metaData.tdStyle = 'color: red;';
-					    	break;
-					    }
+					    metaData.tdStyle = 'color: '+record.get('estado_doc_color')+';';
 					    return value;
 					}
-				}
+				},
+				{text:'VRR', dataIndex:'estado_doc_requisito_requerido_flag', width: 60},
+				{text:'Correlativo', dataIndex:'estado_doc_correlativo_flag', width: 70},
+				{text:'Generar PDF', dataIndex:'estado_doc_generar_pdf_flag', width: 90},
+				{text:'Modificar', dataIndex:'estado_doc_modificar_flag', width: 60},
+				{text:'Final', dataIndex:'estado_doc_final_flag', width: 60},
+				{text:'Orden', dataIndex:'estado_doc_index', width: 50}
 			],
 			tbar:[{
 				text:'Nuevo', 
@@ -42,7 +35,7 @@
 				handler: function() {
 					var rows = Ext.getCmp('estado_doc_main_grid').getSelection();
 					if (rows.length>0) {
-						estado_doc.edit_window(rows[0].get('tipo_doc_requisito_id'));
+						estado_doc.edit_window(rows[0].get('estado_doc_id'));
 					} else {
 						Ext.Msg.alert('Error','Seleccione un registro');
 					}
@@ -60,7 +53,7 @@
 					handler: function() {
 						var rows = Ext.getCmp('estado_doc_main_grid').getSelection();
 						if (rows.length>0) {
-							syslog.show_window('public.tipo_doc_requisito', rows[0].get('tipo_doc_requisito_id'));
+							syslog.show_window('public.estado_doc', rows[0].get('estado_doc_id'));
 						} else {
 							Ext.Msg.alert('Error','Seleccione un registro');
 						}
@@ -78,7 +71,6 @@
 				store: Ext.create('Ext.data.Store', {
 					data : [
 						{search_id: 'all', search_desc: 'Busqueda General'},
-						{search_id: 'keyname', search_desc: 'Por Nombre clave'},
 						{search_id: 'estado', search_desc: 'Por Estado'}
 					]
 				})
@@ -113,14 +105,14 @@
 						var f = Ext.getCmp('estado_doc_form');
 						f.loadRecord(record);
 						Ext.getCmp('estado_doc_form_title_label').setText(estado_doc.title);
-						Ext.getCmp('estado_doc_form_tipo_doc_requisito_id_displayfield').setValue(record.get('tipo_doc_requisito_id'));
+						Ext.getCmp('estado_doc_form_estado_doc_id_displayfield').setValue(record.get('estado_doc_id'));
 						Ext.getCmp('estado_doc_form_save_bt').hide();
 						Ext.getCmp('estado_doc_form_cancel_bt').hide();
 					}
 				},
 				rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts ) {
 					if (!estado_doc.form_editing) {
-						estado_doc.edit_window(record.get('tipo_doc_requisito_id'));
+						estado_doc.edit_window(record.get('estado_doc_id'));
 					}
 				}
 			}
@@ -183,7 +175,7 @@
 					}
 				}],
 				defaults: {
-					labelWidth: 140,
+					labelWidth: 100,
 					labelStyle: 'color: gray'
 				},
 				items: [{
@@ -193,11 +185,11 @@
 					value: 'edit'
 				},{
 					xtype: 'hidden',
-					id: 'estado_doc_form_tipo_doc_requisito_id_field',
-					name: 'tipo_doc_requisito_id'
+					id: 'estado_doc_form_estado_doc_id_field',
+					name: 'estado_doc_id'
 				},{
 					xtype: 'displayfield',
-					id: 'estado_doc_form_tipo_doc_requisito_id_displayfield',
+					id: 'estado_doc_form_estado_doc_id_displayfield',
 					fieldLabel: 'ID',
 					x: 10, y: 0,
 					width: 200
@@ -220,120 +212,115 @@
     				}
 				},{
 					fieldLabel: 'Descripcion',
-					id: 'estado_doc_form_tipo_doc_requisito_desc_field',
+					id: 'estado_doc_form_estado_doc_desc_field',
     				xtype: 'textfield',
-    				name: 'tipo_doc_requisito_desc',
+    				name: 'estado_doc_desc',
     				x: 10, y: 60, width: 420
 				},{
     				xtype: 'combobox',
-    				id: 'estado_doc_form_tipo_doc_requisito_requerido_flag_field',
-    				name: 'tipo_doc_requisito_requerido_flag',
-    				fieldLabel: 'Requerido',
+    				id: 'estado_doc_form_estado_doc_modificar_flag_field',
+    				name: 'estado_doc_modificar_flag',
+    				fieldLabel: 'Permite modificar el registro?',
     				displayField: 'desc',
     				valueField: 'id',
     				store: estado_doc.yes_no_store,
     				queryMode: 'local',
-    				x: 10, y: 90, width: 200,
+    				x: 10, y: 90, width: 250,
     				editable: false,
-    				listeners: {
-    					select: function(combo, record, eOpts ) {
-				    	}
-    				}
-				},{
-    				xtype: 'combobox',
-    				id: 'estado_doc_form_tipo_doc_requisito_pdf_flag_field',
-    				name: 'tipo_doc_requisito_pdf_flag',
-    				fieldLabel: 'Requiere Doc. Escaneado',
-    				displayField: 'desc',
-    				valueField: 'id',
-    				store: estado_doc.yes_no_store,
-    				queryMode: 'local',
-    				x: 10, y: 120, width: 200,
-    				editable: false,
-    				listeners: {
-    					select: function(combo, record, eOpts ) {
-				    	}
-    				}
-				},{
-    				xtype: 'combobox',
-    				id: 'estado_doc_form_tipo_doc_requisito_numero_flag_field',
-    				name: 'tipo_doc_requisito_numero_flag',
-    				fieldLabel: 'Requiere Numero Doc.',
-    				displayField: 'desc',
-    				valueField: 'id',
-    				store: estado_doc.yes_no_store,
-    				queryMode: 'local',
-    				x: 10, y: 150, width: 200,
-    				editable: false,
-    				listeners: {
-    					select: function(combo, record, eOpts ) {
-				    	}
-    				}
-				},{
-    				xtype: 'combobox',
-    				id: 'estado_doc_form_tipo_doc_requisito_keyname_field',
-    				name: 'tipo_doc_requisito_keyname',
-    				fieldLabel: 'Nombre Clave',
-    				displayField: 'desc',
-    				valueField: 'id',
-    				store: estado_doc.keyname_store,
-    				queryMode: 'local',
-    				x: 10, y: 180, width: 300,
-    				editable: true,
-    				listeners: {
-    					select: function(combo, record, eOpts ) {
-				    	}
-    				}
-				},{
-    				xtype: 'combobox',
-    				id: 'estado_doc_form_tipo_permiso_id_field',
-    				name: 'tipo_permiso_id',
-    				fieldLabel: 'Tipo Permiso',
-    				displayField: 'tipo_permiso_desc',
-    				valueField: 'tipo_permiso_id',
-    				store: estado_doc.tipo_permiso_store,
-    				queryMode: 'local',
-    				x: 10, y: 210, width: 420,
-    				editable: false,
-    				emptyText: '- ninguno -',
     				listeners: {
     					select: function(combo, record, eOpts ) {
 				    	}
     				},
-    				triggers: {
-				    	clear: {
-				            cls: 'x-form-clear-trigger',
-				            weight: 2, 
-				            handler: function() {
-				            	Ext.getCmp('estado_doc_form_tipo_permiso_id_field').setValue('');
-				            }
-				        }
-			    	}
+    				labelWidth: 160
 				},{
     				xtype: 'combobox',
-    				id: 'estado_doc_form_tipo_doc_requisito_index_field',
-    				name: 'tipo_doc_requisito_index',
+    				id: 'estado_doc_form_estado_doc_generar_pdf_flag_field',
+    				name: 'estado_doc_generar_pdf_flag',
+    				fieldLabel: 'Permite generar documento (PDF)?',
+    				displayField: 'desc',
+    				valueField: 'id',
+    				store: estado_doc.yes_no_store,
+    				queryMode: 'local',
+    				x: 10, y: 120, width: 250,
+    				editable: false,
+    				listeners: {
+    					select: function(combo, record, eOpts ) {
+				    	}
+    				},
+    				labelWidth: 185
+				},{
+    				xtype: 'combobox',
+    				id: 'estado_doc_form_estado_doc_requisito_requerido_flag_field',
+    				name: 'estado_doc_requisito_requerido_flag',
+    				fieldLabel: 'Verificar requisitos requeridos?',
+    				displayField: 'desc',
+    				valueField: 'id',
+    				store: estado_doc.yes_no_store,
+    				queryMode: 'local',
+    				x: 10, y: 150, width: 250,
+    				editable: false,
+    				listeners: {
+    					select: function(combo, record, eOpts ) {
+				    	}
+    				},
+    				labelWidth: 160
+				},{
+    				xtype: 'combobox',
+    				id: 'estado_doc_form_estado_doc_correlativo_flag_field',
+    				name: 'estado_doc_correlativo_flag',
+    				fieldLabel: 'Depende de un estado anterior o es inicial (correlativo)?',
+    				displayField: 'desc',
+    				valueField: 'id',
+    				store: estado_doc.yes_no_store,
+    				queryMode: 'local',
+    				x: 10, y: 180, width: 340,
+    				editable: false,
+    				listeners: {
+    					select: function(combo, record, eOpts ) {
+				    	}
+    				},
+    				labelWidth: 285
+				},{
+    				xtype: 'combobox',
+    				id: 'estado_doc_form_estado_doc_final_flag_field',
+    				name: 'estado_doc_final_flag',
+    				fieldLabel: 'Es un estado final?',
+    				displayField: 'desc',
+    				valueField: 'id',
+    				store: estado_doc.yes_no_store,
+    				queryMode: 'local',
+    				x: 10, y: 210, width: 250,
+    				editable: false,
+    				listeners: {
+    					select: function(combo, record, eOpts ) {
+				    	}
+    				},
+    				labelWidth: 160
+				},{
+    				xtype: 'combobox',
+    				id: 'estado_doc_form_estado_doc_color_field',
+    				name: 'estado_doc_color',
+    				fieldLabel: 'Color',
+    				displayField: 'desc',
+    				valueField: 'id',
+    				store: estado_doc.color_store,
+    				queryMode: 'local',
+    				x: 10, y: 240, width: 250,
+    				editable: false,
+    				listeners: {
+    					select: function(combo, record, eOpts ) {
+				    	}
+    				}
+				},{
+    				xtype: 'combobox',
+    				id: 'estado_doc_form_estado_doc_index_field',
+    				name: 'estado_doc_index',
     				fieldLabel: 'Orden',
     				displayField: 'desc',
     				valueField: 'id',
     				store: estado_doc.index_store,
     				queryMode: 'local',
-    				x: 10, y: 240, width: 200,
-    				editable: false,
-    				listeners: {
-    					select: function(combo, record, eOpts ) {
-				    	}
-    				}
-				},{
-    				xtype: 'combobox',
-    				id: 'estado_doc_form_tipo_doc_requisito_estado_field',
-    				name: 'tipo_doc_requisito_estado',
-    				fieldLabel: 'Estado',
-    				displayField: 'desc',
-    				valueField: 'id',
-    				store: estado_doc.estado_store,
-    				queryMode: 'local',
-    				x: 10, y: 270, width: 250,
+    				x: 10, y: 270, width: 200,
     				editable: false,
     				listeners: {
     					select: function(combo, record, eOpts ) {
@@ -345,7 +332,7 @@
 	});
 
 	estado_doc.reload_list = function (select_id) {
-		estado_doc.tipo_doc_requisito_id_selected = select_id||0;
+		estado_doc.estado_doc_id_selected = select_id||0;
 		//estado_doc.main_store.reload();
 		estado_doc.main_store.reload({
 			params: {

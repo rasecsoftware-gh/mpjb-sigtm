@@ -32,7 +32,7 @@
 		                }
 		            }]
 		        },
-		        {text:'Nro. Licencia', dataIndex:'lc_resolucion', width: 75, align: 'left'},
+		        {text:'Nro. Licencia', dataIndex:'lc_codigo', width: 75, align: 'left'},
 				{text:'Estado', dataIndex:'estado_doc_desc', width: 70,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
 						if (record.get('estado_doc_color') != '') {
@@ -253,6 +253,9 @@
     					select: function(combo, record, eOpts ) {
     						Ext.getCmp('lc_form_contribuyente_numero_doc_field').setValue(record.get('contribuyente_numero_doc'));
     						Ext.getCmp('lc_form_contribuyente_fecha_nac_field').setValue(record.get('contribuyente_fecha_nac'));
+    						if (Ext.getCmp('lc_form_lc_codigo_field').getValue().trim() == '') {
+    							Ext.getCmp('lc_form_lc_codigo_field').setValue('K'+record.get('contribuyente_numero_doc'));
+    						}
 				    	}
     				},
     				hidden: true // only for edit
@@ -315,52 +318,53 @@
 				    	}
     				},
     				labelWidth: 70
+				},{ 
+					fieldLabel: 'N&ordm; Resolucion',
+					id: 'lc_form_lc_resolucion_field',
+    				xtype: 'textfield',
+    				name: 'lc_resolucion',
+    				x: 10, y: 130, width: 160
+				},{
+					fieldLabel: 'Fecha Resolucion',
+					id: 'lc_form_lc_resolucion_fecha_field',
+    				xtype: 'datefield',
+    				name: 'lc_resolucion_fecha',
+    				format: 'd/m/Y',
+    				x: 180, y: 130, width: 200,
+    				labelWidth: 100
 				},{
 					fieldLabel: 'Fecha Exp.',
 					id: 'lc_form_lc_fecha_exp_field',
     				xtype: 'datefield',
     				name: 'lc_fecha_exp',
     				format: 'd/m/Y',
-    				x: 10, y: 130, width: 180
+    				x: 10, y: 160, width: 180
 				},{
 					fieldLabel: 'Fecha Ven.',
 					id: 'lc_form_lc_fecha_ven_field',
     				xtype: 'datefield',
     				name: 'lc_fecha_ven',
     				format: 'd/m/Y',
-    				x: 210, y: 130, width: 170,
+    				x: 210, y: 160, width: 170,
     				labelWidth: 70
-				},{ 
-					fieldLabel: 'Resolucion',
-					id: 'lc_form_lc_resolucion_field',
-    				xtype: 'textfield',
-    				name: 'lc_resolucion',
-    				x: 10, y: 160, width: 280
 				},{ 
 					fieldLabel: 'Nro. Licencia',
 					id: 'lc_form_lc_codigo_field',
     				xtype: 'textfield',
     				name: 'lc_codigo',
-    				x: 300, y: 160, width: 170,
-    				labelWidth: 70
+    				x: 10, y: 190, width: 160
 				},{ 
 					fieldLabel: 'Grupo Sang.',
 					id: 'lc_form_lc_grupo_s_field',
     				xtype: 'textfield',
     				name: 'lc_grupo_s',
-    				x: 10, y: 190, width: 160
+    				x: 180, y: 190, width: 140,
+    				labelWidth: 70
 				},{ 
 					fieldLabel: 'Restricciones',
 					id: 'lc_form_lc_restricciones_field',
     				xtype: 'textfield',
     				name: 'lc_restricciones',
-    				x: 180, y: 190, width: 170,
-    				labelWidth: 70
-				},{ 
-					fieldLabel: 'Observacion',
-					id: 'lc_form_lc_observacion_field',
-    				xtype: 'textfield',
-    				name: 'lc_observacion',
     				x: 10, y: 220, width: 380
 				},{
 					xtype: 'displayfield',
