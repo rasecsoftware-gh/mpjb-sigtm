@@ -1,6 +1,7 @@
 <script type="text/javascript">
 	/********************* generamos el name espace ***************************/
 	lc = {};
+	lc.title = 'Licencia de Conducir';
 	// general stores
 	lc.contribuyente_store = Ext.create("Ext.data.Store", {
 		proxy:{
@@ -45,7 +46,10 @@
 
 	lc.categoria_store = Ext.create("Ext.data.Store", {
 		data : [
-			{id: 'B', desc: 'Categoria B'}
+			{id: 'I', desc: 'Categoria I'},
+			{id: 'II-A', desc: 'Categoria II-A'},
+			{id: 'II-B', desc: 'Categoria II-B'},
+			{id: 'II-C', desc: 'Categoria II-C'},
 		]
 	});
 
@@ -133,14 +137,15 @@
 
 <!--  cargamos los componentes -->
 <?php echo $this->load->view('v_lc_list'); ?>
-<?php //echo $this->load->view('v_lc_new'); ?>
-<?php //echo $this->load->view('v_lc_edit'); ?>
+<?php echo $this->load->view('v_lc_new'); ?>
+<?php echo $this->load->view('v_lc_edit'); ?>
+<?php echo $this->load->view('v_lc_update'); ?>
 <?php ////echo $this->load->view('v_lc_delete'); ?>
-<?php //echo $this->load->view('v_lc_doc_requisito_add'); ?>
-<?php //echo $this->load->view('v_lc_doc_requisito_edit'); ?>
-<?php //echo $this->load->view('v_lc_doc_requisito_delete'); ?>
-<?php //echo $this->load->view('v_lc_doc_estado_add'); ?>
-<?php //echo $this->load->view('v_lc_doc_estado_delete'); ?>
+<?php echo $this->load->view('v_lc_doc_requisito_add'); ?>
+<?php echo $this->load->view('v_lc_doc_requisito_edit'); ?>
+<?php echo $this->load->view('v_lc_doc_requisito_delete'); ?>
+<?php echo $this->load->view('v_lc_doc_estado_add'); ?>
+<?php echo $this->load->view('v_lc_doc_estado_delete'); ?>
 <?php //echo $this->load->view('v_lc_plantilla_cambiar'); ?>
 <?php //echo $this->load->view('v_lc_pdf_generar'); ?>
 <?php //echo $this->load->view('v_lc_print'); ?>

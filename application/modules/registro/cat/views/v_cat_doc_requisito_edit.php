@@ -1,7 +1,7 @@
 <script>
-	clit.doc_requisito_edit_window = function() {
-		var doc_id = Ext.getCmp('clit_form_clit_id_field').getValue();
-		var rows = Ext.getCmp('clit_form_doc_requisito_grid').getSelection();
+	cat.doc_requisito_edit_window = function() {
+		var doc_id = Ext.getCmp('cat_form_cat_id_field').getValue();
+		var rows = Ext.getCmp('cat_form_doc_requisito_grid').getSelection();
 		var record = null;
 		if (rows.length > 0) {
 			record = rows[0];
@@ -14,7 +14,7 @@
 			return false;
 		} 
 		var w_config = {
-			id: 'clit_doc_requisito_edit_window',
+			id: 'cat_doc_requisito_edit_window',
 			title: 'Modificar documento adjuntado', 
 			modal: true,
 			width: 450,
@@ -22,11 +22,11 @@
 			layout: 'border',
 			items:[{
 				xtype: 'form', 
-				url: 'clit/updateDocRequisito',
+				url: 'cat/updateDocRequisito',
 				bodyPadding: 10,
 				region: 'center',
 				layout: 'absolute',
-				id: 'clit_doc_requisito_form',
+				id: 'cat_doc_requisito_form',
 				defaultType: 'textfield',
 				defaults: {
 					labelWidth: 100
@@ -44,7 +44,7 @@
 					name: 'tipo_doc_requisito_id',
 					value: record.get('tipo_doc_requisito_id')
 				},{
-					id: 'clit_doc_requisito_form_tipo_doc_requisito_desc_field',
+					id: 'cat_doc_requisito_form_tipo_doc_requisito_desc_field',
 					xtype: 'displayfield',
 					fieldLabel: 'Documento',
 				    value: record.get('tipo_doc_requisito_desc').toUpperCase(),
@@ -53,7 +53,7 @@
 				    },
 				    x: 10, y: 10, width: 400
 				},{
-					id: 'clit_doc_requisito_form_doc_requisito_fecha_field',
+					id: 'cat_doc_requisito_form_doc_requisito_fecha_field',
 					xtype: 'datefield',
 					fieldLabel: 'Fecha documento',
     				name: 'doc_requisito_fecha',
@@ -66,13 +66,13 @@
 				    x: 10, y: 70, width: 350
 				},{
 					fieldLabel: 'Escaneado en PDF',
-					id: 'clit_doc_requisito_form_doc_requisito_pdf_field', // 
+					id: 'cat_doc_requisito_form_doc_requisito_pdf_field', // 
     				xtype: 'displayfield',
     				name: 'doc_requisito_pdf',
     				x: 10, y: 100, width: 400
 				},{
 					fieldLabel: 'Cambiar PDF',
-					id: 'clit_doc_requisito_form_file_field', // 
+					id: 'cat_doc_requisito_form_file_field', // 
     				xtype: 'filefield',
     				name: 'doc_requisito_file',
     				labelStyle : (record.get('tipo_doc_requisito_pdf_flag') == 'N' ? 'color: gray;': ''),
@@ -81,12 +81,12 @@
 			}],
 			buttons:[{
 				text: 'Guardar', handler: function() {
-					var frm = Ext.getCmp('clit_doc_requisito_form');
+					var frm = Ext.getCmp('cat_doc_requisito_form');
 					frm.submit({
 						success: function(form, action) {
 							if (action.result.success) {
-								Ext.getCmp('clit_doc_requisito_edit_window').close();
-								clit.doc_requisito_reload_list(doc_id);
+								Ext.getCmp('cat_doc_requisito_edit_window').close();
+								cat.doc_requisito_reload_list(doc_id);
 							} else {
 								Ext.Msg.alert('Error', action.result.msg);
 							}
@@ -100,14 +100,14 @@
 				}
 			},{
 				text: 'Salir', handler: function() {
-					Ext.getCmp('clit_doc_requisito_edit_window').close();
+					Ext.getCmp('cat_doc_requisito_edit_window').close();
 				}
 			}],
 			listeners: {
 				show: function () {					
-					Ext.getCmp('clit_doc_requisito_form').loadRecord(record);
+					Ext.getCmp('cat_doc_requisito_form').loadRecord(record);
 					if ( record.get('tipo_doc_requisito_pdf_flag') == 'N' ) {
-						//Ext.getCmp('clit_doc_requisito_form_file_field').disable();	
+						//Ext.getCmp('cat_doc_requisito_form_file_field').disable();	
 					}
 				}
 			}

@@ -308,23 +308,38 @@
     				name: 'contribuyente_direccion',
     				x: 10, y: 240, width: 380
 				},{
+					fieldLabel: 'Fecha Nac.',
+					id: 'contribuyente_form_contribuyente_fecha_nac_field',
+    				xtype: 'datefield',
+    				name: 'contribuyente_fecha_nac',
+    				x: 10, y: 270, width: 250,
+    				triggers: {
+				    	clear: {
+				            cls: 'x-form-clear-trigger',
+				            weight: 2, 
+				            handler: function() {
+				            	Ext.getCmp('contribuyente_form_contribuyente_fecha_nac_field').setValue('');
+				            }
+				        }
+			    	}
+				},{
 					fieldLabel: 'Telefono',
 					id: 'contribuyente_form_contribuyente_telefono_field',
     				xtype: 'textfield',
     				name: 'contribuyente_telefono',
-    				x: 10, y: 270, width: 250
+    				x: 10, y: 300, width: 250
 				},{
 					fieldLabel: 'E-mail',
 					id: 'contribuyente_form_contribuyente_email_field',
     				xtype: 'textfield',
     				name: 'contribuyente_email',
-    				x: 10, y: 300, width: 380
+    				x: 10, y: 330, width: 380
 				},{
 					fieldLabel: 'Observacion',
 					id: 'contribuyente_form_contribuyente_observacion_field',
     				xtype: 'textfield',
     				name: 'contribuyente_observacion',
-    				x: 10, y: 330, width: 380
+    				x: 10, y: 360, width: 380
 				}]
 			}]
 		}]

@@ -1,18 +1,18 @@
 <script>
-	lc.panel = Ext.create('Ext.Panel', {
+	cat.panel = Ext.create('Ext.Panel', {
 		region: 'center',
 		layout: 'border',
 		items: [{
 			xtype: 'grid',
-			id:'lc_main_grid',
+			id:'cat_main_grid',
 			region: 'center', 
 			//split:true, 
 			//forceFit:true,
 			sortableColumns: false,
 			enableColumnHide: false,
 			columns:[
-				{text:'Año', dataIndex:'lc_anio', width: 45},
-				{text:'Numero', dataIndex:'lc_numero', width: 55},
+				{text:'Año', dataIndex:'cat_anio', width: 45},
+				{text:'Numero', dataIndex:'cat_numero', width: 55},
 				{
 		            xtype: 'actioncolumn',
 		            width: 25,
@@ -20,18 +20,17 @@
 		                icon: 'tools/icons/page_white_acrobat.png',  // Use a URL in the icon config
 		                tooltip: 'Ver constancia en formato PDF',
 		                handler: function(grid, rowIndex, colIndex, item, e, record) {
-		                    lc.print_window(record);
+		                    cat.print_window(record);
 		                },
 		                isDisabled: function (view, rowIndex, colIndex, item, record) {
-		                	return !($.trim(record.get('lc_pdf')).length > 0);
+		                	return !($.trim(record.get('cat_pdf')).length > 0);
 		                }
 		            }]
 		        },
 				{text:'Nombres o Razon Soc.', dataIndex:'contribuyente_nombres', width: 200},
 				{text:'Apellidos', dataIndex:'contribuyente_apellidos', width: 150},
 				{text:'DNI/RUC', dataIndex:'contribuyente_numero_doc', width: 75},
-				{text:'Fecha', dataIndex:'lc_fecha', width: 70},
-				{text:'Resultado', dataIndex:'lc_resultado', width: 70, align: 'center'},
+				{text:'Fecha', dataIndex:'cat_fecha', width: 70},
 				{text:'Estado', dataIndex:'estado_doc_desc', width: 70,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
 						if (record.get('estado_doc_color') != '') {
@@ -45,14 +44,14 @@
 			tbar:[{
 				text:'Nuevo', 
 				handler: function() {
-					lc.new_window();
+					cat.new_window();
 				}
 			},{
 				text:'Modificar', 
 				handler: function() {
-					var rows = Ext.getCmp('lc_main_grid').getSelection();
+					var rows = Ext.getCmp('cat_main_grid').getSelection();
 					if (rows.length>0) {
-						lc.edit_window(rows[0].get('lc_id'));
+						cat.edit_window(rows[0].get('cat_id'));
 					} else {
 						Ext.Msg.alert('Error', 'Seleccione un registro');
 					}
@@ -62,25 +61,25 @@
 				menu: [{
 					text: 'Generar PDF', 
 					handler: function() {
-						lc.pdf_generar_window();
+						cat.pdf_generar_window();
 					}
 				},{
 					text: 'Cambiar plantilla', 
 					handler: function() {
-						lc.plantilla_cambiar_window();
+						cat.plantilla_cambiar_window();
 					}
 				},'-',{
 					text: 'Eliminar', 
 					handler: function() {
-						lc.delete_window();
+						cat.delete_window();
 					},
-					hidden: !<?php echo sys_session_hasRoleToString('lc.delete'); ?>,
+					hidden: !<?php echo sys_session_hasRoleToString('cat.delete'); ?>,
 				},'-',{
 					text: 'Ver informacion de registro', 
 					handler: function() {
-						var rows = Ext.getCmp('lc_main_grid').getSelection();
+						var rows = Ext.getCmp('cat_main_grid').getSelection();
 						if (rows.length>0) {
-							syslog.show_window('public.lc', rows[0].get('lc_id'));
+							syslog.show_window('public.cat', rows[0].get('cat_id'));
 						} else {
 							Ext.Msg.alert('Error', 'Seleccione un registro');
 						}
@@ -88,7 +87,7 @@
 				}]
 			},'->',{
 				xtype: 'combobox',
-				id: 'lc_search_by_cb',
+				id: 'cat_search_by_cb',
 				displayField: 'search_desc',
 				valueField: 'search_id',
 				name: 'search_by',
@@ -105,49 +104,50 @@
 				})
 			},{
 				xtype: 'textfield',
-				id: 'lc_search_text',
+				id: 'cat_search_text',
 				enableKeyEvents: true,
 				width: 140,
 				listeners: {
 					keypress: function(sender, e, eOpts) {
 						if (e.getKey() == e.ENTER) {
-							Ext.getCmp('lc_search_bt').click(e);
+							Ext.getCmp('cat_search_bt').click(e);
 						}
 					}
 				}
 			},{
-				id: 'lc_search_bt',
+				id: 'cat_search_bt',
 				text:'Buscar/Actualizar', handler: function() {
-					lc.reload_list();
+					cat.reload_list();
 				}
 			}],
-			store: lc.main_store,
+			store: cat.main_store,
 			dockedItems: [{
 		        xtype: 'pagingtoolbar',
-		        store: lc.main_store, // same store GridPanel is using
+		        store: cat.main_store, // same store GridPanel is using
 		        dock: 'bottom',
 		        displayInfo: true
 		    }],
 			listeners:{
 				select: function (ths, record, index, eOpts) {
-					if (!lc.form_editing) {
-						var f = Ext.getCmp('lc_form');
+					if (!cat.form_editing) {
+						var f = Ext.getCmp('cat_form');
 						f.loadRecord(record);
-						Ext.getCmp('lc_form_title_label').setText('Constancia');
-						Ext.getCmp('lc_form_lc_id_displayfield').setValue(record.get('lc_id'));
-						Ext.getCmp('lc_form_save_bt').hide();
-						Ext.getCmp('lc_form_cancel_bt').hide();
-						Ext.getCmp('lc_form_contribuyente_id_field').hide();
-						Ext.getCmp('lc_form_contribuyente_nomape_field').show();
-						Ext.getCmp('lc_form_doc_requisito_grid').enable();
-						Ext.getCmp('lc_form_doc_estado_grid').enable();
-						lc.doc_requisito_reload_list(record.get('lc_id'));
-						lc.doc_estado_reload_list(record.get('lc_id'));
+						Ext.getCmp('cat_form_title_label').setText(cat.title);
+						Ext.getCmp('cat_form_cat_id_displayfield').setValue(record.get('cat_id'));
+						Ext.getCmp('cat_form_save_bt').hide();
+						Ext.getCmp('cat_form_cancel_bt').hide();
+						Ext.getCmp('cat_form_contribuyente_id_field').hide();
+						Ext.getCmp('cat_form_contribuyente_nomape_field').show();
+						Ext.getCmp('cat_form_doc_requisito_grid').enable();
+						Ext.getCmp('cat_form_doc_estado_grid').enable();
+						Ext.getCmp('cat_form_cat_vehiculo_panel').enable();
+						cat.doc_requisito_reload_list(record.get('cat_id'));
+						cat.doc_estado_reload_list(record.get('cat_id'));
 					}
 				},
 				rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
-					if (!lc.form_editing) {
-						lc.edit_window(record.get('lc_id'));
+					if (!cat.form_editing) {
+						cat.edit_window(record.get('cat_id'));
 					}
 				}
 			}
@@ -159,39 +159,39 @@
 			width: 500,
 			items: [{
 				xtype: 'form',
-				id: 'lc_form',
-				url: 'lc/AddOrUpdate',
+				id: 'cat_form',
+				url: 'cat/AddOrUpdate',
 				layout: 'absolute',
 				region: 'north',
-				height: 235,
+				height: 275,
 				bodyStyle: {
 					//background: '#4c9dd8'
 					borderTop: '1px solid silver!important;'
 				},
 				tbar:[{
 					xtype: 'label',
-					id: 'lc_form_title_label',
-					text: 'Constancia',
+					id: 'cat_form_title_label',
+					text: cat.title,
 					style: {
 						fontWeight: 'bold'
 					}
 				},'->',{
 					text: 'Guardar',
-					id: 'lc_form_save_bt',
+					id: 'cat_form_save_bt',
 					hidden: true,
 					handler: function () {
-						var operation = Ext.getCmp('lc_form_operation_field').getValue();
-						var frm = Ext.getCmp('lc_form');
+						var operation = Ext.getCmp('cat_form_operation_field').getValue();
+						var frm = Ext.getCmp('cat_form');
 						frm.mask('guardando');
 						frm.submit({
 							success: function(form, action) {
 								frm.unmask();
 								if (action.result.success) {
-									lc.form_editing = false;
+									cat.form_editing = false;
 									if ( operation == 'new' ) {
-										lc.reload_list(action.result.rowid);
+										cat.reload_list(action.result.rowid);
 									} else {
-										lc.reload_list(frm.getRecord().get('lc_id'));
+										cat.reload_list(frm.getRecord().get('cat_id'));
 									}
 								} else {
 									Ext.Msg.alert('Error', action.result.msg);
@@ -207,16 +207,17 @@
 					}
 				},{
 					text: 'Cancelar',
-					id: 'lc_form_cancel_bt',
+					id: 'cat_form_cancel_bt',
 					hidden: true,
 					handler: function () {
-						Ext.getCmp('lc_form_save_bt').hide();
-						Ext.getCmp('lc_form_cancel_bt').hide();
-						Ext.getCmp('lc_form_contribuyente_id_field').hide();
-						Ext.getCmp('lc_form_contribuyente_nomape_field').show();
-						Ext.getCmp('lc_form_doc_requisito_grid').enable();
-						Ext.getCmp('lc_form_doc_estado_grid').enable();
-						lc.form_editing = false;
+						Ext.getCmp('cat_form_save_bt').hide();
+						Ext.getCmp('cat_form_cancel_bt').hide();
+						Ext.getCmp('cat_form_contribuyente_id_field').hide();
+						Ext.getCmp('cat_form_contribuyente_nomape_field').show();
+						Ext.getCmp('cat_form_doc_requisito_grid').enable();
+						Ext.getCmp('cat_form_doc_estado_grid').enable();
+						Ext.getCmp('cat_form_cat_vehiculo_panel').enable();
+						cat.form_editing = false;
 					}
 				}],
 				defaults: {
@@ -225,123 +226,152 @@
 				},
 				items: [{
 					xtype: 'hidden',
-					id: 'lc_form_operation_field',
+					id: 'cat_form_operation_field',
 					name: 'operation',
 					value: 'edit'
 				},{
 					xtype: 'hidden',
-					id: 'lc_form_lc_id_field',
-					name: 'lc_id'
+					id: 'cat_form_cat_id_field',
+					name: 'cat_id'
 				},{
 					xtype: 'hidden',
-					id: 'lc_form_plantilla_id_field',
+					id: 'cat_form_plantilla_id_field',
 					name: 'plantilla_id'
 				},{
 					xtype: 'displayfield',
-					id: 'lc_form_lc_id_displayfield',
+					id: 'cat_form_cat_id_displayfield',
 					fieldLabel: 'ID',
-					x: 10, y: 0,
-					width: 200
+					x: 400, y: 10,
+					labelWidth: 25,
+					width: 80
 				},{
 					fieldLabel: 'Numero y Año',
-					id: 'lc_form_lc_numero_field',
+					id: 'cat_form_cat_numero_field',
     				xtype: 'textfield',
-    				name: 'lc_numero',
+    				name: 'cat_numero',
     				fieldStyle: 'text-align: center;',
-    				x: 10, y: 30, width: 160
+    				x: 10, y: 10, width: 160
 				},{
-					id: 'lc_form_lc_anio_field',
+					id: 'cat_form_cat_anio_field',
     				xtype: 'textfield',
-    				name: 'lc_anio',
+    				name: 'cat_anio',
     				editable: false,
     				value: '2018',
-    				x: 175, y: 30, width: 40
+    				x: 175, y: 10, width: 40
 				},{
     				xtype: 'combobox',
-    				id: 'lc_form_contribuyente_id_field',
+    				id: 'cat_form_contribuyente_id_field',
     				name: 'contribuyente_id',
     				fieldLabel: 'Contribuyente',
     				displayField: 'contribuyente_nomape',
     				valueField: 'contribuyente_id',
-    				store: lc.contribuyente_store,
+    				store: cat.contribuyente_store,
     				queryMode: 'remote',
     				triggerAction: 'last', // query
     				minChars: 2,
     				matchFieldWidth: false,
-    				x: 10, y: 60, width: 380,
+    				x: 10, y: 40, width: 380,
     				editable: true,
     				listeners: {
     					select: function(combo, record, eOpts ) {
-    						Ext.getCmp('lc_form_contribuyente_numero_doc_field').setValue(record.get('contribuyente_numero_doc'));
+    						Ext.getCmp('cat_form_contribuyente_numero_doc_field').setValue(record.get('contribuyente_numero_doc'));
 				    	}
     				},
     				hidden: true // only for edit
 				},{ // only for display
 					fieldLabel: 'Contribuyente',
-					id: 'lc_form_contribuyente_nomape_field',
+					id: 'cat_form_contribuyente_nomape_field',
     				xtype: 'textfield',
     				name: 'contribuyente_nomape',
-    				x: 10, y: 60, width: 380
+    				x: 10, y: 40, width: 380
 				},{
-					id: 'lc_form_contribuyente_numero_doc_field',
+					id: 'cat_form_contribuyente_numero_doc_field',
     				xtype: 'textfield',
     				name: 'contribuyente_numero_doc',
     				editable: false,
-    				x: 395, y: 60, width: 75
+    				x: 395, y: 40, width: 75
 				},{
 					fieldLabel: 'Fecha',
-					id: 'lc_form_lc_fecha_field',
+					id: 'cat_form_cat_fecha_field',
     				xtype: 'datefield',
-    				name: 'lc_fecha',
+    				name: 'cat_fecha',
     				format: 'd/m/Y',
-    				x: 10, y: 90, width: 200
+    				x: 10, y: 70, width: 200
+				},{ 
+					fieldLabel: 'Descripcion',
+					id: 'cat_form_cat_desc_field',
+    				xtype: 'textfield',
+    				name: 'cat_desc',
+    				x: 10, y: 100, width: 380
 				},{
-    				xtype: 'combobox',
-    				id: 'lc_form_lc_resultado_field',
-    				name: 'lc_resultado',
-    				fieldLabel: 'Registra Infraccion de Transito?',
-    				displayField: 'desc',
-    				valueField: 'id',
-    				store: lc.resultado_store,
-    				queryMode: 'local',
-    				x: 10, y: 120, width: 300,
-    				editable: false,
-    				listeners: {
-    					select: function(combo, record, eOpts ) {
-				    	}
-    				},
-    				labelWidth: 170,
-    				hidden: false // only for edit
+					fieldLabel: 'Fecha Inicio',
+					id: 'cat_form_cat_fecha_inicio_field',
+    				xtype: 'datefield',
+    				name: 'cat_fecha_inicio',
+    				format: 'd/m/Y',
+    				x: 10, y: 130, width: 180
+				},{
+					fieldLabel: 'Fecha Fin',
+					id: 'cat_form_cat_fecha_fin_field',
+    				xtype: 'datefield',
+    				name: 'cat_fecha_fin',
+    				format: 'd/m/Y',
+    				x: 210, y: 130, width: 170,
+    				labelWidth: 70
+				},{ 
+					fieldLabel: 'Ruta',
+					id: 'cat_form_cat_ruta_field',
+    				xtype: 'textfield',
+    				name: 'cat_ruta',
+    				x: 10, y: 160, width: 380
+				},{ 
+					fieldLabel: 'Exclusivo para',
+					id: 'cat_form_cat_desc_exclusiva_field',
+    				xtype: 'textfield',
+    				name: 'cat_desc_exclusiva',
+    				x: 10, y: 190, width: 380
 				},{
 					xtype: 'displayfield',
-					id: 'lc_form_lc_recibo_validado_flag_displayfield',
+					id: 'cat_form_cat_recibo_validado_flag_displayfield',
 					fieldLabel: 'Se ha validado el recibo?',
-					name: 'lc_recibo_validado_flag',
-					x: 10, y: 150,
-					width: 30,
-					labelWidth: 160
+					name: 'cat_recibo_validado_flag',
+					x: 10, y: 220, width: 180,
+					labelWidth: 145
 				},{
 					xtype: 'displayfield',
-					id: 'lc_form_plantilla_desc_displayfield',
-					fieldLabel: 'Plantilla para la generacion del documento PDF',
+					id: 'cat_form_plantilla_desc_displayfield',
+					fieldLabel: 'Plantilla para generar PDF',
 					name: 'plantilla_desc',
-					x: 10, y: 180,
-					width: 400,
-					labelWidth: 250
+					x: 200, y: 220, width: 250,
+					labelWidth: 140
 				}]
 			},{
 				xtype: 'panel',
 				layout: 'border',
 				region: 'center',
 				items: [{
+					id: 'cat_form_cat_vehiculo_panel',
+					xtype: 'panel',
+					region: 'north',
+					height: 30,
+					tbar:[{
+						text: 'Vehiculos y conductores &hellip;',
+						handler: function () {
+							var doc_id = Ext.getCmp('cat_form_cat_id_field').getValue();
+							if ( doc_id > 0) {
+								cat.cat_vehiculo_list_window(doc_id);
+							}
+						}
+					}]
+				},{
 					xtype: 'grid',
-					id: 'lc_form_doc_requisito_grid',
+					id: 'cat_form_doc_requisito_grid',
 					region: 'center', 
 					//split:true, 
 					//forceFit:true,
 					sortableColumns: false,
 					enableColumnHide: false,
-					store: lc.doc_requisito_store,
+					store: cat.doc_requisito_store,
 					columns:[
 						{text:'Documento', dataIndex: 'tipo_doc_requisito_desc', width: 190,
 							renderer: function (value, metaData, record) {
@@ -387,31 +417,31 @@
 						text: 'Agregar o Modifcar', 
 						tooltip: 'Agregar o Modificar documento', tooltipType: 'title',
 						handler: function() {
-							lc.doc_requisito_add_or_edit();
+							cat.doc_requisito_add_or_edit();
 						}
 					},{
 						text: '-', 
 						tooltip: 'Quitar', tooltipType: 'title',
 						handler: function() {
-							lc.doc_requisito_delete_window();
+							cat.doc_requisito_delete_window();
 						}
 					}],
 					listeners: {
 						rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
-							lc.doc_requisito_add_or_edit();
+							cat.doc_requisito_add_or_edit();
 						}
 					},
-					hidden: false // hide on new lc
+					hidden: false // hide on new cat
 				},{
 					xtype: 'grid',
-					id: 'lc_form_doc_estado_grid',
+					id: 'cat_form_doc_estado_grid',
 					region: 'south', 
 					height: 200,
 					//split:true, 
 					//forceFit:true,
 					sortableColumns: false,
 					enableColumnHide: false,
-					store: lc.doc_estado_store,
+					store: cat.doc_estado_store,
 					columns:[
 						{	
 							text:'Estado', dataIndex: 'estado_doc_desc', width: 150,
@@ -433,10 +463,10 @@
 				                icon: 'tools/icons/accept.png',  // Use a URL in the icon config
 				                tooltip: 'Establecer estado', tooltipType: 'title',
 				                handler: function(grid, rowIndex, colIndex, item, e, record) {
-				                    lc.doc_estado_add_window(record);
+				                    cat.doc_estado_add_window(record);
 				                },
 				                isDisabled: function (view, rowIndex, colIndex, item, record) {
-				                	var doc = Ext.getCmp('lc_form').getRecord();
+				                	var doc = Ext.getCmp('cat_form').getRecord();
 				                	return !(
 				                		record.get('estado_doc_index') > 1 // no es inicial
 				                		&& record.get('doc_estado_id') == null // no tiene registro
@@ -450,10 +480,10 @@
 				                icon: 'tools/icons/arrow_undo.png',  // Use a URL in the icon config
 				                tooltip: 'Cancelar estado', tooltipType: 'title',
 				                handler: function(grid, rowIndex, colIndex, item, e, record) {
-				                    lc.doc_estado_delete_window(record);
+				                    cat.doc_estado_delete_window(record);
 				                },
 				                isDisabled: function (view, rowIndex, colIndex, item, record) {
-				                	var doc = Ext.getCmp('lc_form').getRecord();
+				                	var doc = Ext.getCmp('cat_form').getRecord();
 				                	return !(
 				                		record.get('estado_doc_index') > 1 // no es inicial (el estado incial no se puede revertir)
 				                		&& record.get('doc_estado_id') != null // no tiene registro
@@ -470,56 +500,56 @@
 						text: 'Continuar', 
 						tooltip: 'Modificar documento', tooltipType: 'title',
 						handler: function() {
-							lc.doc_requisito_add_or_edit();
+							cat.doc_requisito_add_or_edit();
 						},
 						hidden: true
 					}],
 					listeners: {
 						rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
-							//lc.doc_requisito_add_or_edit();
+							//cat.doc_requisito_add_or_edit();
 						}
 					},
-					hidden: false // hide on new lc
+					hidden: false // hide on new cat
 				}]
 			}]
 		}]
 	});
 
-	lc.reload_list = function (select_id) {
-		lc.lc_id_selected = select_id||0;
-		//lc.main_store.reload();
-		lc.main_store.reload({
+	cat.reload_list = function (select_id) {
+		cat.cat_id_selected = select_id||0;
+		//cat.main_store.reload();
+		cat.main_store.reload({
 			params: {
-				search_by: Ext.getCmp('lc_search_by_cb').getValue(),
-				search_text: Ext.getCmp('lc_search_text').getValue()
+				search_by: Ext.getCmp('cat_search_by_cb').getValue(),
+				search_text: Ext.getCmp('cat_search_text').getValue()
 			}
 		});
 	};
 
-	lc.doc_requisito_reload_list = function (doc_id) {
-		lc.doc_requisito_store.reload({
+	cat.doc_requisito_reload_list = function (doc_id) {
+		cat.doc_requisito_store.reload({
 			params: {
 				doc_id: doc_id
 			}
 		});
 	};
 
-	lc.doc_requisito_add_or_edit = function () {
-		var rows = Ext.getCmp('lc_form_doc_requisito_grid').getSelection();
+	cat.doc_requisito_add_or_edit = function () {
+		var rows = Ext.getCmp('cat_form_doc_requisito_grid').getSelection();
 		if (rows.length > 0) {
 			record = rows[0];
 			if ( record.get('doc_requisito_id') > 0 ) {
-				lc.doc_requisito_edit_window();
+				cat.doc_requisito_edit_window();
 			} else {
-				lc.doc_requisito_add_window();
+				cat.doc_requisito_add_window();
 			}
 		} else {
 			Ext.Msg.alert('Agregar o Modificar documento', 'Seleccione un registro por favor.');
 		}
 	};
 
-	lc.doc_estado_reload_list = function (doc_id) {
-		lc.doc_estado_store.reload({
+	cat.doc_estado_reload_list = function (doc_id) {
+		cat.doc_estado_store.reload({
 			params: {
 				doc_id: doc_id
 			}

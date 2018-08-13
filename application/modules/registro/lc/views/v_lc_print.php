@@ -1,15 +1,15 @@
 <script>
-	clit.print_window = function(record) {
+	lc.print_window = function(record) {
 		var w_config = {
 			title: 'Ver documento PDF', 
 			modal: true,
 			width: 850,
 			height: 600, 
-			id:'clit_print_window',
+			id:'lc_print_window',
 			loader: {
-				url: 'clit/printPreview',
+				url: 'lc/printPreview',
 				params: {
-		            doc_id: record.get('clit_id')
+		            doc_id: record.get('lc_id')
 		        },
 				autoLoad: true,
 				scripts: true,

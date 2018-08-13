@@ -138,11 +138,11 @@
 							handler: sys_menu_item_handler,
 							hidden: !<?php echo sys_session_hasRoleToString('registro.lc'); ?>
 						},{
-							text: 'Autorizaciones Temporales &nbsp;', 
+							text: 'Constancia de Autorizaciones Temporales &nbsp;', 
 							module: {
-								title: 'Autorizaciones Temporales',
-								name: 'at',
-								url: 'at/at'
+								title: 'Constancia de Autorizaciones Temporales',
+								name: 'cat',
+								url: 'cat/cat'
 							},
 							handler: sys_menu_item_handler,
 							hidden: !<?php echo sys_session_hasRoleToString('registro.at'); ?>

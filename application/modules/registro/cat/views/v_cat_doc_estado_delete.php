@@ -1,5 +1,5 @@
 <script>
-	clit.doc_estado_delete_window = function(record) {
+	cat.doc_estado_delete_window = function(record) {
 		Ext.Msg.show({
 		    title: 'Control de estado',
 		    message: 'Realmente desea revertir el estado?',
@@ -11,12 +11,12 @@
 						params: {
 							doc_estado_id: record.get('doc_estado_id')
 						},
-						url: 'clit/deleteDocEstado',
+						url: 'cat/deleteDocEstado',
 						success: function (response, opts) {
 							var result = Ext.decode(response.responseText);
 							if (result.success) {
 								Ext.Msg.alert('Documento', result.msg);
-								clit.reload_list(record.get('doc_id'));
+								cat.reload_list(record.get('doc_id'));
 							} else {
 								Ext.Msg.alert('Documento', result.msg);
 							}

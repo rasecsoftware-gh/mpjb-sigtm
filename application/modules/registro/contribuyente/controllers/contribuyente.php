@@ -68,7 +68,7 @@ class Contribuyente extends MX_Controller {
 			'contribuyente_telefono'=>$this->input->post('contribuyente_telefono'),
 			'contribuyente_email'=>$this->input->post('contribuyente_email'),
 			'contribuyente_observacion'=>$this->input->post('contribuyente_observacion'),
-			
+			'contribuyente_fecha_nac'=>trim($this->input->post('contribuyente_fecha_nac')),
 			'contribuyente_estado'=>'A',
 		);
 
@@ -117,6 +117,16 @@ class Contribuyente extends MX_Controller {
 			)));
 		}
 
+		if ( $data['contribuyente_fecha_nac'] == '' ) {
+			$data['contribuyente_fecha_nac'] = null;
+		} elseif ( strlen($data['contribuyente_fecha_nac']) != 10 ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique una fecha valida",
+				'target_id'=>'contribuyente_form_contribuyente_fecha_nac_field'
+			)));
+		}
+
 		try {
 			$result = $this->model->add($data);
 		} catch (Exception $ex) {
@@ -152,8 +162,8 @@ class Contribuyente extends MX_Controller {
 			'contribuyente_direccion'=>to_upper($this->input->post('contribuyente_direccion')),
 			'contribuyente_telefono'=>$this->input->post('contribuyente_telefono'),
 			'contribuyente_email'=>$this->input->post('contribuyente_email'),
-			'contribuyente_observacion'=>$this->input->post('contribuyente_observacion')
-			//'contribuyente_estado'=>$this->input->post('contribuyente_estado'),
+			'contribuyente_observacion'=>$this->input->post('contribuyente_observacion'),
+			'contribuyente_fecha_nac'=>trim($this->input->post('contribuyente_fecha_nac'))
 		);
 
 		if (trim($data['contribuyente_numero_doc'])=='') {
@@ -191,6 +201,16 @@ class Contribuyente extends MX_Controller {
 				'success'=>false,
 				'msg'=>"Especifique los apellidos",
 				'target_id'=>'contribuyente_form_contribuyente_apellidos_field'
+			)));
+		}
+
+		if ( $data['contribuyente_fecha_nac'] == '' ) {
+			$data['contribuyente_fecha_nac'] = null;
+		} elseif ( strlen($data['contribuyente_fecha_nac']) != 10 ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique una fecha valida",
+				'target_id'=>'contribuyente_form_contribuyente_fecha_nac_field'
 			)));
 		}
 

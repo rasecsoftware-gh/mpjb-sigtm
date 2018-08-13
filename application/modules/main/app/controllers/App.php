@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Viewport extends MX_Controller {
+class App extends MX_Controller {
 
 	public function __construct()
 	{
@@ -15,7 +15,7 @@ class Viewport extends MX_Controller {
 	public function index()
 	{
 		
-		$this->load->view('v_viewport');
+		$this->load->view('v_app');
 	}
 }
 ?>

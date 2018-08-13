@@ -55,7 +55,7 @@
 				    	    		success:function(resp, opts){
 				    	    			obj = Ext.decode(resp.responseText);
 				    	    			if(obj.msg == 'true'){
-				    	    				window.location.replace("viewport");
+				    	    				window.location.replace("app");
 				    	    			}else{
 				    	    				lbl = Ext.getCmp('login.message');
 				    	    				lbl.setText(obj.msg);

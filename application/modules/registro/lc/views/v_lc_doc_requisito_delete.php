@@ -1,6 +1,6 @@
 <script>
-	clit.doc_requisito_delete_window = function() {
-		var rows = Ext.getCmp('clit_form_doc_requisito_grid').getSelection();
+	lc.doc_requisito_delete_window = function() {
+		var rows = Ext.getCmp('lc_form_doc_requisito_grid').getSelection();
 		var record = null;
 		if (rows.length > 0) {
 			record = rows[0];
@@ -24,12 +24,12 @@
 						params: {
 							doc_requisito_id: record.get('doc_requisito_id')
 						},
-						url: 'clit/deleteDocRequisito',
+						url: 'lc/deleteDocRequisito',
 						success: function (response, opts) {
 							var result = Ext.decode(response.responseText);
 							if (result.success) {
 								Ext.Msg.alert('Documento', result.msg);
-								clit.doc_requisito_reload_list(record.get('doc_id'));
+								lc.doc_requisito_reload_list(record.get('doc_id'));
 							} else {
 								Ext.Msg.alert('Documento', result.msg);
 							}
