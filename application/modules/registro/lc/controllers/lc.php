@@ -852,7 +852,7 @@ class LC extends MX_Controller {
 				$this->model->update(
 					array(
 						'lc_id'=>$p_doc_id,
-						'lc_pdf'=>$filename
+						'lc_resolucion_pdf'=>$filename
 					)
 				);
 				die(json_encode(array (
@@ -880,7 +880,7 @@ class LC extends MX_Controller {
 		//die(FCPATH);
 		$p_doc_id = $this->input->post('doc_id');
 		$doc = $this->model->get_row($p_doc_id);
-		$filename = $doc->lc_pdf;
+		$filename = $doc->lc_resolucion_pdf;
 		if (file_exists(FCPATH."dbfiles/public.lc/".$filename) && $filename != '') {
 			$url = $this->config->item('base_url')."dbfiles/public.lc/{$filename}";
 			echo "<embed src=\"{$url}\" type=\"application/pdf\" width=\"100%\" height=\"100%\"></embed>";

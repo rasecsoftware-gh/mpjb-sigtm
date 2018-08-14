@@ -28,7 +28,7 @@
 		                    lc.print_window(record);
 		                },
 		                isDisabled: function (view, rowIndex, colIndex, item, record) {
-		                	return !($.trim(record.get('lc_pdf')).length > 0);
+		                	return !($.trim(record.get('lc_resolucion_pdf')).length > 0);
 		                }
 		            }]
 		        },
