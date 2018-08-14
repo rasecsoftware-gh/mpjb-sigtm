@@ -17,6 +17,7 @@
 				{text:'Nombres o Razon social', dataIndex:'contribuyente_nombres', width: 230},
 				{text:'Apellidos', dataIndex:'contribuyente_apellidos', width: 150},
 				{text:'Direccion', dataIndex:'contribuyente_direccion', width: 150},
+				{text:'Telefono', dataIndex:'contribuyente_telefono', width: 80},
 				{text:'Estado', dataIndex:'contribuyente_estado', width: 50,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
 					    switch (value) {
