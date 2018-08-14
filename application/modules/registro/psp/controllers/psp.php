@@ -437,7 +437,7 @@ class PSP extends MX_Controller {
 			)));
 		}
 
-		if ( $data['doc_requisito_numero'] == '' ) {
+		if ( $data['doc_requisito_numero'] == ''  && $tipo_doc_requisito->tipo_doc_requisito_numero_flag == 'S' ) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Numero",
@@ -518,7 +518,7 @@ class PSP extends MX_Controller {
 			)));
 		}
 
-		if ( $data['doc_requisito_numero'] == '' ) {
+		if ( $data['doc_requisito_numero'] == ''  && $tipo_doc_requisito->tipo_doc_requisito_numero_flag == 'S' ) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique el Numero",
