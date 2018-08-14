@@ -208,7 +208,7 @@ class LC extends MX_Controller {
 	}
 
 	public function Update() {
-		//sys_session_hasRoleOrDie('lc.update');
+		sys_session_hasRoleOrDie('lc.update');
 		$data = array(
 			'lc_id'=>$this->input->post('lc_id'),
   			'lc_anio'=>trim($this->input->post('lc_anio')),

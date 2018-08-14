@@ -76,7 +76,8 @@
     				xtype: 'filefield',
     				name: 'doc_requisito_file',
     				labelStyle : (record.get('tipo_doc_requisito_pdf_flag') == 'N' ? 'color: gray;': ''),
-    				x: 10, y: 130, width: 400
+    				x: 10, y: 130, width: 400,
+    				accept: 'application/pdf'
 				}]
 			}],
 			buttons:[{
