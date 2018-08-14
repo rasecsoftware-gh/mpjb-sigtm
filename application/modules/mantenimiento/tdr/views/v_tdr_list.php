@@ -11,8 +11,9 @@
 			sortableColumns: false,
 			enableColumnHide: false,
 			columns:[
-				{text:'Tipo Doc.', dataIndex:'tipo_doc_id', width: 60},
-				{text:'Descripcion', dataIndex:'tipo_doc_requisito_desc', width: 300},
+				{text:'TD', dataIndex:'tipo_doc_id', width: 40},
+				{text:'Tipo Documento', dataIndex:'tipo_doc_desc', width: 150},
+				{text:'Descripcion', dataIndex:'tipo_doc_requisito_desc', width: 250},
 				{text:'Requerido', dataIndex:'tipo_doc_requisito_requerido_flag', width: 60},
 				{text:'Escaneado Req.', dataIndex:'tipo_doc_requisito_pdf_flag', width: 70},
 				{text:'Numero Req.', dataIndex:'tipo_doc_requisito_numero_flag', width: 60},

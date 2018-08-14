@@ -146,9 +146,9 @@
 <?php echo $this->load->view('v_lc_doc_requisito_delete'); ?>
 <?php echo $this->load->view('v_lc_doc_estado_add'); ?>
 <?php echo $this->load->view('v_lc_doc_estado_delete'); ?>
-<?php //echo $this->load->view('v_lc_plantilla_cambiar'); ?>
-<?php //echo $this->load->view('v_lc_pdf_generar'); ?>
-<?php //echo $this->load->view('v_lc_print'); ?>
+<?php echo $this->load->view('v_lc_plantilla_cambiar'); ?>
+<?php echo $this->load->view('v_lc_pdf_generar'); ?>
+<?php echo $this->load->view('v_lc_print'); ?>
 <?php echo $this->load->view('syslog/v_syslog'); ?>
 
 <script type="text/javascript">

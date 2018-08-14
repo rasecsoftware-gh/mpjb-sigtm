@@ -777,10 +777,10 @@ class LC extends MX_Controller {
 		$td = $this->db->where('tipo_doc_id', $c['tipo_doc_id'])->get('public.tipo_doc')->row();
 		$p = $this->db->where('plantilla_id', $c['plantilla_id'])->get('public.plantilla')->row();
 
-		$config_list = $this->db->select('config_id, config_value')->get('sys.config')->result();
+		$config_list = $this->db->select('config_id, config_valor')->get('sys.config')->result();
 		$config = array();
 		foreach ($config_list as $r) {
-			$config[$r->config_id] = $r->config_value;
+			$config[$r->config_id] = $r->config_valor;
 		}
 
 		
@@ -797,7 +797,7 @@ class LC extends MX_Controller {
 		$c['lc_resolucion_fecha_desc'] = $c['lc_resolucion_fecha_dia'].' de '.month_name(intval($c['lc_resolucion_fecha_mes'])).' del '.$c['lc_resolucion_fecha_anio'];
 
 		// documentos adjuntos requeridos con keyname
-		$doc_requisito_list = $this->model->get_doc_requisito_list($doc_id);
+		$doc_requisito_list = $this->model->get_doc_requisito_list($doc_id)['data'];
 		foreach ($doc_requisito_list as $dr) {
 			if ($dr->tipo_doc_requisito_keyname != '') {
 				$prefijo = 'dr_'.$dr->tipo_doc_requisito_keyname;
