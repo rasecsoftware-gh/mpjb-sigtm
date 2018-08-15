@@ -358,8 +358,8 @@ class Cat extends MX_Controller {
 			)));
 		}
 
-		$lc_count = $this->db->select('COUNT(*) AS value')->where('cat_id', $p_cat_id)->get('public.lc')->row();
-		if ($lc_count->value > 0) {
+		$cat_count = $this->db->select('COUNT(*) AS value')->where('cat_id', $p_cat_id)->get('public.lc')->row();
+		if ($cat_count->value > 0) {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"El cat tiene Licencias de Conducir registrado(s)."
@@ -905,7 +905,7 @@ class Cat extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique Numero de licencia de conducir",
-				'target_id'=>'cat_vehiculo_form_cat_vehiculo_conductor_nlc_field'
+				'target_id'=>'cat_vehiculo_form_cat_vehiculo_conductor_ncat_field'
 			)));
 		}
 
@@ -1023,7 +1023,7 @@ class Cat extends MX_Controller {
 			die(json_encode(array(
 				'success'=>false,
 				'msg'=>"Especifique Numero de licencia de conducir",
-				'target_id'=>'cat_vehiculo_form_cat_vehiculo_conductor_nlc_field'
+				'target_id'=>'cat_vehiculo_form_cat_vehiculo_conductor_ncat_field'
 			)));
 		}
 
@@ -1054,17 +1054,78 @@ class Cat extends MX_Controller {
 		$td = $this->db->where('tipo_doc_id', $c['tipo_doc_id'])->get('public.tipo_doc')->row();
 		$p = $this->db->where('plantilla_id', $c['plantilla_id'])->get('public.plantilla')->row();
 
-		$cfg = array();
-		//$cfg = $this->db->where('config_id', 1)->get('sys.config')->row(0, 'array');
-		//$cfg['entidad_nombre_mayus'] = strtoupper($cfg['entidad_nombre']);
+		$config_list = $this->db->select('config_id, config_valor')->get('sys.config')->result();
+		$config = array();
+		foreach ($config_list as $r) {
+			$config[$r->config_id] = $r->config_valor;
+		}
+
 		
 		$c['tipo_doc_desc'] = to_upper($c['tipo_doc_desc']);
 
 		// 02/06/2018
-		$c['cat_fecha_dia_numero'] = substr($c['cat_fecha'], 0, 2);
-		$meses = array('', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre');
-		$c['cat_fecha_mes_nombre'] = $meses[intval(substr($c['cat_fecha'], 3, 2))];
+		$c['cat_fecha_dia'] = substr($c['cat_fecha'], 0, 2);
+		$c['cat_fecha_mes'] = substr($c['cat_fecha'], 3, 2);
 		$c['cat_fecha_anio'] = substr($c['cat_fecha'], 6, 4);
+		$c['cat_fecha_desc'] = $c['cat_fecha_dia'].' de '.month_name(intval($c['cat_fecha_mes'])).' del '.$c['cat_fecha_anio'];
+
+		$c['cat_fecha_inicio_dia'] = substr($c['cat_fecha_inicio'], 0, 2);
+		$c['cat_fecha_inicio_mes'] = substr($c['cat_fecha_inicio'], 3, 2);
+		$c['cat_fecha_inicio_anio'] = substr($c['cat_fecha_inicio'], 6, 4);
+		$c['cat_fecha_inicio_desc'] = $c['cat_fecha_inicio_dia'].' de '.month_name(intval($c['cat_fecha_inicio_mes'])).' del '.$c['cat_fecha_inicio_anio'];
+
+		$c['cat_fecha_fin_dia'] = substr($c['cat_fecha_fin'], 0, 2);
+		$c['cat_fecha_fin_mes'] = substr($c['cat_fecha_fin'], 3, 2);
+		$c['cat_fecha_fin_anio'] = substr($c['cat_fecha_fin'], 6, 4);
+		$c['cat_fecha_fin_desc'] = $c['cat_fecha_fin_dia'].' de '.month_name(intval($c['cat_fecha_fin_mes'])).' del '.$c['cat_fecha_fin_anio'];
+
+		// documentos adjuntos requeridos con keyname
+		$doc_requisito_list = $this->model->get_doc_requisito_list($doc_id)['data'];
+		foreach ($doc_requisito_list as $dr) {
+			if ($dr->tipo_doc_requisito_keyname != '') {
+				$prefijo = 'dr_'.$dr->tipo_doc_requisito_keyname;
+				$c["{$prefijo}_fecha_dia"] = substr($dr->doc_requisito_fecha, 0, 2);
+				$c["{$prefijo}_fecha_mes"] = substr($dr->doc_requisito_fecha, 3, 2);
+				$c["{$prefijo}_fecha_anio"] = substr($dr->doc_requisito_fecha, 6, 4);
+				$c["{$prefijo}_fecha_desc"] = $c["{$prefijo}_fecha_dia"].' de '.month_name(intval($c["{$prefijo}_fecha_mes"])).' del '.$c["{$prefijo}_fecha_anio"];
+				$c["{$prefijo}_fecha"] = $dr->doc_requisito_fecha;
+				$c["{$prefijo}_numero"] = $dr->doc_requisito_numero;
+			}
+		}
+
+		$cat_vehiculo_list = $this->model->get_vehiculo_list($doc_id)['data'];
+		if ( count($cat_vehiculo_list) == 1 ) {
+			foreach ($cat_vehiculo_list as $i=>$dr) {
+				$prefijo = 'cat_vehiculo';
+				$c["{$prefijo}_categoria"] = $dr->cat_vehiculo_categoria;
+				$c["{$prefijo}_marca"] = $dr->cat_vehiculo_marca;
+				$c["{$prefijo}_modelo"] = $dr->cat_vehiculo_modelo;
+				$c["{$prefijo}_color"] = $dr->cat_vehiculo_color;
+				$c["{$prefijo}_placa"] = $dr->cat_vehiculo_placa;
+				$c["{$prefijo}_ntp"] = $dr->cat_vehiculo_ntp;
+				$c["{$prefijo}_conductor_nomape"] = $dr->cat_vehiculo_conductor_nomape;
+				$c["{$prefijo}_conductor_dni"] = $dr->cat_vehiculo_conductor_dni;
+				$c["{$prefijo}_conductor_nlc"] = $dr->cat_vehiculo_conductor_nlc;
+				break; // only one!
+			}
+
+		} else {
+			// tabla
+			foreach ($cat_vehiculo_list as $i=>$dr) {
+				$prefijo = 'cat_vehiculo'.($i+1);
+				$c["{$prefijo}_categoria"] = $dr->cat_vehiculo_categoria;
+				$c["{$prefijo}_marca"] = $dr->cat_vehiculo_marca;
+				$c["{$prefijo}_modelo"] = $dr->cat_vehiculo_modelo;
+				$c["{$prefijo}_color"] = $dr->cat_vehiculo_color;
+				$c["{$prefijo}_placa"] = $dr->cat_vehiculo_placa;
+				$c["{$prefijo}_ntp"] = $dr->cat_vehiculo_ntp;
+				$c["{$prefijo}_conductor_nomape"] = $dr->cat_vehiculo_conductor_nomape;
+				$c["{$prefijo}_conductor_dni"] = $dr->cat_vehiculo_conductor_dni;
+				$c["{$prefijo}_conductor_nlc"] = $dr->cat_vehiculo_conductor_nlc;
+			}
+		}
+		
+		
 		
 		$path_archivo = FCPATH.'dbfiles/public.plantilla/'.$p->plantilla_archivo;
 		if ( !(file_exists($path_archivo) && $p->plantilla_archivo != '') ) {
@@ -1076,8 +1137,8 @@ class Cat extends MX_Controller {
 	    foreach ($var_list as $key => $value) {
 	        if (array_key_exists($value, $c)) {
 	            $t->setValue($value, $c[$value]);
-	        } elseif (array_key_exists($value, $cfg)) {
-	        	$t->setValue($value, $cfg[$value]);
+	        } elseif (array_key_exists($value, $config)) {
+	        	$t->setValue($value, $config[$value]);
 	        } elseif ($value=='no-tiene') {
 	        	$t->setValue($value, '');
 	        } else {
@@ -1116,7 +1177,7 @@ class Cat extends MX_Controller {
 					'filename'=>$filename
 				)));
 			} catch (Exception $ex) {
-				die(json_encode(array (
+				die(json_encode(array(
 					'success'=>false,
 					'msg'=>$ex->getMessage()
 				)));

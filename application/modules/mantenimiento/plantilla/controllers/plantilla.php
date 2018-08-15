@@ -275,10 +275,10 @@ class Plantilla extends MX_Controller {
 			)));
 		}
 
-		$plantilla = $this->model->get_row($data['plantilla_id']);
+		$plantilla = $this->model->get_row($p_plantilla_id);
 
 		$result = $this->model->delete($p_plantilla_id);
-
+		$upload_path = 'dbfiles/public.plantilla/';
 		if ($result !== false) {
 			// move to deleted
 			if (file_exists($upload_path.$plantilla->plantilla_archivo) && trim($plantilla->plantilla_archivo)!='') {

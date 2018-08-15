@@ -148,16 +148,16 @@
 							hidden: !<?php echo sys_session_hasRoleToString('registro.at'); ?>
 						}]
 					},{
-						text: 'Consultas y Reportes', 
+						text: 'Reportes', 
 						menu:[{
-							text: 'Consulta de Ficha Tecnica de Transporte&nbsp;', 
+							text: 'Reporte de Ficha Tecnica de Transporte&nbsp;', 
 							module: {
-								title: 'Consulta de Ficha Tecnica de Transporte',
-								name: 'con_ftt',
-								url: 'con_ftt/con_ftt'
+								name: 'rep_ftt',
+								url: '<?php echo base_url('rep_ftt')?>',
+								open_as: 'window'
 							},
 							handler: sys_menu_item_handler,
-							hidden: !<?php echo sys_session_hasRoleToString('cr.con_ftt'); ?>
+							hidden: !<?php echo sys_session_hasRoleToString('reporte.con_ftt'); ?>
 						},'-',{
 							text: 'Reporte de Contribuyentes &nbsp;', 
 							module: {
@@ -254,7 +254,16 @@
 
 		function sys_menu_item_handler (item) {
 	        var m = item.module;
-	        sys_add_tab(m.title, m.name, m.url);
+	        var open_as = Ext.isDefined(m.open_as)?m.open_as:'tab';
+	        switch (open_as) {
+	        	case 'tab':
+	        		sys_add_tab(m.title, m.name, m.url);
+	        		break;
+	        	case 'window':
+	        		window.open(m.url, '_blank');
+	        		break;
+	        }
+	        
 	        //Ext.Msg.alert('Item', item.text);
 	    };
 

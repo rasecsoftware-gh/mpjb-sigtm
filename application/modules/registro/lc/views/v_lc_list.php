@@ -254,7 +254,7 @@
     						Ext.getCmp('lc_form_contribuyente_numero_doc_field').setValue(record.get('contribuyente_numero_doc'));
     						Ext.getCmp('lc_form_contribuyente_fecha_nac_field').setValue(record.get('contribuyente_fecha_nac'));
     						if (Ext.getCmp('lc_form_lc_codigo_field').getValue().trim() == '') {
-    							Ext.getCmp('lc_form_lc_codigo_field').setValue('K'+record.get('contribuyente_numero_doc'));
+    							Ext.getCmp('lc_form_lc_codigo_field').setValue('KJB'+record.get('contribuyente_numero_doc'));
     						}
 				    	}
     				},
@@ -352,7 +352,8 @@
 					id: 'lc_form_lc_codigo_field',
     				xtype: 'textfield',
     				name: 'lc_codigo',
-    				x: 10, y: 190, width: 160
+    				x: 10, y: 190, width: 160,
+    				maxLength: 11
 				},{ 
 					fieldLabel: 'Grupo Sang.',
 					id: 'lc_form_lc_grupo_s_field',
