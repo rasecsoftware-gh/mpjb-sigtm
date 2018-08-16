@@ -36,8 +36,14 @@
 		margin: 0!important;
 		padding: 0!important;
 	}
+	input {
+		border: none!important;
+	}
 }
 
+input {
+		padding: 3px;
+}
 .hidable {}
 
 .printable {
