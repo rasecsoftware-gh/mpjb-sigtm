@@ -23,7 +23,7 @@
 			    			var frm = Ext.getCmp('psp_form');
 			    			frm.reset();
 							frm.loadRecord(record);
-							Ext.getCmp('psp_form_title_label').setText('Nuevo Permiso');
+							Ext.getCmp('psp_form_title_label').setText('Nuevo ' + psp.title);
 							Ext.getCmp('psp_form_save_bt').setText('Guardar y continuar...');
 							Ext.getCmp('psp_form_save_bt').show();
 							Ext.getCmp('psp_form_cancel_bt').show();
@@ -31,6 +31,7 @@
 							Ext.getCmp('psp_form_contribuyente_nomape_field').hide();
 							Ext.getCmp('psp_form_doc_requisito_grid').disable();
 							Ext.getCmp('psp_form_doc_estado_grid').disable();
+							Ext.getCmp('psp_form_psp_vehiculo_panel').disable();
 							w.unmask();
 			    		});
 					} else {

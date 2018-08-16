@@ -134,7 +134,7 @@
 					if (!psp.form_editing) {
 						var f = Ext.getCmp('psp_form');
 						f.loadRecord(record);
-						Ext.getCmp('psp_form_title_label').setText('Permiso de Servicio Publico');
+						Ext.getCmp('psp_form_title_label').setText(psp.title);
 						Ext.getCmp('psp_form_psp_id_displayfield').setValue(record.get('psp_id'));
 						Ext.getCmp('psp_form_save_bt').hide();
 						Ext.getCmp('psp_form_cancel_bt').hide();
@@ -142,6 +142,7 @@
 						Ext.getCmp('psp_form_contribuyente_nomape_field').show();
 						Ext.getCmp('psp_form_doc_requisito_grid').enable();
 						Ext.getCmp('psp_form_doc_estado_grid').enable();
+						Ext.getCmp('psp_form_psp_vehiculo_panel').enable();
 						psp.doc_requisito_reload_list(record.get('psp_id'));
 						psp.doc_estado_reload_list(record.get('psp_id'));
 					}
@@ -172,7 +173,7 @@
 				tbar:[{
 					xtype: 'label',
 					id: 'psp_form_title_label',
-					text: 'Permiso de Servicio Publico',
+					text: psp.title,
 					style: {
 						fontWeight: 'bold'
 					}
@@ -211,12 +212,14 @@
 					id: 'psp_form_cancel_bt',
 					hidden: true,
 					handler: function () {
+						Ext.getCmp('psp_form_title_label').setText(psp.title);
 						Ext.getCmp('psp_form_save_bt').hide();
 						Ext.getCmp('psp_form_cancel_bt').hide();
 						Ext.getCmp('psp_form_contribuyente_id_field').hide();
 						Ext.getCmp('psp_form_contribuyente_nomape_field').show();
 						Ext.getCmp('psp_form_doc_requisito_grid').enable();
 						Ext.getCmp('psp_form_doc_estado_grid').enable();
+						Ext.getCmp('psp_form_psp_vehiculo_panel').enable();
 						psp.form_editing = false;
 					}
 				}],
@@ -356,6 +359,7 @@
 				region: 'center',
 				items: [{
 					xtype: 'panel',
+					id: 'psp_form_psp_vehiculo_panel',
 					region: 'north',
 					height: 30,
 					tbar:[{

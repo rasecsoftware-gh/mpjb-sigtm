@@ -1,6 +1,7 @@
 <script type="text/javascript">
 	/********************* generamos el name espace ***************************/
 	psp = {};
+	psp.title = 'Permiso de Servicio Publico';
 	// general stores
 	psp.contribuyente_store = Ext.create("Ext.data.Store", {
 		proxy:{

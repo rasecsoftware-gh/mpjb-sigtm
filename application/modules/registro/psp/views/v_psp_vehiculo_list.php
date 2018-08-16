@@ -93,6 +93,7 @@
 							    			frm.reset();
 											frm.loadRecord(record);
 											Ext.getCmp('psp_vehiculo_form_title_label').setText('Nuevo Vehiculo');
+											Ext.getCmp('psp_vehiculo_form_update_bt').enable();
 											w.unmask();
 							    		});
 
@@ -148,6 +149,7 @@
 						Ext.getCmp('psp_vehiculo_form').reset();
 						Ext.getCmp('psp_vehiculo_form_title_label').setText('Datos del Vehiculo');
 						Ext.getCmp('psp_vehiculo_form').loadRecord(record);
+						Ext.getCmp('psp_vehiculo_form_update_bt').enable();
 					}
 				}
 			},{
@@ -193,7 +195,8 @@
 									});
 								}
 							});
-						}
+						},
+						disabled: true
 					}],
 					items: [{
 						xtype: 'hidden',

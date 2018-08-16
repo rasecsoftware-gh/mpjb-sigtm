@@ -31,13 +31,14 @@
 						], function () {
 							var frm = Ext.getCmp('psp_form');
 							frm.loadRecord(record);
-							Ext.getCmp('psp_form_title_label').setText('Modificar Permiso');
+							Ext.getCmp('psp_form_title_label').setText('Modificar ' + psp.title);
 							Ext.getCmp('psp_form_save_bt').show();
 							Ext.getCmp('psp_form_cancel_bt').show();
 							Ext.getCmp('psp_form_contribuyente_id_field').show();
 							Ext.getCmp('psp_form_contribuyente_nomape_field').hide();
 							Ext.getCmp('psp_form_doc_requisito_grid').disable();
 							Ext.getCmp('psp_form_doc_estado_grid').disable();
+							Ext.getCmp('psp_form_psp_vehiculo_panel').disable();
 							w.unmask();
 						});
 					} else {

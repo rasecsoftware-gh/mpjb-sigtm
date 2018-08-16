@@ -648,6 +648,7 @@ class PSP extends MX_Controller {
 			$tipo_doc_requisito_requerido_count = $this->db
 			->select('COUNT(*) AS value')
 			->where('tipo_doc_id', $data['tipo_doc_id'])
+			->where('tipo_permiso_id', $doc->tipo_permiso_id)
 			->where('tipo_doc_requisito_estado', 'A')
 			->where('tipo_doc_requisito_requerido_flag', 'S')
 			->get('public.tipo_doc_requisito')->row();
