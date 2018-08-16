@@ -224,7 +224,7 @@
 					items: {
 						title:'Inicio',
 						bodyPadding: 20,
-        				html : 'Bienvenido!'
+        				html : 'Bienvenido al sistema...'
 					}
 				}]
 			});
