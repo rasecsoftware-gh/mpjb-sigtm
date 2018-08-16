@@ -42,7 +42,7 @@
 				    	}
 				    }],
 				    buttons: [{
-				        text: 'Login',
+				        text: 'Acceder',
 				        formBind: true,
 				        listeners: {
 				    	    click: function() {
