@@ -1,5 +1,5 @@
 <?php
-	$title = "Reporte de Contribuyentes";
+	$title = "Reporte de Constancias de Libre Infraccion de Transito";
 ?>
 <!DOCTYPE html>
 <html>
@@ -56,24 +56,16 @@
 			</td>
 		</tr>
 		<tr>
-			<td><label for="tipo_doc_identidad_id_field">Tipo de Documento de Identidad:</label></td>
+			<td>Contribuyente:</td>
 			<td>
-
-			    <select id="tipo_doc_identidad_id_field" name="tipo_doc_identidad_id" style="width: 200px;">
-<?php 
-	foreach ($tipo_doc_identidad_list as $r):
-		$selected = '';
-		if ( $r->tipo_doc_identidad_id == $p_tipo_doc_identidad_id ) {
-			$selected = 'selected="selected"';
-		}
-?>
-			      <option value="<?=$r->tipo_doc_identidad_id?>" <?=$selected?> ><?=$r->tipo_doc_identidad_desc?></option>
-<?php
-	endforeach;
-?>			      
-			    </select>
+				<input type="text" id="contribuyente_desc_field" name="contribuyente_desc" value="<?=$contribuyente_desc?>" style="width: 400px;"/>
 				<script>
-				$("#tipo_doc_identidad_id_field").selectmenu();
+				$("#contribuyente_desc_field").autocomplete({
+					source: 'rep_ftt/getContribuyenteList',
+					select: function( event, ui ) {
+						$('#contribuyente_id_field').val(ui.item.contribuyente_id);
+					}
+				});
 				</script>
 			</td>
 		</tr>
