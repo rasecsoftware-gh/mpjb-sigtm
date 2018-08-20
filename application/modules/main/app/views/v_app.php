@@ -146,6 +146,24 @@
 							},
 							handler: sys_menu_item_handler,
 							hidden: !<?php echo sys_session_hasRoleToString('registro.at'); ?>
+						},'-',{
+							text: 'Papeletas &nbsp;', 
+							module: {
+								title: 'Papeletas',
+								name: 'papeleta',
+								url: 'papeleta/papeleta'
+							},
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('registro.papeleta'); ?>
+						},{
+							text: 'Notificaciones &nbsp;', 
+							module: {
+								title: 'Notificaciones',
+								name: 'notificacion',
+								url: 'notificacion/notificacion'
+							},
+							handler: sys_menu_item_handler,
+							hidden: !<?php echo sys_session_hasRoleToString('registro.notificacion'); ?>
 						}]
 					},{
 						text: 'Reportes', 
@@ -161,48 +179,48 @@
 						},'-',{
 							text: 'Reporte de Contribuyentes &nbsp;', 
 							module: {
-								title: 'Reporte de Contribuyentes',
-								name: 'rep_contribuyente',
-								url: 'rep_contribuyente/rep_contribuyente'
+								name: 'rep_ftt',
+								url: '<?php echo base_url('rep_contribuyente')?>',
+								open_as: 'window'
 							},
 							handler: sys_menu_item_handler,
-							hidden: !<?php echo sys_session_hasRoleToString('cr.rep_contribuyente'); ?>
+							hidden: !<?php echo sys_session_hasRoleToString('reporte.rep_contribuyente'); ?>
 						},{
 							text: 'Reporte de Constancias de Libre Infraccion de Transito &nbsp;', 
 							module: {
-								title: 'Reporte de Constancias de Libre Infraccion de Transito',
 								name: 'rep_clit',
-								url: 'rep_clit/rep_clit'
+								url: '<?php echo base_url('rep_clit')?>',
+								open_as: 'window'
 							},
 							handler: sys_menu_item_handler,
-							hidden: !<?php echo sys_session_hasRoleToString('cr.rep_clit'); ?>
+							hidden: !<?php echo sys_session_hasRoleToString('reporte.rep_clit'); ?>
 						},{
 							text: 'Reporte de Permisos de Servicio Publico &nbsp;', 
 							module: {
-								title: 'Reporte de Permisos de Servicio Publico',
 								name: 'rep_psp',
-								url: 'rep_psp/rep_psp'
+								url: '<?php echo base_url('rep_psp')?>',
+								open_as: 'window'
 							},
 							handler: sys_menu_item_handler,
-							hidden: !<?php echo sys_session_hasRoleToString('cr.rep_psp'); ?>
+							hidden: !<?php echo sys_session_hasRoleToString('reporte.rep_psp'); ?>
 						},{
 							text: 'Reporte de Licencias de Conducir &nbsp;', 
 							module: {
-								title: 'Reporte de Licencias de Conducir',
 								name: 'rep_lc',
-								url: 'rep_lc/rep_lc'
+								url: '<?php echo base_url('rep_lc')?>',
+								open_as: 'window'
 							},
 							handler: sys_menu_item_handler,
-							hidden: !<?php echo sys_session_hasRoleToString('cr.rep_lc'); ?>
+							hidden: !<?php echo sys_session_hasRoleToString('reporte.rep_lc'); ?>
 						},{
-							text: 'Reporte de Autorizaciones Temporales &nbsp;', 
+							text: 'Reporte de Constancias de Autorizacion Temporales &nbsp;', 
 							module: {
-								title: 'Reporte de Autorizaciones Temporales',
-								name: 'rep_at',
-								url: 'rep_at/rep_at'
+								name: 'rep_cat',
+								url: '<?php echo base_url('rep_cat')?>',
+								open_as: 'window'
 							},
 							handler: sys_menu_item_handler,
-							hidden: !<?php echo sys_session_hasRoleToString('cr.rep_at'); ?>
+							hidden: !<?php echo sys_session_hasRoleToString('reporte.rep_cat'); ?>
 						}]
 					},{
 						text: '?'
