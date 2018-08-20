@@ -73,7 +73,7 @@
 		<tr>
 			<td>Contribuyente:</td>
 			<td>
-				<input type="text" id="contribuyente_desc_field" name="contribuyente_desc" value="<?=$p_contribuyente_desc?>" style="width: 400px;"/>
+				<input type="text" id="contribuyente_desc_field" name="contribuyente_desc" value="<?=$p_contribuyente_desc?>" style="width: 400px;" autocomplete="off"/>
 				<script>
 				$("#contribuyente_desc_field").autocomplete({
 					source: '<?=$controller?>/getContribuyenteList',
@@ -88,7 +88,7 @@
 			<td>Ubicacion:</td>
 			<td>
 				<!--<input type="hidden" id="ubigeo_id_field" name="ubigeo_id" value=""/>-->
-				<input type="text" id="ubigeo_desc_field" name="ubicacion_desc" value="<?=$p_ubigeo_desc?>" style="width: 500px;"/>
+				<input type="text" id="ubigeo_desc_field" name="ubicacion_desc" value="<?=$p_ubigeo_desc?>" style="width: 500px;" autocomplete="off"/>
 				<script>
 				$("#ubigeo_desc_field").autocomplete({
 					source: '<?=$controller?>/getUbigeoList',

@@ -62,7 +62,7 @@ class M_Rep_LC extends CI_Model{
         }
         if ( $data['p_contribuyente_desc'] != '' ) {
             //$ubigeo_id = rtrim($data['p_ubigeo_id'], '0');
-            $this->db->where("c.contribuyente_nombres||' - '||c.contribuyente_apellidos||' - '||c.contribuyente_numero_doc ILIKE '{$data['p_contribuyente_desc']}%'");
+            $this->db->where("c.contribuyente_nombres||' '||c.contribuyente_apellidos||' '||c.contribuyente_numero_doc ILIKE '{$data['p_contribuyente_desc']}%'");
         }
         if ( $data['p_ubigeo_desc'] != '' ) {
             //$ubigeo_id = rtrim($data['p_ubigeo_id'], '0');
