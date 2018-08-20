@@ -19,7 +19,13 @@
 				load: function (sender, records, successful, eOpts) {
 					if (successful) {
 						var record = sender.getAt(0);
+						papeleta.contribuyente_store.reload({
+							params: {
+								query: record.get('contribuyente_numero_doc')
+							}
+						});
 						sys_storeLoadMonitor([
+							papeleta.contribuyente_store
 						], function () {
 							var frm = Ext.getCmp('papeleta_form');
 							frm.loadRecord(record);

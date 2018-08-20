@@ -23,10 +23,9 @@ class Papeleta extends MX_Controller {
 		$pagination_size = $this->input->get('limit');
 		$pagination_start = $this->input->get('start');
 		$ret = $this->model->get_list($search_by, $search_text, $pagination_size, $pagination_start);
-		/*$rows = $ret['data'];
-		foreach ($rows as $i=>$r) {
-			//$ret['data'][$i]->oc_anio_numero = $r->oc_anio.'-'.$r->oc_numero;
-		}*/
+		foreach ($ret['data'] as $i=>$r) {
+			$r->contribuyente_nomape = $r->contribuyente_nombres.' '.$r->contribuyente_apellidos;
+		}
 		echo json_encode($ret);
 	}
 
@@ -199,7 +198,7 @@ class Papeleta extends MX_Controller {
 		$filter = trim($this->input->get_post('query'));
 		$ret = $this->model->get_contribuyente_list($filter);
 		foreach ($ret['data'] as $i=>$r) {
-			$ret['data'][$i]->contribuyente_nomape = $r->contribuyente_nombres.' '.$r->contribuyente_apellidos;
+			$r->contribuyente_nomape = $r->contribuyente_nombres.' '.$r->contribuyente_apellidos;
 		}
 		echo json_encode($ret);
 	}

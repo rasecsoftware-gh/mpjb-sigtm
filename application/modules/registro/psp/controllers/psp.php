@@ -1007,6 +1007,22 @@ class PSP extends MX_Controller {
 		}
 	}
 
+	public function getVehiculoListText () {
+		$p_doc_id = $this->input->get('doc_id');
+		$ret = $this->model->get_vehiculo_list($p_doc_id);
+		$str = '';
+		foreach ($ret['data'] as $r) {
+			$str .= "CATEGORIA: {$r->psp_vehiculo_categoria}".PHP_EOL;
+			$str .= "MARCA: {$r->psp_vehiculo_marca}".PHP_EOL;
+			$str .= "MODELO: {$r->psp_vehiculo_modelo}".PHP_EOL;
+			$str .= "COLOR: {$r->psp_vehiculo_color}".PHP_EOL;
+			$str .= "PLACA: {$r->psp_vehiculo_marca}".PHP_EOL;
+			$str .= "MARCA: {$r->psp_vehiculo_marca}".PHP_EOL;
+			$str .= "MARCA: {$r->psp_vehiculo_marca}".PHP_EOL;
+		}
+		echo json_encode($ret);
+	}
+
 	private function _generarPDF($doc_id) {
 		$c = $this->model->get_row($doc_id, 'array');
 		$td = $this->db->where('tipo_doc_id', $c['tipo_doc_id'])->get('public.tipo_doc')->row();

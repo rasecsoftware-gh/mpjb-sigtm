@@ -73,6 +73,7 @@ class M_Papeleta extends CI_Model{
 
 	public function get_new_row () {
 		$row = array(
+			'papeleta_fecha'=>date('d/m/Y'),
 			'tipo_infraccion_id'=>'L',
 			'medida_preventiva_id'=>'00', 
 			'estado_papeleta_id'=>1 // registrado

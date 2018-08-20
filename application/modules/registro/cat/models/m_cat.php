@@ -355,7 +355,8 @@ class M_Cat extends CI_Model{
 			de.doc_estado_id,
 			de.doc_id,
 			de.doc_estado_fecha,
-			de.doc_estado_usuario
+			de.doc_estado_usuario,
+			de.doc_estado_obs
 		")
 		->from('public.estado_doc AS ed')
 		->join('public.doc_estado AS de', "de.doc_id = {$doc_id} AND de.estado_doc_id = ed.estado_doc_id", 'left')

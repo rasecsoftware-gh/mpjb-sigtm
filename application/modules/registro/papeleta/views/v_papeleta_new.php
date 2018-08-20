@@ -19,13 +19,12 @@
 				load: function (sender, records, successful, eOpts) {
 					if (successful) {
 						var record = sender.getAt(0);
-						
 						sys_storeLoadMonitor([], function () {
 			    			var frm = Ext.getCmp('papeleta_form');
 			    			frm.reset();
 							frm.loadRecord(record);
 							Ext.getCmp('papeleta_form_title_label').setText('Nueva '+papeleta.title);
-							Ext.getCmp('papeleta_form_save_bt').setText('Guardar y continuar...');
+							Ext.getCmp('papeleta_form_save_bt').setText('Guardar');
 							Ext.getCmp('papeleta_form_save_bt').show();
 							Ext.getCmp('papeleta_form_cancel_bt').show();
 							Ext.getCmp('papeleta_form_contribuyente_id_field').show();

@@ -11,14 +11,14 @@
 			sortableColumns: false,
 			enableColumnHide: false,
 			columns:[
-				{text:'Numero', dataIndex:'papeleta_numero', width: 70},
+				{text:'Numero', dataIndex:'papeleta_numero', width: 60},
 				{text:'Fecha', dataIndex:'papeleta_fecha', width: 70},
-				{text:'Nombres o Razon social', dataIndex:'contribuyente_nombres', width: 230},
+				{text:'Nombres o Razon social', dataIndex:'contribuyente_nombres', width: 200},
 				{text:'Apellidos', dataIndex:'contribuyente_apellidos', width: 150},
-				{text:'Tipo Infraccion', dataIndex:'tipo_infraccion_desc', width: 100},
-				{text:'Cod. Inf.', dataIndex:'papeleta_infraccion_codigo', width: 50},
-				{text:'Med. Preventiva', dataIndex:'medida_preventiva_desc', width: 100},
-				{text:'Estado', dataIndex:'estado_papeleta_desc', width: 50,
+				{text:'T. Infra.', dataIndex:'tipo_infraccion_desc', width: 70},
+				{text:'Cod.Infra.', dataIndex:'papeleta_infraccion_codigo', width: 50},
+				{text:'Med.Prevent.', dataIndex:'medida_preventiva_desc', width: 100},
+				{text:'Estado', dataIndex:'estado_papeleta_desc', width: 80,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
 					    /*switch (value) {
 					    	case 'A':
@@ -108,6 +108,7 @@
 					if (!papeleta.form_editing) {
 						var f = Ext.getCmp('papeleta_form');
 						f.loadRecord(record);
+						Ext.getCmp('papeleta_form_papeleta_id_displayfield').setValue(record.get('papeleta_id'));
 						Ext.getCmp('papeleta_form_save_bt').hide();
 						Ext.getCmp('papeleta_form_cancel_bt').hide();
 
@@ -126,7 +127,7 @@
 			region: 'east',
 			layout: 'border',
 			split: true,
-			width: 400,
+			width: 470,
 			items: [{
 				xtype: 'form',
 				id: 'papeleta_form',
@@ -179,7 +180,7 @@
 					}
 				}],
 				defaults: {
-					labelWidth: 120,
+					labelWidth: 100,
 					labelStyle: 'color: gray'
 				},
 				items: [{
@@ -221,7 +222,7 @@
     				triggerAction: 'last', // query
     				minChars: 2,
     				matchFieldWidth: false,
-    				x: 10, y: 90, width: 380,
+    				x: 10, y: 90, width: 350,
     				editable: true,
     				listeners: {
     					select: function(combo, record, eOpts ) {
@@ -234,13 +235,13 @@
 					id: 'papeleta_form_contribuyente_nomape_field',
     				xtype: 'textfield',
     				name: 'contribuyente_nomape',
-    				x: 10, y: 90, width: 380
+    				x: 10, y: 90, width: 350
 				},{
 					id: 'papeleta_form_contribuyente_numero_doc_field',
     				xtype: 'textfield',
     				name: 'contribuyente_numero_doc',
     				editable: false,
-    				x: 395, y: 90, width: 75
+    				x: 370, y: 90, width: 75
 				},{
     				xtype: 'combobox',
     				id: 'papeleta_form_tipo_infraccion_id_field',

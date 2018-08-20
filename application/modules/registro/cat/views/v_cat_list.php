@@ -442,6 +442,17 @@
 					sortableColumns: false,
 					enableColumnHide: false,
 					store: cat.doc_estado_store,
+					tbar:[{
+						xtype: 'label',
+						text: 'Control de estados'
+					},'->',{
+						text: 'Continuar', 
+						tooltip: 'Modificar documento', tooltipType: 'title',
+						handler: function() {
+							cat.doc_requisito_add_or_edit();
+						},
+						hidden: true
+					}],
 					columns:[
 						{	
 							text:'Estado', dataIndex: 'estado_doc_desc', width: 150,
@@ -493,18 +504,16 @@
 				            }]
 				        }
 					],
-					tbar:[{
-						xtype: 'label',
-						text: 'Control de estados'
-					},'->',{
-						text: 'Continuar', 
-						tooltip: 'Modificar documento', tooltipType: 'title',
-						handler: function() {
-							cat.doc_requisito_add_or_edit();
-						},
-						hidden: true
+					bbar:[{
+						id: 'cat_form_doc_estado_obs_field',
+						xtype: 'displayfield',
+						fieldLabel: 'Observacion',
+						value: ''
 					}],
 					listeners: {
+						select: function (ths, record, index, eOpts) {
+							Ext.getCmp('cat_form_doc_estado_obs_field').setValue(record.get('doc_estado_obs'));
+						},
 						rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
 							//cat.doc_requisito_add_or_edit();
 						}

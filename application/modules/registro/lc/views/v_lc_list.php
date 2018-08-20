@@ -527,7 +527,16 @@
 						},
 						hidden: true
 					}],
+					bbar:[{
+						id: 'lc_form_doc_estado_obs_field',
+						xtype: 'displayfield',
+						fieldLabel: 'Observacion',
+						value: ''
+					}],
 					listeners: {
+						select: function (ths, record, index, eOpts) {
+							Ext.getCmp('lc_form_doc_estado_obs_field').setValue(record.get('doc_estado_obs'));
+						},
 						rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
 							//lc.doc_requisito_add_or_edit();
 						}

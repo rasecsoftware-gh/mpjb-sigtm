@@ -512,7 +512,16 @@
 						},
 						hidden: true
 					}],
+					bbar:[{
+						id: 'psp_form_doc_estado_obs_field',
+						xtype: 'displayfield',
+						fieldLabel: 'Observacion',
+						value: ''
+					}],
 					listeners: {
+						select: function (ths, record, index, eOpts) {
+							Ext.getCmp('psp_form_doc_estado_obs_field').setValue(record.get('doc_estado_obs'));
+						},
 						rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts) {
 							//psp.doc_requisito_add_or_edit();
 						}
