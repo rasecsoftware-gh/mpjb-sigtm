@@ -142,6 +142,11 @@
 							Ext.Msg.alert('Error','Seleccione un registro');
 						}
 					}
+				},'->',{
+					text: 'Ver Listado en Texto', 
+					handler: function() {
+						window.open("psp/getVehiculoListText?doc_id="+doc_id, '_blank');
+					}
 				}],
 				store: psp.psp_vehiculo_main_store,
 				listeners:{

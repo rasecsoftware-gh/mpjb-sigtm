@@ -1017,10 +1017,13 @@ class PSP extends MX_Controller {
 			$str .= "MODELO: {$r->psp_vehiculo_modelo}".PHP_EOL;
 			$str .= "COLOR: {$r->psp_vehiculo_color}".PHP_EOL;
 			$str .= "PLACA: {$r->psp_vehiculo_marca}".PHP_EOL;
-			$str .= "MARCA: {$r->psp_vehiculo_marca}".PHP_EOL;
-			$str .= "MARCA: {$r->psp_vehiculo_marca}".PHP_EOL;
+			$str .= "Nro. TARJETA PROP: {$r->psp_vehiculo_ntp}".PHP_EOL;
+			$str .= "CONDUCTOR: {$r->psp_vehiculo_conductor_nomape}".PHP_EOL;
+			$str .= "DNI: {$r->psp_vehiculo_conductor_dni}".PHP_EOL;
+			$str .= "LIC. CONDUCIR: {$r->psp_vehiculo_conductor_nlc}".PHP_EOL;
+			$str .= PHP_EOL;
 		}
-		echo json_encode($ret);
+		echo "<pre>{$str}</pre>";
 	}
 
 	private function _generarPDF($doc_id) {
