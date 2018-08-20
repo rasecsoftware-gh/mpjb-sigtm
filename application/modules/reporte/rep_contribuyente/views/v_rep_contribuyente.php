@@ -81,7 +81,7 @@
 			<td>Ubicacion:</td>
 			<td>
 				<!--<input type="hidden" id="ubigeo_id_field" name="ubigeo_id" value=""/>-->
-				<input type="text" id="ubigeo_desc_field" name="ubicacion_desc" value="<?=$p_ubigeo_desc?>" style="width: 500px;"/>
+				<input type="text" id="ubigeo_desc_field" name="ubigeo_desc" value="<?=$p_ubigeo_desc?>" style="width: 500px;"/>
 				<script>
 				$("#ubigeo_desc_field").autocomplete({
 					source: 'rep_contribuyente/getUbigeoList',

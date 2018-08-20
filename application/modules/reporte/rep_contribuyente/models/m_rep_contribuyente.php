@@ -44,8 +44,8 @@ class M_Rep_Contribuyente extends CI_Model{
             $this->db->where('c.tipo_doc_identidad_id', $data['p_tipo_doc_identidad_id']);
         }
         if ( $data['p_ubigeo_desc'] != '' ) {
-            $ubigeo_id = rtrim($data['p_ubigeo_id'], '0');
-            $this->db->where("u.ubigeo_departamento||' - '||u.ubigeo_provincia||' - '||u.ubigeo_distrito LIKE '{$p_ubigeo_desc}%'");
+            //$ubigeo_id = rtrim($data['p_ubigeo_id'], '0');
+            $this->db->where("u.ubigeo_departamento||' - '||u.ubigeo_provincia||' - '||u.ubigeo_distrito ILIKE '{$data['p_ubigeo_desc']}%'");
         }
         $rows = $this->db->get()->result();
         return $rows;
