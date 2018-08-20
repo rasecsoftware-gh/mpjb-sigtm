@@ -97,7 +97,31 @@ class M_Rep_FTT extends CI_Model{
     }
 
     public function get_papeleta_list ($contribuyente_id) {
-        return array();
+        $this->db->select("
+            p.*,
+            c.contribuyente_numero_doc,
+            c.contribuyente_nombres,
+            c.contribuyente_apellidos,
+            c.contribuyente_fecha_nac,
+            tp.tipo_persona_desc,
+            tdi.tipo_doc_identidad_desc,
+            u.ubigeo_departamento,
+            u.ubigeo_provincia,
+            u.ubigeo_distrito,
+            ti.tipo_infraccion_desc,
+            mp.medida_preventiva_desc,
+            ep.estado_papeleta_desc
+        ")
+        ->from('public.papeleta AS p')
+        ->join('public.contribuyente AS c', 'c.contribuyente_id = p.contribuyente_id', 'inner')
+        ->join('public.tipo_persona AS tp', 'tp.tipo_persona_id = c.tipo_persona_id', 'inner')
+        ->join('public.tipo_doc_identidad AS tdi', 'tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id', 'inner')
+        ->join('public.ubigeo AS u', 'u.ubigeo_id = c.ubigeo_id', 'left')
+        ->join('public.tipo_infraccion AS ti', 'ti.tipo_infraccion_id = p.tipo_infraccion_id', 'inner')
+        ->join('public.medida_preventiva AS mp', 'mp.medida_preventiva_id = p.medida_preventiva_id', 'inner')
+        ->join('public.estado_papeleta AS ep', 'ep.estado_papeleta_id = p.estado_papeleta_id', 'inner')
+        ->where('p.contribuyente_id', $contribuyente_id);
+        return $this->db->get()->result();
     }
 
     public function get_psp_list ($contribuyente_id) {

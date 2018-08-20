@@ -228,14 +228,21 @@
 		foreach ($papeleta_list as $i=>$p):
 ?>
 				<tr>
-					<th style="width: auto;" colspan="1"><?=$i+1?></th>
-					<th style="width: auto;" colspan="1">N&ordm; DE LICENCIA:</th>
-					<td style="width: auto;" colspan="1"><?=$p->lc_codigo?></td>
-					<th style="width: auto;" colspan="1">CLASE:</th>
-					<td style="width: auto;" colspan="1"><?=$p->lc_clase?></td>
-					<th style="width: auto;" colspan="1">CATEGORIA:</th>
-					<td style="width: auto;" colspan="1"><?=$p->lc_categoria?></td>
+					<th style="width: auto;" colspan="1" rowspan="2"><?=$i+1?></th>
+					<th style="width: auto;" colspan="1">N&ordm; DE PAPELETA:</th>
+					<td style="width: auto;" colspan="1"><?=$p->papeleta_numero?></td>
+					<th style="width: auto;" colspan="1">FECHA:</th>
+					<td style="width: auto;" colspan="1"><?=$p->papeleta_fecha?></td>
+					<th style="width: auto;" colspan="1">TIPO-CAT:</th>
+					<td style="width: auto;" colspan="1"><?=$p->tipo_infraccion_id.'-'.$p->papeleta_infraccion_codigo?></td>
 				</tr>	
+
+				<tr>
+					<th style="width: auto;" colspan="1">MEDIDA PREVENTIVA:</th>
+					<td style="width: auto;" colspan="1"><?=$p->medida_preventiva_desc?></td>
+					<th style="width: auto;" colspan="1">ESTADO:</th>
+					<td style="width: auto;" colspan="3"><?=$p->estado_papeleta_desc?></td>
+				</tr>
 <?php
 		endforeach;
 	endif;
