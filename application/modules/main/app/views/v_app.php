@@ -223,7 +223,10 @@
 							hidden: !<?php echo sys_session_hasRoleToString('reporte.rep_cat'); ?>
 						}]
 					},{
-						text: '?'
+						text: '?', 
+						handler: function (e, ui) {
+							window.open('<?=base_url('docs')?>/sigtm_manual_usuario.pdf', '_blank');
+						}
 					},'->',{
 			        	text: '<?php echo $this->session->userdata("username");?>', //plain: true,
 			        	xtype: 'button', 
