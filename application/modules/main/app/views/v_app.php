@@ -145,7 +145,7 @@
 								url: 'cat/cat'
 							},
 							handler: sys_menu_item_handler,
-							hidden: !<?php echo sys_session_hasRoleToString('registro.at'); ?>
+							hidden: !<?php echo sys_session_hasRoleToString('registro.cat'); ?>
 						},'-',{
 							text: 'Papeletas &nbsp;', 
 							module: {
