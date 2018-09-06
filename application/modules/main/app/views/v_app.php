@@ -175,7 +175,7 @@
 								open_as: 'window'
 							},
 							handler: sys_menu_item_handler,
-							hidden: !<?php echo sys_session_hasRoleToString('reporte.con_ftt'); ?>
+							hidden: !<?php echo sys_session_hasRoleToString('reporte.rep_ftt'); ?>
 						},'-',{
 							text: 'Reporte de Contribuyentes &nbsp;', 
 							module: {
