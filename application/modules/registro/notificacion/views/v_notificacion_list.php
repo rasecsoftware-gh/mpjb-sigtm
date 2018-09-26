@@ -15,6 +15,7 @@
 				{text:'Fecha', dataIndex:'notificacion_fecha', width: 70},
 				{text:'Nombres o Razon social', dataIndex:'contribuyente_nombres', width: 180},
 				{text:'Apellidos', dataIndex:'contribuyente_apellidos', width: 120},
+				{text:'Papeleta', dataIndex:'papeleta_numero', width: 90},
 				{text:'Acto Admin.', dataIndex:'notificacion_acto_administrativo', width: 150},
 				{text:'Acta Fecha', dataIndex:'notificacion_acta_fecha', width: 70},
 				{text:'Se nego a recibir', dataIndex:'notificacion_acta_snar', width: 70},
@@ -106,6 +107,8 @@
 
 						Ext.getCmp('notificacion_form_contribuyente_id_field').hide();
 						Ext.getCmp('notificacion_form_contribuyente_nomape_field').show();
+						Ext.getCmp('notificacion_form_papeleta_id_field').hide();
+						Ext.getCmp('notificacion_form_papeleta_numero_field').show();
 					}
 				},
 				rowdblclick: function ( ths, record, tr, rowIndex, e, eOpts ) {
@@ -235,18 +238,43 @@
     				editable: false,
     				x: 370, y: 90, width: 75
 				},{
+    				xtype: 'combobox',
+    				id: 'notificacion_form_papeleta_id_field',
+    				name: 'papeleta_id',
+    				fieldLabel: 'Papeleta',
+    				displayField: 'papeleta_numero',
+    				valueField: 'papeleta_id',
+    				store: notificacion.papeleta_store,
+    				queryMode: 'remote',
+    				triggerAction: 'last', // query
+    				minChars: 1,
+    				matchFieldWidth: false,
+    				x: 10, y: 120, width: 300,
+    				editable: true,
+    				listeners: {
+    					select: function(combo, record, eOpts ) {
+				    	}
+    				},
+    				hidden: true // only for edit
+				},{ // only for display
+					fieldLabel: 'Papeleta',
+					id: 'notificacion_form_papeleta_numero_field',
+    				xtype: 'textfield',
+    				name: 'papeleta_numero',
+    				x: 10, y: 120, width: 300
+				},{
 					fieldLabel: 'Acto Administrativo',
 					id: 'notificacion_form_notificacion_acto_administrativo_field',
     				xtype: 'textfield',
     				name: 'notificacion_acto_administrativo',
-    				x: 10, y: 120, width: 400,
+    				x: 10, y: 150, width: 400,
     				maxLength: 100
 				},{
 					fieldLabel: 'Acta - Fecha',
 					id: 'notificacion_form_notificacion_acta_fecha_field',
     				xtype: 'datefield',
     				name: 'notificacion_acta_fecha',
-    				x: 10, y: 150, width: 250
+    				x: 10, y: 180, width: 250
 				},{
     				xtype: 'combobox',
     				id: 'notificacion_form_notificacion_acta_snar_field',
@@ -257,7 +285,7 @@
     				valueField: 'id',
     				store: notificacion.yesno_store,
     				queryMode: 'local',
-    				x: 10, y: 180, width: 210,
+    				x: 10, y: 210, width: 210,
     				editable: false
 				},{
     				xtype: 'combobox',
@@ -269,7 +297,7 @@
     				valueField: 'id',
     				store: notificacion.yesno_store,
     				queryMode: 'local',
-    				x: 10, y: 210, width: 210,
+    				x: 10, y: 240, width: 210,
     				editable: false
 				},{
     				xtype: 'combobox',
@@ -281,7 +309,7 @@
     				valueField: 'id',
     				store: notificacion.yesno_store,
     				queryMode: 'local',
-    				x: 10, y: 240, width: 210,
+    				x: 10, y: 270, width: 210,
     				editable: false
 				}]
 			}]

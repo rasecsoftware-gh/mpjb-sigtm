@@ -25,15 +25,19 @@
 							}
 						});
 						sys_storeLoadMonitor([
-							notificacion.contribuyente_store
+							notificacion.contribuyente_store,
+							notificacion.papeleta_store
 						], function () {
 							var frm = Ext.getCmp('notificacion_form');
 							frm.loadRecord(record);
+							notificacion.papeleta_store.reload(); // reload with current form values
 							Ext.getCmp('notificacion_form_title_label').setText('Modificar '+notificacion.title);
 							Ext.getCmp('notificacion_form_save_bt').show();
 							Ext.getCmp('notificacion_form_cancel_bt').show();
 							Ext.getCmp('notificacion_form_contribuyente_id_field').show();
 							Ext.getCmp('notificacion_form_contribuyente_nomape_field').hide();
+							Ext.getCmp('notificacion_form_papeleta_id_field').show();
+							Ext.getCmp('notificacion_form_papeleta_numero_field').hide();
 							w.unmask();
 						});
 					} else {

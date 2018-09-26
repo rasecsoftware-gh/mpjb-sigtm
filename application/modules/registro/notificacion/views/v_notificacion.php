@@ -19,6 +19,29 @@
 		}
 	});
 
+	notificacion.papeleta_store = Ext.create("Ext.data.Store", {
+		proxy:{
+			type: 'ajax',
+			url: 'notificacion/getPapeletaList',
+			reader: {
+				type: 'json',
+				rootProperty: 'data'
+			}
+		},
+		autoLoad: false,
+		listeners: {
+			load: function () {
+			},
+			beforeload: function (s, operation, eOpts) {
+				console.log(operation.params);
+				operation.setParams({
+					contribuyente_id: Ext.getCmp('notificacion_form_contribuyente_id_field').getValue(),
+					query: Ext.getCmp('notificacion_form_papeleta_id_field').getRawValue()
+				});
+			}
+		}
+	});
+
 	notificacion.yesno_store = Ext.create("Ext.data.Store", {
 		data : [
 			{id: 'SI', desc: 'Si'},

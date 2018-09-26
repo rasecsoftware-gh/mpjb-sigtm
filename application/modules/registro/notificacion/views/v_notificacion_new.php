@@ -29,6 +29,8 @@
 							Ext.getCmp('notificacion_form_cancel_bt').show();
 							Ext.getCmp('notificacion_form_contribuyente_id_field').show();
 							Ext.getCmp('notificacion_form_contribuyente_nomape_field').hide();
+							Ext.getCmp('notificacion_form_papeleta_id_field').show();
+							Ext.getCmp('notificacion_form_papeleta_numero_field').hide();
 							w.unmask();
 			    		});
 					} else {

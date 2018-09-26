@@ -18,13 +18,15 @@ class M_Notificacion extends CI_Model{
 			tdi.tipo_doc_identidad_desc,
 			u.ubigeo_departamento,
 			u.ubigeo_provincia,
-			u.ubigeo_distrito
+			u.ubigeo_distrito,
+			p.papeleta_numero
 		")
 		->from('public.notificacion AS n')
 		->join('public.contribuyente AS c', 'c.contribuyente_id = n.contribuyente_id', 'inner')
 		->join('public.tipo_persona AS tp', 'tp.tipo_persona_id = c.tipo_persona_id', 'inner')
 		->join('public.tipo_doc_identidad AS tdi', 'tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id', 'inner')
-		->join('public.ubigeo AS u', 'u.ubigeo_id = c.ubigeo_id', 'left');
+		->join('public.ubigeo AS u', 'u.ubigeo_id = c.ubigeo_id', 'left')
+		->join('public.papeleta AS p', 'p.papeleta_id = n.papeleta_id', 'inner');
 
 		switch ($search_by) {
 			case 'all':
@@ -87,13 +89,15 @@ class M_Notificacion extends CI_Model{
 			tdi.tipo_doc_identidad_desc,
 			u.ubigeo_departamento,
 			u.ubigeo_provincia,
-			u.ubigeo_distrito
+			u.ubigeo_distrito,
+			p.papeleta_numero
 		")
 		->from('public.notificacion AS n')
 		->join('public.contribuyente AS c', 'c.contribuyente_id = n.contribuyente_id', 'inner')
 		->join('public.tipo_persona AS tp', 'tp.tipo_persona_id = c.tipo_persona_id', 'inner')
 		->join('public.tipo_doc_identidad AS tdi', 'tdi.tipo_doc_identidad_id = c.tipo_doc_identidad_id', 'inner')
 		->join('public.ubigeo AS u', 'u.ubigeo_id = c.ubigeo_id', 'left')
+		->join('public.papeleta AS p', 'p.papeleta_id = n.papeleta_id', 'inner')
 		->where('notificacion_id', $id);
 		return $this->db->get()->row();
 	}
@@ -174,6 +178,37 @@ class M_Notificacion extends CI_Model{
 		$rows = $this->db->order_by('c.contribuyente_nombres')
 		->order_by('c.contribuyente_apellidos')
 		->order_by('c.contribuyente_id')
+		->limit(50)
+		->get()->result();
+		$total_count = count($rows);
+		$ret = array(
+			'data'=>$rows,
+			'total'=>$total_count
+		);
+		return $ret;
+	}
+
+	public function get_papeleta_list ($filter, $contribuyente_id) {
+		$this->db
+		->select("
+			p.papeleta_id,
+			p.papeleta_numero,
+			p.papeleta_numero||' - '||p.papeleta_fecha::text AS papeleta_desc
+		")
+		->from('public.papeleta AS p')
+		->like('p.papeleta_numero', $filter)
+		->where('p.contribuyente_id', $contribuyente_id);
+		/*if ( $filter != '' ) {
+			$terms = explode(' ', $filter);
+			foreach ($terms as $i=>$t) {
+				if (trim($t)!='') {
+					$this->db->where("c.contribuyente_numero_doc||' '||c.contribuyente_nombres||' '||c.contribuyente_apellidos ILIKE '%{$t}%'");
+				}
+			}
+			
+		}*/
+		$rows = $this->db
+		->order_by('p.papeleta_numero', 'DESC')
 		->limit(50)
 		->get()->result();
 		$total_count = count($rows);

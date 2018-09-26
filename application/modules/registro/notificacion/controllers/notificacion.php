@@ -63,7 +63,8 @@ class Notificacion extends MX_Controller {
 			'notificacion_acta_snar'=>$this->input->post('notificacion_acta_snar'),
 			'notificacion_acta_snaf'=>$this->input->post('notificacion_acta_snaf'),
 			'notificacion_acta_sdbp'=>$this->input->post('notificacion_acta_sdbp'),
-			'notificacion_acta_fecha'=>$this->input->post('notificacion_acta_fecha')
+			'notificacion_acta_fecha'=>$this->input->post('notificacion_acta_fecha'),
+			'papeleta_id'=>$this->input->post('papeleta_id')
 		);
 
 		if ($data['notificacion_numero']=='') {
@@ -92,6 +93,27 @@ class Notificacion extends MX_Controller {
 				'success'=>false,
 				'msg'=>"Especifique el contribuyente infractor",
 				'target_id'=>'notificacion_form_contribuyente_id_field'
+			)));
+		}
+
+		if ( !($data['papeleta_id'] > 0) ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la papeleta",
+				'target_id'=>'notificacion_form_papeleta_id_field'
+			)));
+		}
+
+		$contribuyente_papeleta = $this->db
+		->where('contribuyente_id', $data['contribuyente_id'])
+		->where('papeleta_id', $data['papeleta_id'])
+		->get('public.papeleta')
+		->row();
+		if (is_null($contribuyente_papeleta)) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"La papeleta no existe o no corresponde al contribuyente.",
+				'target_id'=>'notificacion_form_papeleta_id_field'
 			)));
 		}
 
@@ -138,7 +160,8 @@ class Notificacion extends MX_Controller {
 			'notificacion_acta_snar'=>$this->input->post('notificacion_acta_snar'),
 			'notificacion_acta_snaf'=>$this->input->post('notificacion_acta_snaf'),
 			'notificacion_acta_sdbp'=>$this->input->post('notificacion_acta_sdbp'),
-			'notificacion_acta_fecha'=>$this->input->post('notificacion_acta_fecha')
+			'notificacion_acta_fecha'=>$this->input->post('notificacion_acta_fecha'),
+			'papeleta_id'=>$this->input->post('papeleta_id')
 		);
 
 		if ($data['notificacion_numero']=='') {
@@ -154,6 +177,27 @@ class Notificacion extends MX_Controller {
 				'success'=>false,
 				'msg'=>"Especifique el contribuyente infractor",
 				'target_id'=>'notificacion_form_contribuyente_id_field'
+			)));
+		}
+
+		if ( !($data['papeleta_id'] > 0) ) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"Especifique la papeleta",
+				'target_id'=>'notificacion_form_papeleta_id_field'
+			)));
+		}
+
+		$contribuyente_papeleta = $this->db
+		->where('contribuyente_id', $data['contribuyente_id'])
+		->where('papeleta_id', $data['papeleta_id'])
+		->get('public.papeleta')
+		->row();
+		if (is_null($contribuyente_papeleta)) {
+			die(json_encode(array(
+				'success'=>false,
+				'msg'=>"La papeleta no existe o no corresponde al contribuyente.",
+				'target_id'=>'notificacion_form_papeleta_id_field'
 			)));
 		}
 
@@ -204,6 +248,16 @@ class Notificacion extends MX_Controller {
 		foreach ($ret['data'] as $i=>$r) {
 			$r->contribuyente_nomape = $r->contribuyente_nombres.' '.$r->contribuyente_apellidos;
 		}
+		echo json_encode($ret);
+	}
+
+	public function getPapeletaList () {
+		$contribuyente_id = $this->input->get_post('contribuyente_id');
+		if ( !($contribuyente_id > 0) ) {
+			$contribuyente_id = 0;
+		}
+		$filter = trim($this->input->get_post('query'));
+		$ret = $this->model->get_papeleta_list($filter, $contribuyente_id);	
 		echo json_encode($ret);
 	}
 
